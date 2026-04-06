@@ -205,35 +205,49 @@ export function gerarCronograma(diagnostico, respostas) {
     couro.oleosidade === 'Normal' ? '2 vezes por semana' :
                                     '1 vez por semana'
 
+  // Função para calcular próxima data a partir de um dia da semana
+  function proximaData(diaSemana, semanaOffset = 0) {
+    const dias = { 'Segunda-feira': 1, 'Terça-feira': 2, 'Quarta-feira': 3, 'Quinta-feira': 4, 'Sexta-feira': 5, 'Sábado': 6, 'Domingo': 0 }
+    const hoje = new Date()
+    const diaAlvo = dias[diaSemana] ?? 1
+    const diaAtual = hoje.getDay()
+    let diff = diaAlvo - diaAtual
+    if (diff <= 0) diff += 7
+    const data = new Date(hoje)
+    data.setDate(hoje.getDate() + diff + (semanaOffset * 7))
+    data.setHours(8, 0, 0, 0)
+    return data
+  }
+
   if (nivelDano === 'alto') {
     semanas.push({ semana: 1, etapas: [
-      { dia: 'Segunda-feira', tipo: 'Reconstrução' },
-      { dia: 'Quinta-feira',  tipo: 'Hidratação'   },
+      { dia: 'Segunda-feira', tipo: 'Reconstrução', data: proximaData('Segunda-feira', 0) },
+      { dia: 'Quinta-feira',  tipo: 'Hidratação',   data: proximaData('Quinta-feira',  0) },
     ]})
     semanas.push({ semana: 2, etapas: [
-      { dia: 'Terça-feira', tipo: 'Nutrição'    },
-      { dia: 'Sexta-feira', tipo: 'Hidratação'  },
+      { dia: 'Terça-feira', tipo: 'Nutrição',    data: proximaData('Terça-feira', 1) },
+      { dia: 'Sexta-feira', tipo: 'Hidratação',  data: proximaData('Sexta-feira', 1) },
     ]})
     semanas.push({ semana: 3, etapas: [
-      { dia: 'Segunda-feira', tipo: 'Reconstrução' },
-      { dia: 'Quinta-feira',  tipo: 'Nutrição'     },
+      { dia: 'Segunda-feira', tipo: 'Reconstrução', data: proximaData('Segunda-feira', 2) },
+      { dia: 'Quinta-feira',  tipo: 'Nutrição',     data: proximaData('Quinta-feira',  2) },
     ]})
     semanas.push({ semana: 4, etapas: [
-      { dia: 'Quarta-feira', tipo: 'Hidratação' },
-      { dia: 'Sábado',       tipo: 'Nutrição'   },
+      { dia: 'Quarta-feira', tipo: 'Hidratação', data: proximaData('Quarta-feira', 3) },
+      { dia: 'Sábado',       tipo: 'Nutrição',   data: proximaData('Sábado',       3) },
     ]})
   } else if (nivelDano === 'moderado') {
     semanas.push({ semana: 1, etapas: [
-      { dia: 'Segunda-feira', tipo: tratamentos[0] || 'Hidratação' },
-      { dia: 'Quinta-feira',  tipo: tratamentos[1] || 'Nutrição'   },
+      { dia: 'Segunda-feira', tipo: tratamentos[0] || 'Hidratação', data: proximaData('Segunda-feira', 0) },
+      { dia: 'Quinta-feira',  tipo: tratamentos[1] || 'Nutrição',   data: proximaData('Quinta-feira',  0) },
     ]})
     semanas.push({ semana: 2, etapas: [
-      { dia: 'Terça-feira', tipo: 'Hidratação' },
-      { dia: 'Sexta-feira', tipo: 'Nutrição'   },
+      { dia: 'Terça-feira', tipo: 'Hidratação', data: proximaData('Terça-feira', 1) },
+      { dia: 'Sexta-feira', tipo: 'Nutrição',   data: proximaData('Sexta-feira', 1) },
     ]})
   } else {
-    semanas.push({ semana: 1, etapas: [{ dia: 'Quarta-feira', tipo: 'Hidratação' }] })
-    semanas.push({ semana: 2, etapas: [{ dia: 'Quarta-feira', tipo: 'Nutrição'   }] })
+    semanas.push({ semana: 1, etapas: [{ dia: 'Quarta-feira', tipo: 'Hidratação', data: proximaData('Quarta-feira', 0) }] })
+    semanas.push({ semana: 2, etapas: [{ dia: 'Quarta-feira', tipo: 'Nutrição',   data: proximaData('Quarta-feira', 1) }] })
   }
 
   return { semanas, frequenciaLavagem }

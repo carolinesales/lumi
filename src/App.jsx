@@ -9,6 +9,8 @@ import Analisando       from './pages/Analisando'
 import Resultado        from './pages/Resultado'
 import Home             from './pages/Home'
 import VerificarEmail from './pages/VerificaEmail'
+import Cronograma   from './pages/Cronograma'
+import EtapaDetalhe from './pages/EtapaDetalhe'
 
 
 
@@ -24,6 +26,8 @@ export default function App() {
           <Route path="/analisando"   element={<ProtectedRoute><Analisando /></ProtectedRoute>} />
           <Route path="/resultado"    element={<ProtectedRoute><Resultado /></ProtectedRoute>} />
           <Route path="/app/home"     element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/app/cronograma"              element={<ProtectedRoute><Cronograma /></ProtectedRoute>} />
+          <Route path="/app/etapa/:cronogramaId/:etapaId" element={<ProtectedRoute><EtapaDetalhe /></ProtectedRoute>} />        
           <Route path="/"      element={<Splash />} />
           <Route path="*"      element={<Navigate to="/" replace />} />
           <Route path="/verificar-email" element={<VerificarEmail />} />

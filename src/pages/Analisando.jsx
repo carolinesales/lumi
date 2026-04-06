@@ -22,6 +22,7 @@ export default function Analisando() {
         const recomendacoes = gerarRecomendacoes(diagnostico, respostas)
         const cronograma    = gerarCronograma(diagnostico, respostas)
 
+        // Diagnóstico
         const diagnosticoRef = await addDoc(collection(db, 'usuarios', uid, 'diagnosticos'), {
           idQuestionario:     questionarioId,
           nivelDano:          diagnostico.nivelDano,
@@ -30,6 +31,7 @@ export default function Analisando() {
           dataDiagnostico:    serverTimestamp(),
         })
 
+        // Hair Score
         await addDoc(collection(db, 'usuarios', uid, 'hair_scores'), {
           idDiagnostico: diagnosticoRef.id,
           pontuacao,
@@ -37,6 +39,7 @@ export default function Analisando() {
           dataRegistro:   serverTimestamp(),
         })
 
+        // Recomendações
         for (const rec of recomendacoes) {
           await addDoc(collection(db, 'usuarios', uid, 'recomendacoes'), {
             idDiagnostico: diagnosticoRef.id,
@@ -47,6 +50,7 @@ export default function Analisando() {
           })
         }
 
+        // Cronograma com datas reais
         const cronogramaRef = await addDoc(collection(db, 'usuarios', uid, 'cronogramas'), {
           idDiagnostico:     diagnosticoRef.id,
           dataInicio:        serverTimestamp(),
@@ -59,12 +63,17 @@ export default function Analisando() {
               semana:      semana.semana,
               dia:         etapa.dia,
               tipoCuidado: etapa.tipo,
+              dataEtapa:   etapa.data,
+              concluida:   false,
+              pulada:      false,
             })
           }
         }
 
+        // Atualizar flag do usuário
         await setDoc(doc(db, 'usuarios', uid), { perfilCompleto: true }, { merge: true })
 
+        // Guardar resultado no sessionStorage
         sessionStorage.setItem('lumi_resultado', JSON.stringify({
           pontuacao, classificacao, diagnostico, recomendacoes, cronograma,
           diagnosticoId: diagnosticoRef.id,
@@ -72,7 +81,7 @@ export default function Analisando() {
 
         navigate('/resultado')
       } catch (err) {
-        console.error('Erro:', err)
+        console.error('Erro ao processar diagnóstico:', err)
         navigate('/resultado')
       }
     }, 3000)
@@ -97,16 +106,13 @@ export default function Analisando() {
       {/* Pontos animados */}
       <div style={{ display: 'flex', gap: 12, marginBottom: 40 }}>
         {[0, 1, 2].map(i => (
-          <div key={i} style={{
-            width: 10, height: 10, borderRadius: '50%', background: '#1A1A1A',
-            animation: `pulse 1.4s ease-in-out ${i * 0.2}s infinite`,
-          }} />
+          <div key={i} style={{ width: 10, height: 10, borderRadius: '50%', background: '#1A1A1A', animation: `pulse 1.4s ease-in-out ${i * 0.2}s infinite` }} />
         ))}
       </div>
 
       {/* Texto */}
       <div style={{ textAlign: 'center', marginBottom: 40, animation: 'fadeUp .6s .2s ease both' }}>
-        <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 22, fontWeight: 600, color: '#1A1A1A', marginBottom: 10 }}>
+        <h2 style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 22, fontWeight: 600, color: '#1A1A1A', marginBottom: 10 }}>
           Analisando seu perfil
         </h2>
         <p style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 14, color: '#6B6B6B', lineHeight: 1.6, maxWidth: 280 }}>

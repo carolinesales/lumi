@@ -1,273 +1,327 @@
-import { useEffect, useState } from 'react'
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore'
-import { db } from '../lib/firebase'
-import { useAuth } from '../contexts/AuthContext'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate }                   from 'react-router-dom'
+import {
+  collection, query, orderBy, limit, doc, onSnapshot,
+} from 'firebase/firestore'
 
-const TIPO_ICON = {
-  Hidratação:   'fa-droplet',
-  Nutrição:     'fa-leaf',
-  Reconstrução: 'fa-wrench',
-  Detox:        'fa-sparkles',
-  Umectação:    'fa-jar',
-  Lavagem:      'fa-pump-soap',
+import { db }        from '../lib/firebase'
+import { useAuth }   from '../contexts/AuthContext'
+import { useIdioma } from '../contexts/IdiomaContext'
+
+import RegistroModal from './RegistroModal'
+import AppShell      from '@/components/lumi/AppShell'
+
+import {
+  HairScoreCard,
+  HairTimeline,
+  useHairScoreViewModel,
+  useHairTimeline,
+} from '@/features/hairScore'
+
+import TodayHeader      from '@/features/home/components/TodayHeader'
+import WeekCalendar     from '@/features/home/components/WeekCalendar'
+import MonthCalendar    from '@/features/home/components/MonthCalendar'
+import QuickCheckinCard from '@/features/home/components/QuickCheckinCard'
+import InsightCard      from '@/features/home/components/InsightCard'
+
+import {
+  AdaptiveRoutineCard,
+  useAdaptiveRoutine,
+} from '@/features/routineEngine'
+
+import { ConquistasCard } from '@/features/gamification'
+
+import {
+  calcularStreakReal,
+  calcularCuidado7Dias,
+} from '@/features/gamification/utils/gamificationUtils'
+
+const ESTADOS_BR = {
+  Acre: 'AC', Alagoas: 'AL', Amapá: 'AP', Amazonas: 'AM', Bahia: 'BA',
+  Ceará: 'CE', 'Distrito Federal': 'DF', 'Espírito Santo': 'ES', Goiás: 'GO',
+  Maranhão: 'MA', 'Mato Grosso': 'MT', 'Mato Grosso do Sul': 'MS',
+  'Minas Gerais': 'MG', Pará: 'PA', Paraíba: 'PB', Paraná: 'PR',
+  Pernambuco: 'PE', Piauí: 'PI', 'Rio de Janeiro': 'RJ',
+  'Rio Grande do Norte': 'RN', 'Rio Grande do Sul': 'RS', Rondônia: 'RO',
+  Roraima: 'RR', 'Santa Catarina': 'SC', 'São Paulo': 'SP',
+  Sergipe: 'SE', Tocantins: 'TO',
 }
 
-const TIPO_DESC = {
-  Hidratação:   'Reidrate seus fios para conquistar maciez e brilho.',
-  Nutrição:     'Reponha os óleos e combata o ressecamento.',
-  Reconstrução: 'Fortaleça os fios com proteínas e queratina.',
-  Detox:        'Remova resíduos e regule a oleosidade do couro.',
-  Umectação:    'Hidrate profundamente com óleos e manteigas.',
-  Lavagem:      'Lave os fios com o método indicado para seu tipo.',
+function siglaEstado(state = '') {
+  if (!state) return ''
+  if (state.length === 2) return state.toUpperCase()
+  return ESTADOS_BR[state] ?? state
+}
+
+function dataHoje() { return new Date().toISOString().split('T')[0] }
+
+function etapaParaData(e) {
+  if (!e?.dataEtapa) return null
+  return e.dataEtapa?.toDate?.() ?? new Date(e.dataEtapa)
+}
+
+function mesmaData(a, b) {
+  return (
+    a.getDate()     === b.getDate()  &&
+    a.getMonth()    === b.getMonth() &&
+    a.getFullYear() === b.getFullYear()
+  )
+}
+
+function gerarRangeDias(diasLabel, diasAntes = 7, diasDepois = 11) {
+  const hoje = new Date()
+  hoje.setHours(0, 0, 0, 0)
+  return Array.from({ length: diasAntes + 1 + diasDepois }, (_, i) => {
+    const d = new Date(hoje)
+    d.setDate(hoje.getDate() - diasAntes + i)
+    const dow      = d.getDay()
+    const labelIdx = dow === 0 ? 6 : dow - 1
+    return { wd: diasLabel[labelIdx], n: d.getDate(), date: d, isHoje: mesmaData(d, hoje) }
+  })
 }
 
 export default function Home() {
-  const { user, logout }          = useAuth()
-  const [hairScore, setHairScore] = useState(null)
-  const [etapas, setEtapas]       = useState([])
-  const [progresso, setProgresso] = useState({ concluidas: 0, total: 0 })
-  const [loading, setLoading]     = useState(true)
-  const navigate = useNavigate()
-  const nome = user?.displayName?.split(' ')[0] ?? 'você'
+  const { user }     = useAuth()
+  const { t }        = useIdioma()
+  const navigate     = useNavigate()
+
+  const [perfil,           setPerfil]           = useState(null)
+  const [etapas,           setEtapas]           = useState([])
+  const [hairScore,        setHairScore]        = useState(null)
+  const [regHoje,          setRegHoje]          = useState(null)
+  const [showReg,          setShowReg]          = useState(false)
+  const [clima,            setClima]            = useState(null)
+  const [conquistas,       setConquistas]       = useState([])
+  const [streakReal,       setStreakReal]       = useState(0)
+  const [cuidado7DiasReal, setCuidado7DiasReal] = useState(0)
+
+  const diasTraduzidos = t('cron_dias') || ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']
+  const DIAS_LABEL = [
+    diasTraduzidos[1], diasTraduzidos[2], diasTraduzidos[3],
+    diasTraduzidos[4], diasTraduzidos[5], diasTraduzidos[6], diasTraduzidos[0],
+  ]
+  const semana = useMemo(() => gerarRangeDias(DIAS_LABEL, 7, 11), [diasTraduzidos])
+
+  const hairScoreVM = useHairScoreViewModel({ perfil, hairScore })
+  const { scores: timelineScores } = useHairTimeline(user?.uid, 8)
+  const adaptiveRoutine = useAdaptiveRoutine({
+    hairState:   hairScoreVM.state,
+    hairScore:   hairScoreVM.score,
+    eventos:     perfil?.eventosRecentes ?? [],
+    fragilidade: hairScoreVM.fragilidade,
+    clima,
+  })
 
   useEffect(() => {
     if (!user) return
     const uid = user.uid
-    async function carregar() {
-      try {
-        const scoreSnap = await getDocs(query(collection(db, 'usuarios', uid, 'hair_scores'), orderBy('dataRegistro', 'desc'), limit(1)))
-        if (!scoreSnap.empty) setHairScore(scoreSnap.docs[0].data())
-        const cronSnap = await getDocs(query(collection(db, 'usuarios', uid, 'cronogramas'), orderBy('dataInicio', 'desc'), limit(1)))
-        if (!cronSnap.empty) {
-          const cronId = cronSnap.docs[0].id
-          const etapasSnap = await getDocs(collection(db, 'usuarios', uid, 'cronogramas', cronId, 'etapas'))
-          const todas = etapasSnap.docs.map(d => ({ id: d.id, cronogramaId: cronId, ...d.data() }))
-          setEtapas(todas)
-          setProgresso({ concluidas: todas.filter(e => e.concluida).length, total: todas.length })
-        }
-      } finally { setLoading(false) }
-    }
-    carregar()
+    let unsubEtapas = null
+
+    const u1 = onSnapshot(doc(db, 'usuarios', uid), s =>
+      setPerfil(s.exists() ? s.data() : null)
+    )
+    const u2 = onSnapshot(
+      query(collection(db, 'usuarios', uid, 'hair_scores'), orderBy('dataRegistro', 'desc'), limit(1)),
+      s => setHairScore(s.empty ? null : s.docs[0].data()),
+    )
+    const u3 = onSnapshot(
+      doc(db, 'usuarios', uid, 'registros', dataHoje()),
+      s => setRegHoje(s.exists() ? s.data() : null),
+    )
+    const u4 = onSnapshot(
+      query(collection(db, 'usuarios', uid, 'cronogramas'), orderBy('dataInicio', 'desc'), limit(1)),
+      s => {
+        if (unsubEtapas) unsubEtapas()
+        if (s.empty) { setEtapas([]); return }
+        const cronId = s.docs[0].id
+        unsubEtapas = onSnapshot(
+          collection(db, 'usuarios', uid, 'cronogramas', cronId, 'etapas'),
+          snap => setEtapas(
+            snap.docs
+              .map(d => ({ id: d.id, cronogramaId: cronId, ...d.data() }))
+              .sort((a, b) => (etapaParaData(a) ?? new Date(0)) - (etapaParaData(b) ?? new Date(0))),
+          ),
+        )
+      },
+    )
+    const u5 = onSnapshot(
+      doc(db, 'usuarios', uid, 'conquistas', 'desbloqueadas'),
+      s => setConquistas(s.exists() ? s.data().ids ?? [] : []),
+    )
+
+    return () => { u1(); u2(); u3(); u4(); u5(); unsubEtapas?.() }
   }, [user])
 
-  const etapaHoje     = etapas.find(e => !e.concluida && !e.pulada)
-  const etapasFuturas = etapas.filter(e => e.id !== etapaHoje?.id && !e.concluida).slice(0, 6)
-  const pct           = progresso.total > 0 ? Math.round((progresso.concluidas / progresso.total) * 100) : 0
-  const scoreCor      = hairScore?.pontuacao >= 80 ? '#22c55e' : hairScore?.pontuacao >= 60 ? '#f59e0b' : hairScore?.pontuacao >= 40 ? '#f97316' : '#ef4444'
+  useEffect(() => {
+    if (!user) return
+    calcularStreakReal(user.uid).then(setStreakReal)
+    calcularCuidado7Dias(user.uid).then(setCuidado7DiasReal)
+  }, [user, regHoje])
 
-  const NavBar = () => (
-    <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 430, background: '#fff', borderTop: '0.5px solid #F0F0F0', display: 'flex', padding: '10px 0 20px', zIndex: 30 }}>
-      {[
-        { icon: 'fa-house',             label: 'Inicial',    href: '/app/home'       },
-        { icon: 'fa-calendar',          label: 'Cronograma', href: '/app/cronograma' },
-        { icon: 'fa-clock-rotate-left', label: 'Histórico',  href: '/app/historico'  },
-        { icon: 'fa-user',              label: 'Perfil',     href: '/app/perfil'     },
-      ].map((item, i) => {
-        const ativo = window.location.pathname === item.href
-        return (
-          <a key={i} href={item.href} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textDecoration: 'none' }}>
-            {ativo && <div style={{ width: 20, height: 3, background: '#1A1A1A', borderRadius: 99, marginBottom: 2 }} />}
-            <i className={`fa-solid ${item.icon}`} style={{ fontSize: 20, color: ativo ? '#1A1A1A' : '#C0C0C0' }} />
-            <span style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 10, color: ativo ? '#1A1A1A' : '#C0C0C0', fontWeight: ativo ? 700 : 400 }}>
-              {item.label}
-            </span>
-          </a>
-        )
-      })}
-    </div>
+  useEffect(() => {
+    const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY
+    if (!apiKey || !navigator.geolocation) return
+    navigator.geolocation.getCurrentPosition(async ({ coords: { latitude: lat, longitude: lon } }) => {
+      try {
+        const [wRes, gRes] = await Promise.all([
+          fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pt_br`),
+          fetch(`https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${apiKey}`),
+        ])
+        const [weather, geo] = await Promise.all([wRes.json(), gRes.json()])
+        const cidade = weather.name || geo[0]?.name || ''
+        const estado = siglaEstado(geo[0]?.state ?? '')
+        setClima({
+          cidade:      estado ? `${cidade}, ${estado}` : cidade,
+          temperatura: Math.round(weather.main?.temp      ?? 0),
+          umidade:     weather.main?.humidity              ?? 0,
+          sensacao:    Math.round(weather.main?.feels_like ?? 0),
+        })
+      } catch { setClima(null) }
+    }, () => {})
+  }, [])
+
+  const etapaAtual = etapas.find(e => !e.concluida && !e.pulada)
+  const streak     = perfil?.streak ?? 0
+  const nome       = perfil?.nome || user?.displayName || 'Caroline'
+  const foto       = user?.photoURL || perfil?.fotoURL || perfil?.avatar || ''
+
+  const proximasEtapas = useMemo(() => {
+    const hoje = new Date(); hoje.setHours(0, 0, 0, 0)
+    return etapas
+      .filter(e => !e.concluida && !e.pulada && (etapaParaData(e) ?? new Date(0)) >= hoje)
+      .slice(0, 8)
+  }, [etapas])
+
+  function getEtapaDia(dia) {
+    return etapas.find(e => { const d = etapaParaData(e); return d && mesmaData(d, dia.date) })
+  }
+
+  function abrirEtapa(etapa) {
+    if (!etapa) return
+    navigate(`/app/etapa/${etapa.cronogramaId}/${etapa.id}`)
+  }
+
+  function iniciarAcaoAdaptativa(action) {
+    const match = etapas.find(e =>
+      !e.concluida && !e.pulada &&
+      (e.tipoCuidado === action.tipo || e.tipoCuidado === action.title)
+    )
+    if (match)      { abrirEtapa(match);      return }
+    if (etapaAtual) { abrirEtapa(etapaAtual); return }
+    navigate('/questionario')
+  }
+
+  function climaTexto() {
+    if (!clima) return 'Ative a localização para receber insights do clima.'
+    if (clima.umidade <= 45)     return `Umidade baixa em ${clima.cidade}. Capriche na hidratação hoje.`
+    if (clima.umidade >= 75)     return `Alta umidade hoje. Use um óleo ou creme mais consistente para reduzir o frizz.`
+    if (clima.temperatura >= 28) return `Calor em ${clima.cidade}. Use proteção térmica antes de sair.`
+    return `Clima equilibrado em ${clima.cidade}. Ótimo dia para manter sua rotina.`
+  }
+
+  const hairScoreCard = (
+    <HairScoreCard
+      score={hairScoreVM.score}
+      delta={hairScoreVM.delta}
+      state={hairScoreVM.state}
+      trend={hairScoreVM.trend}
+      message={hairScoreVM.message || 'Seu diagnóstico está sendo acompanhado pelo Lumi.'}
+      fragilidade={hairScoreVM.fragilidade}
+      streak={streak}
+    />
   )
 
-  const Conteudo = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, padding: '20px 24px 0' }}>
+  const routineCard = (
+    <AdaptiveRoutineCard routine={adaptiveRoutine} onStartAction={iniciarAcaoAdaptativa} />
+  )
 
-      {/* Saudação */}
-      <div>
-        <p style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 13, color: '#9B9B9B', margin: '0 0 2px' }}>Olá,</p>
-        <h2 style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 22, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>{nome}</h2>
-      </div>
+  const trendCard    = <HairTimeline scores={timelineScores} />
+  const climaCard    = <InsightCard clima={clima} text={climaTexto()} />
 
-      {/* Próxima Etapa */}
-      {etapaHoje && (
-        <div>
-          <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: '0 0 10px' }}>Próxima Etapa</p>
-          <div onClick={() => navigate(`/app/etapa/${etapaHoje.cronogramaId}/${etapaHoje.id}`)}
-            style={{ background: '#F5F5F5', borderRadius: 16, padding: '16px', display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer', border: '0.5px solid #E8E8E8' }}>
-            <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <i className={`fa-solid ${TIPO_ICON[etapaHoje.tipoCuidado] ?? 'fa-droplet'}`} style={{ fontSize: 20, color: '#fff' }} />
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 16, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{etapaHoje.tipoCuidado}</p>
-                <i className="fa-solid fa-chevron-right" style={{ fontSize: 13, color: '#C0C0C0' }} />
-              </div>
-              <p style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 11, fontWeight: 700, color: '#6B6B6B', margin: '2px 0 4px', textTransform: 'uppercase', letterSpacing: 1 }}>
-                {etapaHoje.dia}
-              </p>
-              <p style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 13, color: '#9B9B9B', margin: 0, lineHeight: 1.4 }}>
-                {TIPO_DESC[etapaHoje.tipoCuidado]}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+  const conquistasCard = (
+    <ConquistasCard
+      desbloqueadas={conquistas}
+      progressData={{
+        streak:            streakReal,
+        etapasConcluidas:  perfil?.etapasConcluidas  ?? 0,
+        hairScore:         hairScoreVM.score          ?? 0,
+        totalDiagnosticos: perfil?.totalDiagnosticos  ?? 0,
+        xp:                perfil?.xp                 ?? 0,
+        cuidado7Dias:      cuidado7DiasReal,
+      }}
+    />
+  )
 
-      {/* Etapas Futuras */}
-      {etapasFuturas.length > 0 && (
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>Etapas Futuras</p>
-            <button onClick={() => navigate('/app/cronograma')}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Nunito Sans, sans-serif', fontSize: 13, color: '#1A1A1A', padding: 0, fontWeight: 600, textDecoration: 'underline' }}>
-              Ver tudo
-            </button>
-          </div>
-          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 4 }}>
-            {etapasFuturas.map((etapa, i) => (
-              <div key={i} onClick={() => navigate(`/app/etapa/${etapa.cronogramaId}/${etapa.id}`)}
-                style={{ background: '#fff', borderRadius: 14, padding: '14px 12px', minWidth: 130, flexShrink: 0, border: '0.5px solid #E8E8E8', cursor: 'pointer' }}>
-                <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-                  <i className={`fa-solid ${TIPO_ICON[etapa.tipoCuidado] ?? 'fa-droplet'}`} style={{ fontSize: 15, color: '#fff' }} />
-                </div>
-                <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: '0 0 6px' }}>{etapa.tipoCuidado}</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <i className="fa-regular fa-calendar" style={{ fontSize: 10, color: '#9B9B9B' }} />
-                  <p style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 11, color: '#9B9B9B', margin: 0 }}>{etapa.dia}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Progresso */}
-      <div>
-        <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: '0 0 10px' }}>Progresso Geral</p>
-        <div style={{ background: '#F5F5F5', borderRadius: 16, padding: '20px 16px', display: 'flex', alignItems: 'center', gap: 16, border: '0.5px solid #E8E8E8' }}>
-          <div style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
-            <svg width="72" height="72" viewBox="0 0 72 72">
-              <circle cx="36" cy="36" r="28" fill="none" stroke="#E8E8E8" strokeWidth="6" />
-              <circle cx="36" cy="36" r="28" fill="none" stroke="#1A1A1A" strokeWidth="6"
-                strokeDasharray={`${(pct / 100) * 175.9} 175.9`}
-                strokeLinecap="round" strokeDashoffset="44"
-                transform="rotate(-90 36 36)" />
-            </svg>
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-              <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{pct}%</p>
-              <p style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 9, color: '#9B9B9B', margin: 0 }}>Concluído</p>
-            </div>
-          </div>
-          <div>
-            <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: '0 0 4px' }}>
-              Você concluiu {progresso.concluidas} {progresso.concluidas === 1 ? 'etapa' : 'etapas'}
-            </p>
-            <p style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 13, color: '#6B6B6B', margin: 0, lineHeight: 1.5 }}>
-              {progresso.total - progresso.concluidas > 0
-                ? `Faltam ${progresso.total - progresso.concluidas} etapas para completar seu cronograma`
-                : 'Parabéns! Você completou todas as etapas!'}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Hair Score */}
-      {hairScore && (
-        <div>
-          <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: '0 0 10px' }}>Hair Score</p>
-          <div style={{ background: '#fff', borderRadius: 16, padding: '16px', display: 'flex', alignItems: 'center', gap: 12, border: '0.5px solid #E8E8E8' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4 }}>
-              <span style={{ fontFamily: 'Times New Roman, serif', fontSize: 48, color: scoreCor, lineHeight: 1 }}>{hairScore.pontuacao}</span>
-              <span style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 13, color: '#9B9B9B', marginBottom: 6 }}>/100</span>
-            </div>
-            <div style={{ flex: 1 }}>
-              <span style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 12, fontWeight: 700, color: scoreCor, background: `${scoreCor}18`, borderRadius: 99, padding: '3px 12px' }}>
-                {hairScore.classificacao}
-              </span>
-              <div style={{ height: 3, background: '#F0F0F0', borderRadius: 99, overflow: 'hidden', marginTop: 10 }}>
-                <div style={{ height: '100%', width: `${hairScore.pontuacao}%`, background: scoreCor, borderRadius: 99 }} />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Estado vazio */}
-      {!loading && etapas.length === 0 && (
-        <div style={{ background: '#fff', borderRadius: 16, padding: '32px 20px', textAlign: 'center', border: '0.5px solid #E8E8E8' }}>
-          <i className="fa-solid fa-leaf" style={{ fontSize: 28, color: '#C0C0C0', marginBottom: 12, display: 'block' }} />
-          <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 16, fontWeight: 600, color: '#1A1A1A', marginBottom: 6 }}>Nenhum cronograma ainda</p>
-          <p style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 13, color: '#9B9B9B', marginBottom: 20, lineHeight: 1.5 }}>Faça seu diagnóstico para começar.</p>
-          <button onClick={() => navigate('/questionario')}
-            style={{ background: '#1A1A1A', color: '#fff', border: 'none', borderRadius: 25, padding: '12px 24px', fontFamily: 'Nunito Sans, sans-serif', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
-            Iniciar diagnóstico
-          </button>
-        </div>
-      )}
-
-    </div>
+  const diaryCard = (
+    <QuickCheckinCard regHoje={regHoje} onOpen={() => setShowReg(true)} />
   )
 
   return (
-    <>
-      <style>{`
-        .home-mobile { display: flex }
-        .home-desktop { display: none }
-        @media (min-width: 1024px) {
-          .home-mobile { display: none }
-          .home-desktop { display: flex }
-        }
-      `}</style>
+    <AppShell onPrimaryAction={() => setShowReg(true)}>
+      <main className="mx-auto flex min-h-dvh w-full max-w-[1120px] flex-col gap-6 bg-[#F5F4F5] px-4 pb-32 pt-4 lg:rounded-[32px] lg:p-6 lg:pb-6">
 
-      {/* MOBILE */}
-      <div className="home-mobile" style={{ minHeight: '100vh', background: '#F5F5F5', maxWidth: 430, margin: '0 auto', flexDirection: 'column', paddingBottom: 80 }}>
-        <div style={{ background: '#fff', padding: '52px 24px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 10, borderBottom: '0.5px solid #F0F0F0' }}>
-          <h1 style={{ fontFamily: 'Times New Roman, serif', fontStyle: 'italic', fontSize: 26, color: '#1A1A1A', margin: 0 }}>Lumi</h1>
-          <button onClick={logout} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
-            <i className="fa-solid fa-right-from-bracket" style={{ fontSize: 16, color: '#C0C0C0' }} />
-          </button>
+        {/* Header mobile */}
+        <div className="lg:hidden">
+          <TodayHeader nome={nome} foto={foto} onProfile={() => navigate('/app/perfil')} />
         </div>
-        <Conteudo />
-        <NavBar />
-      </div>
 
-      {/* DESKTOP */}
-      <div className="home-desktop" style={{ minHeight: '100vh', background: '#F5F5F5' }}>
-        {/* Sidebar */}
-        <div style={{ width: 240, background: '#fff', borderRight: '0.5px solid #F0F0F0', position: 'fixed', top: 0, left: 0, height: '100vh', display: 'flex', flexDirection: 'column', padding: '40px 0' }}>
-          <div style={{ padding: '0 24px 32px', borderBottom: '0.5px solid #F0F0F0' }}>
-            <h1 style={{ fontFamily: 'Times New Roman, serif', fontStyle: 'italic', fontSize: 28, color: '#1A1A1A', margin: 0 }}>Lumi</h1>
-          </div>
-          <nav style={{ flex: 1, padding: '24px 0' }}>
-            {[
-              { icon: 'fa-house',             label: 'Inicial',    href: '/app/home'       },
-              { icon: 'fa-calendar',          label: 'Cronograma', href: '/app/cronograma' },
-              { icon: 'fa-clock-rotate-left', label: 'Histórico',  href: '/app/historico'  },
-              { icon: 'fa-user',              label: 'Perfil',     href: '/app/perfil'     },
-            ].map((item, i) => {
-              const ativo = window.location.pathname === item.href
-              return (
-                <a key={i} href={item.href} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 24px', textDecoration: 'none', background: ativo ? '#F5F5F5' : 'transparent', borderLeft: ativo ? '3px solid #1A1A1A' : '3px solid transparent' }}>
-                  <i className={`fa-solid ${item.icon}`} style={{ fontSize: 16, color: ativo ? '#1A1A1A' : '#C0C0C0', width: 20 }} />
-                  <span style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 14, color: ativo ? '#1A1A1A' : '#9B9B9B', fontWeight: ativo ? 700 : 400 }}>
-                    {item.label}
-                  </span>
-                </a>
-              )
-            })}
-          </nav>
-          <div style={{ padding: '24px' }}>
-            <button onClick={logout} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-              <i className="fa-solid fa-right-from-bracket" style={{ fontSize: 15, color: '#C0C0C0' }} />
-              <span style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 14, color: '#9B9B9B' }}>Sair</span>
-            </button>
+        {/* ── Desktop ── */}
+        <div className="hidden flex-col gap-6 lg:flex">
+          {hairScoreCard}
+
+          <div className="grid grid-cols-[minmax(0,1fr)_300px] items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+
+            {/* Coluna principal */}
+            <div className="flex flex-col gap-6">
+          
+              <WeekCalendar
+                semana={semana}
+                getEtapaDia={getEtapaDia}
+                onOpenEtapa={abrirEtapa}
+              />
+              {routineCard}
+              {trendCard}
+              {conquistasCard}
+              {diaryCard}
+            </div>
+
+            {/* Sidebar */}
+            <aside className="flex flex-col gap-5">
+              <div className="rounded-[20px] bg-white p-5">
+                <MonthCalendar
+                  etapas={etapas}
+                  proximasEtapas={proximasEtapas}
+                  onOpenEtapa={abrirEtapa}
+                />
+              </div>
+              {climaCard}
+            </aside>
           </div>
         </div>
 
-        {/* Conteúdo desktop */}
-        <div style={{ marginLeft: 240, flex: 1, maxWidth: 800, padding: '40px 48px 80px' }}>
-          <Conteudo />
+        {/* ── Mobile ── */}
+        <div className="flex flex-col gap-6 lg:hidden">
+          {hairScoreCard}
+          <WeekCalendar
+            semana={semana}
+            getEtapaDia={getEtapaDia}
+            onOpenEtapa={abrirEtapa}
+          />
+          {routineCard}
+          {climaCard}
+          {trendCard}
+          {conquistasCard}
+          {diaryCard}
         </div>
-      </div>
-    </>
+      </main>
+
+      {showReg && (
+        <RegistroModal
+          onClose={() => setShowReg(false)}
+          onSaved={() => setShowReg(false)}
+          onConcluido={() => setShowReg(false)}
+        />
+      )}
+    </AppShell>
   )
 }

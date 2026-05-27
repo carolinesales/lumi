@@ -1,8 +1,15 @@
-import { useState } from 'react'
+import { useState }   from 'react'
 import { useNavigate } from 'react-router-dom'
-import { doc, setDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore'
-import { db } from '../lib/firebase'
-import { useAuth } from '../contexts/AuthContext'
+import {
+  doc, setDoc, addDoc, collection, serverTimestamp,
+} from 'firebase/firestore'
+
+import { db }      from '@/lib/firebase'
+import { useAuth } from '@/contexts/AuthContext'
+import { Button }  from '@/components/ui/button'
+import { cn }      from '@/lib/utils'
+
+// ─── Constantes ───────────────────────────────────────────────────────────────
 
 const STEPS = [
   {
@@ -19,53 +26,51 @@ const STEPS = [
     titulo: 'Estado atual do fio',
     subtitulo: 'Etapa 2 de 4',
     perguntas: [
-      { id: 'ressecamento',  label: 'Nível de ressecamento',                                    opcoes: ['Baixo', 'Moderado', 'Alto'] },
-      { id: 'frizz',         label: 'Nível de frizz',                                           opcoes: ['Baixo', 'Moderado', 'Alto'] },
-      { id: 'quebra',        label: 'Frequência de quebra',                                     opcoes: ['Baixa', 'Moderada', 'Alta'] },
-      { id: 'brilho',        label: 'Como você avalia o brilho?',                               opcoes: ['Alto', 'Médio', 'Baixo'] },
-      { id: 'elasticidade',  label: 'Ao esticar um fio molhado e soltar, ele volta ao normal?', opcoes: ['Sim, totalmente', 'Parcialmente', 'Não volta'] },
+      { id: 'ressecamento', label: 'Nível de ressecamento',                                    opcoes: ['Baixo', 'Moderado', 'Alto'] },
+      { id: 'frizz',        label: 'Nível de frizz',                                           opcoes: ['Baixo', 'Moderado', 'Alto'] },
+      { id: 'quebra',       label: 'Frequência de quebra',                                     opcoes: ['Baixa', 'Moderada', 'Alta'] },
+      { id: 'brilho',       label: 'Como você avalia o brilho?',                               opcoes: ['Alto', 'Médio', 'Baixo'] },
+      { id: 'elasticidade', label: 'Ao esticar um fio molhado e soltar, ele volta ao normal?', opcoes: ['Sim, totalmente', 'Parcialmente', 'Não volta'] },
     ],
   },
   {
     titulo: 'Couro cabeludo e química',
     subtitulo: 'Etapa 3 de 4',
     perguntas: [
-      { id: 'oleosidade', label: 'Oleosidade do couro cabeludo',      opcoes: ['Baixa', 'Normal', 'Alta'] },
-      { id: 'caspa',      label: 'Presença de caspa',                  opcoes: ['Não', 'Leve', 'Frequente'] },
-      { id: 'queda',      label: 'Queda de cabelo',                   opcoes: ['Baixa', 'Moderada', 'Alta'] },
-      { id: 'quimica',    label: 'Você fez química recentemente?',     opcoes: ['Não', 'Coloração', 'Progressiva', 'Descoloração'] },
+      { id: 'oleosidade', label: 'Oleosidade do couro cabeludo',    opcoes: ['Baixa', 'Normal', 'Alta'] },
+      { id: 'caspa',      label: 'Presença de caspa',               opcoes: ['Não', 'Leve', 'Frequente'] },
+      { id: 'queda',      label: 'Queda de cabelo',                 opcoes: ['Baixa', 'Moderada', 'Alta'] },
+      { id: 'quimica',    label: 'Você fez química recentemente?',  opcoes: ['Não', 'Coloração', 'Progressiva', 'Descoloração'] },
     ],
   },
   {
     titulo: 'Hábitos e rotina',
     subtitulo: 'Etapa 4 de 4',
     perguntas: [
-      { id: 'estresse',       label: 'Nível de estresse',                    opcoes: ['Baixo', 'Moderado', 'Alto'] },
-      { id: 'sono',           label: 'Qualidade do sono',                    opcoes: ['Boa', 'Média', 'Ruim'] },
-      { id: 'atividadeFisica',label: 'Frequência de atividade física',       opcoes: ['Baixa', 'Moderada', 'Alta'] },
-      { id: 'alimentacao',    label: 'Como você avalia sua alimentação?',    opcoes: ['Equilibrada', 'Intermediária', 'Desregulada'] },
+      { id: 'estresse',        label: 'Nível de estresse',                 opcoes: ['Baixo', 'Moderado', 'Alto'] },
+      { id: 'sono',            label: 'Qualidade do sono',                 opcoes: ['Boa', 'Média', 'Ruim'] },
+      { id: 'atividadeFisica', label: 'Frequência de atividade física',    opcoes: ['Baixa', 'Moderada', 'Alta'] },
+      { id: 'alimentacao',     label: 'Como você avalia sua alimentação?', opcoes: ['Equilibrada', 'Intermediária', 'Desregulada'] },
     ],
   },
 ]
 
-export default function Questionario() {
-  const [step, setStep]           = useState(0)
-  const [respostas, setRespostas] = useState({})
-  const [loading, setLoading]     = useState(false)
-  const [erro, setErro]           = useState('')
-  const { user } = useAuth()
-  const navigate  = useNavigate()
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
+export default function Questionario() {
+  const [step,      setStep]      = useState(0)
+  const [respostas, setRespostas] = useState({})
+  const [loading,   setLoading]   = useState(false)
+  const [erro,      setErro]      = useState('')
+
+  const { user }  = useAuth()
+  const navigate  = useNavigate()
   const stepAtual = STEPS[step]
   const progresso = ((step + 1) / STEPS.length) * 100
-
-  function stepValido() {
-    return stepAtual.perguntas.every(p => respostas[p.id])
-  }
+  const valido    = stepAtual.perguntas.every(p => respostas[p.id])
 
   async function finalizar() {
-    setLoading(true)
-    setErro('')
+    setLoading(true); setErro('')
     try {
       const uid = user.uid
 
@@ -93,15 +98,15 @@ export default function Questionario() {
       }
 
       const questionarioRef = await addDoc(collection(db, 'usuarios', uid, 'questionarios'), {
-        elasticidade:  respostas.elasticidade,
-        brilho:        respostas.brilho,
-        ressecamento:  respostas.ressecamento,
-        frizz:         respostas.frizz,
-        quebra:        respostas.quebra,
-        oleosidade:    respostas.oleosidade,
-        caspa:         respostas.caspa,
-        quedaCabelo:   respostas.queda,
-        dataResposta:  serverTimestamp(),
+        elasticidade: respostas.elasticidade,
+        brilho:       respostas.brilho,
+        ressecamento: respostas.ressecamento,
+        frizz:        respostas.frizz,
+        quebra:       respostas.quebra,
+        oleosidade:   respostas.oleosidade,
+        caspa:        respostas.caspa,
+        quedaCabelo:  respostas.queda,
+        dataResposta: serverTimestamp(),
       })
 
       sessionStorage.setItem('lumi_respostas', JSON.stringify({
@@ -122,70 +127,63 @@ export default function Questionario() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F5F5F5', maxWidth: 430, margin: '0 auto', display: 'flex', flexDirection: 'column' }}>
+    <div className="mx-auto flex min-h-screen max-w-[430px] flex-col bg-lumi-bg">
 
       {/* Logo */}
-      <div style={{ textAlign: 'center', paddingTop: 24, paddingBottom: 8 }}>
-        <h1 style={{ fontFamily: 'Times New Roman, serif', fontStyle: 'italic', fontSize: 28, color: '#1A1A1A', letterSpacing: 1 }}>
-          Lumi
-        </h1>
+      <div className="pb-2 pt-6 text-center">
+        <h1 className="font-serif text-[28px] italic font-normal text-lumi-black">Lumi</h1>
       </div>
 
-      <div style={{ flex: 1, padding: '16px 24px 40px' }}>
+      <div className="flex flex-1 flex-col px-6 pb-10 pt-4">
 
-        {/* Voltar + título */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
-          <button onClick={() => step > 0 ? setStep(s => s - 1) : navigate('/app/home')}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-            <i className="fa-solid fa-chevron-left" style={{ fontSize: 14, color: '#1A1A1A' }} />
+        {/* Header do step */}
+        <div className="mb-5 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => step > 0 ? setStep(s => s - 1) : navigate('/app/home')}
+            className="grid h-8 w-8 place-items-center rounded-full transition hover:bg-lumi-input"
+            aria-label="Voltar"
+          >
+            <i className="fa-solid fa-chevron-left text-sm text-lumi-black" aria-hidden="true" />
           </button>
-          <div style={{ flex: 1 }}>
-            <p style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 12, color: '#6B6B6B', margin: 0 }}>
-              {stepAtual.subtitulo}
-            </p>
-            <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 18, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
-              {stepAtual.titulo}
-            </h2>
+          <div className="flex-1">
+            <p className="font-nunito text-xs text-lumi-gray">{stepAtual.subtitulo}</p>
+            <h2 className="font-heading text-lg font-semibold text-lumi-black">{stepAtual.titulo}</h2>
           </div>
         </div>
 
         {/* Barra de progresso */}
-        <div style={{ height: 4, background: '#E0E0E0', borderRadius: 99, overflow: 'hidden', marginBottom: 28 }}>
-          <div style={{ height: '100%', width: `${progresso}%`, background: '#1A1A1A', borderRadius: 99, transition: 'width .4s ease' }} />
+        <div className="mb-7 h-1 overflow-hidden rounded-full bg-lumi-border">
+          <div
+            className="h-full rounded-full bg-lumi-black transition-all duration-400"
+            style={{ width: `${progresso}%` }}
+          />
         </div>
 
         {/* Perguntas */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div className="flex flex-col gap-6">
           {stepAtual.perguntas.map(pergunta => (
             <div key={pergunta.id}>
-              <label style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 13, fontWeight: 600, color: '#1A1A1A', display: 'block', marginBottom: 10 }}>
+              <label className="mb-2.5 block font-nunito text-sm font-semibold text-lumi-black">
                 {pergunta.label}
               </label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div className="flex flex-col gap-2">
                 {pergunta.opcoes.map(opcao => {
-                  const selecionado = respostas[pergunta.id] === opcao
+                  const sel = respostas[pergunta.id] === opcao
                   return (
-                    <button key={opcao} type="button"
+                    <button
+                      key={opcao}
+                      type="button"
                       onClick={() => setRespostas(prev => ({ ...prev, [pergunta.id]: opcao }))}
-                      style={{
-                        width: '100%',
-                        textAlign: 'left',
-                        padding: '13px 16px',
-                        borderRadius: 12,
-                        border: selecionado ? '1.5px solid #1A1A1A' : '1.5px solid transparent',
-                        background: selecionado ? '#1A1A1A' : '#EFEFEF',
-                        color: selecionado ? '#fff' : '#1A1A1A',
-                        fontFamily: 'Nunito Sans, sans-serif',
-                        fontSize: 14,
-                        fontWeight: selecionado ? 600 : 400,
-                        cursor: 'pointer',
-                        transition: 'all .2s',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}>
+                      className={cn(
+                        'flex w-full items-center justify-between rounded-xl px-4 py-3.5 text-left font-nunito text-sm transition-all',
+                        sel
+                          ? 'bg-lumi-black font-semibold text-white'
+                          : 'bg-lumi-input font-normal text-lumi-black hover:bg-lumi-border',
+                      )}
+                    >
                       {opcao}
-                      {selecionado && <i className="fa-solid fa-check" style={{ fontSize: 12 }} />}
+                      {sel && <i className="fa-solid fa-check text-xs" aria-hidden="true" />}
                     </button>
                   )
                 })}
@@ -194,25 +192,27 @@ export default function Questionario() {
           ))}
         </div>
 
+        {/* Erro */}
         {erro && (
-          <div style={{ marginTop: 20, background: 'rgba(220,50,50,0.07)', border: '1px solid rgba(220,50,50,0.2)', borderRadius: 12, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <i className="fa-solid fa-circle-exclamation" style={{ color: '#dc3232', fontSize: 14 }} />
-            <p style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 13, color: '#dc3232', margin: 0 }}>{erro}</p>
+          <div className="mt-5 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+            <i className="fa-solid fa-circle-exclamation text-sm text-lumi-danger" aria-hidden="true" />
+            <p className="font-nunito text-sm text-lumi-danger">{erro}</p>
           </div>
         )}
 
-        {/* Botão */}
-        <button
+        {/* CTA */}
+        <Button
+          size="lg"
+          className="mt-8 w-full"
           onClick={() => step < STEPS.length - 1 ? setStep(s => s + 1) : finalizar()}
-          disabled={!stepValido() || loading}
-          style={{ width: '100%', background: stepValido() ? '#1A1A1A' : '#C0C0C0', color: '#fff', border: 'none', borderRadius: 50, padding: '16px 24px', fontSize: 15, fontFamily: 'Nunito Sans, sans-serif', fontWeight: 600, cursor: stepValido() && !loading ? 'pointer' : 'not-allowed', marginTop: 32, transition: 'all .2s' }}>
-          {loading ? (
-            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-              <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 14 }} />
-              Salvando...
-            </span>
-          ) : step < STEPS.length - 1 ? 'Próximo passo' : 'Finalizar diagnóstico'}
-        </button>
+          disabled={!valido || loading}
+        >
+          {loading
+            ? <><i className="fa-solid fa-spinner fa-spin text-sm" aria-hidden="true" />Salvando...</>
+            : step < STEPS.length - 1
+            ? 'Próximo passo'
+            : 'Finalizar diagnóstico'}
+        </Button>
 
       </div>
     </div>

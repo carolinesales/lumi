@@ -1,23 +1,88 @@
-import { useState } from 'react'
-import { signInWithEmailAndPassword } from 'firebase/auth'
-import { auth } from '../lib/firebase'
-import { useNavigate, Link } from 'react-router-dom'
+import { useState }                        from 'react'
+import { Link, useNavigate }               from 'react-router-dom'
+import { signInWithEmailAndPassword }      from 'firebase/auth'
 
-const ERROS = {
-  'auth/user-not-found':     'Usuário não encontrado.',
-  'auth/wrong-password':     'Senha incorreta.',
-  'auth/invalid-credential': 'E-mail ou senha incorretos.',
-  'auth/invalid-email':      'E-mail inválido.',
-  'auth/too-many-requests':  'Muitas tentativas. Aguarde.',
+import { auth }      from '@/lib/firebase'
+import { useIdioma } from '@/contexts/IdiomaContext'
+import { Button }    from '@/components/ui/button'
+import { cn }        from '@/lib/utils'
+
+// ─── Componentes internos ─────────────────────────────────────────────────────
+
+function AuthLayout({ photo, children }) {
+  return (
+    <div className="flex h-screen overflow-hidden bg-white">
+      {/* Foto — só desktop */}
+      <div className="hidden w-[48%] shrink-0 lg:block">
+        <img
+          src={photo}
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full object-cover object-[center_20%] grayscale"
+        />
+      </div>
+      {/* Formulário */}
+      <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-6 py-14 lg:px-20">
+        <div className="w-full max-w-[360px]">
+          {children}
+        </div>
+      </div>
+    </div>
+  )
 }
 
+function FieldLabel({ children }) {
+  return (
+    <label className="mb-2 block font-nunito text-sm font-semibold text-lumi-black">
+      {children}
+    </label>
+  )
+}
+
+function FieldInput({ className, ...props }) {
+  return (
+    <input
+      className={cn(
+        'w-full rounded-xl border border-[#E8E8E8] bg-white px-4 py-3.5',
+        'font-nunito text-base text-lumi-black outline-none transition',
+        'placeholder:text-lumi-muted',
+        'focus:border-lumi-black',
+        className,
+      )}
+      {...props}
+    />
+  )
+}
+
+function ErrorBox({ message }) {
+  if (!message) return null
+  return (
+    <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3.5 py-3">
+      <i className="fa-solid fa-circle-exclamation text-sm text-[#dc3232]" aria-hidden="true" />
+      <p className="font-nunito text-sm text-[#dc3232]">{message}</p>
+    </div>
+  )
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function Login() {
-  const [email, setEmail]       = useState('')
-  const [senha, setSenha]       = useState('')
-  const [verSenha, setVerSenha] = useState(false)
-  const [erro, setErro]         = useState('')
-  const [loading, setLoading]   = useState(false)
+  const { t }    = useIdioma()
   const navigate = useNavigate()
+
+  const [email,    setEmail]    = useState('')
+  const [senha,    setSenha]    = useState('')
+  const [verSenha, setVerSenha] = useState(false)
+  const [erro,     setErro]     = useState('')
+  const [loading,  setLoading]  = useState(false)
+
+  const ERROS = {
+    'auth/user-not-found':     t('login_erro_nao_encontrado'),
+    'auth/wrong-password':     t('login_erro_senha'),
+    'auth/invalid-credential': t('login_erro_credencial'),
+    'auth/invalid-email':      t('login_erro_email'),
+    'auth/too-many-requests':  t('login_erro_tentativas'),
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -27,180 +92,89 @@ export default function Login() {
       await signInWithEmailAndPassword(auth, email, senha)
       navigate('/app/home')
     } catch (err) {
-      setErro(ERROS[err.code] ?? 'Erro ao entrar. Tente novamente.')
+      setErro(ERROS[err.code] ?? t('login_erro_generico'))
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div style={{ height: '100vh', display: 'flex', background: '#fff', overflow: 'hidden' }}>
-      <style>{`
-        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-        .fu0 { animation: fadeUp .6s .0s ease both }
-        .fu1 { animation: fadeUp .6s .1s ease both }
-        .fu2 { animation: fadeUp .6s .2s ease both }
-        .fu3 { animation: fadeUp .6s .3s ease both }
+    <AuthLayout photo="/hero-login.jpg">
+      <div className="flex flex-col gap-10 lumi-animate-in">
 
-        .field-input {
-          width: 100%;
-          background: #fff;
-          border: 1px solid #E8E8E8;
-          border-radius: 10px;
-          padding: 13px 16px;
-          font-family: 'Nunito Sans', sans-serif;
-          font-size: 16px;
-          font-weight: 400;
-          line-height: 140%;
-          color: #000;
-          outline: none;
-          transition: border-color .2s;
-          box-sizing: border-box;
-        }
-        .field-input:focus { border-color: #1A1A1A }
-        .field-input::placeholder { color: #D0D0D0 }
-
-        .field-label {
-          font-family: 'Nunito Sans', sans-serif;
-          font-size: 13px;
-          font-weight: 600;
-          color: #1A1A1A;
-          display: block;
-          margin-bottom: 8px;
-        }
-
-        /* ── MOBILE ── */
-        .photo-panel { display: none }
-
-        .form-panel {
-          width: 100%;
-          height: 100vh;
-          display: flex;
-          flex-direction: column;
-          padding: 56px 24px 40px;
-          background: #fff;
-          box-sizing: border-box;
-          overflow-y: auto;
-        }
-
-        .form-inner {
-          display: flex;
-          flex-direction: column;
-          gap: 42px;
-          width: 100%;
-        }
-
-        /* ── DESKTOP ── */
-        @media (min-width: 1024px) {
-          .photo-panel {
-            display: block;
-            width: 48%;
-            flex-shrink: 0;
-            position: relative;
-            height: 100vh;
-            overflow: hidden;
-          }
-          .form-panel {
-            flex: 1;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 0 80px;
-            overflow-y: auto;
-          }
-          .form-inner {
-            width: 100%;
-            max-width: 360px;
-          }
-        }
-      `}</style>
-
-      {/* ── FOTO — desktop ── */}
-      <div className="photo-panel">
-        <img src="/hero-login.jpg" alt="Lumi"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%', filter: 'grayscale(100%)' }} />
-      </div>
-
-      {/* ── FORMULÁRIO ── */}
-      <div className="form-panel">
-        <div className="form-inner">
-
-          {/* Título */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <h2 className="fu0" style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 24, fontWeight: 500, lineHeight: '40px', color: '#000', margin: 0 }}>
-              Login
-            </h2>
-            <p className="fu1" style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 14, fontWeight: 400, lineHeight: '22px', color: '#838383', margin: 0 }}>
-              Entre e acompanhe sua evolução personalizada.
-            </p>
-          </div>
-
-          {/* Campos */}
-          <div className="fu2" style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <label className="field-label">E-mail</label>
-              <input type="email" required value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="field-input" placeholder="voce@email.com" />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <label className="field-label">Senha</label>
-              <div style={{ position: 'relative', width: '100%' }}>
-                <input type={verSenha ? 'text' : 'password'} required value={senha}
-                  onChange={e => setSenha(e.target.value)}
-                  className="field-input" placeholder="••••••••"
-                  style={{ paddingRight: 44 }} />
-                <button type="button" onClick={() => setVerSenha(v => !v)}
-                  style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-                  <i className={`fa-regular ${verSenha ? 'fa-eye' : 'fa-eye-slash'}`} style={{ fontSize: 15, color: '#C0C0C0' }} />
-                </button>
-              </div>
-              <div style={{ textAlign: 'right', marginTop: 8 }}>
-                <button type="button"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Nunito Sans, sans-serif', fontSize: 12, color: '#9B9B9B', padding: 0 }}
-                  onMouseOver={e => e.target.style.color = '#1A1A1A'}
-                  onMouseOut={e => e.target.style.color = '#9B9B9B'}>
-                  Esqueceu sua senha?
-                </button>
-              </div>
-            </div>
-
-            {erro && (
-              <div style={{ background: 'rgba(220,50,50,0.06)', border: '1px solid rgba(220,50,50,0.15)', borderRadius: 10, padding: '11px 14px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <i className="fa-solid fa-circle-exclamation" style={{ color: '#dc3232', fontSize: 13 }} />
-                <p style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 13, color: '#dc3232', margin: 0 }}>{erro}</p>
-              </div>
-            )}
-
-          </div>
-
-          {/* Botão + link */}
-          <div className="fu3" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
-            <button onClick={handleSubmit} disabled={loading}
-              style={{ width: '100%', height: 50, background: '#1A1A1A', color: '#fff', border: 'none', borderRadius: 25, fontSize: 15, fontFamily: 'Nunito Sans, sans-serif', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? .6 : 1, transition: 'all .2s' }}>
-              {loading ? (
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 14 }} />
-                  Entrando...
-                </span>
-              ) : 'Entrar'}
-            </button>
-
-            <p style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 14, fontWeight: 400, color: '#1E1E1E', margin: 0, textAlign: 'center' }}>
-              Ainda não tem conta?{' '}
-              <Link to="/cadastro"
-                style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 14, fontWeight: 600, color: '#1E1E1E', textDecoration: 'none', borderBottom: '1px solid #1E1E1E' }}>
-                Criar conta
-              </Link>
-            </p>
-          </div>
-
+        {/* Título */}
+        <div className="flex flex-col gap-2">
+          <h2 className="font-['Montserrat'] text-2xl font-medium text-lumi-black">
+            {t('login_titulo')}
+          </h2>
+          <p className="font-nunito text-sm text-lumi-gray">
+            {t('login_sub')}
+          </p>
         </div>
+
+        {/* Campos */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <div>
+            <FieldLabel>{t('login_email')}</FieldLabel>
+            <FieldInput
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="voce@email.com"
+              required
+            />
+          </div>
+
+          <div>
+            <FieldLabel>{t('login_senha')}</FieldLabel>
+            <div className="relative">
+              <FieldInput
+                type={verSenha ? 'text' : 'password'}
+                value={senha}
+                onChange={e => setSenha(e.target.value)}
+                placeholder="••••••••"
+                className="pr-11"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setVerSenha(v => !v)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-lumi-muted transition hover:text-lumi-black"
+                aria-label={verSenha ? 'Ocultar senha' : 'Mostrar senha'}
+              >
+                <i className={cn('fa-regular text-sm', verSenha ? 'fa-eye' : 'fa-eye-slash')} aria-hidden="true" />
+              </button>
+            </div>
+            <div className="mt-2 text-right">
+              <button
+                type="button"
+                className="font-nunito text-xs text-lumi-gray transition hover:text-lumi-black"
+              >
+                {t('login_esqueceu')}
+              </button>
+            </div>
+          </div>
+
+          <ErrorBox message={erro} />
+
+          <Button type="submit" size="lg" className="w-full" disabled={loading}>
+            {loading
+              ? <><i className="fa-solid fa-spinner fa-spin text-sm" aria-hidden="true" />{t('login_entrando')}</>
+              : t('login_entrar')}
+          </Button>
+        </form>
+
+        {/* Link cadastro */}
+        <p className="text-center font-nunito text-sm text-lumi-black">
+          {t('login_sem_conta')}{' '}
+          <Link
+            to="/cadastro"
+            className="font-semibold underline underline-offset-2 transition hover:opacity-70"
+          >
+            {t('login_criar')}
+          </Link>
+        </p>
       </div>
-    </div>
+    </AuthLayout>
   )
 }

@@ -1,0 +1,212 @@
+/* src/styles/lumi-motion.css */
+
+:root {
+  --lumi-ease: cubic-bezier(.22, 1, .36, 1);
+  --lumi-ease-soft: cubic-bezier(.16, 1, .3, 1);
+
+  --lumi-duration-fast: 180ms;
+  --lumi-duration-normal: 320ms;
+  --lumi-duration-slow: 620ms;
+}
+
+/* Scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Fade up */
+@keyframes lumi-fade-up-soft {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(.985);
+    filter: blur(3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Breathe */
+@keyframes lumi-breathe-glow {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: .56;
+  }
+
+  50% {
+    transform: translate3d(0, -8px, 0) scale(1.04);
+    opacity: .86;
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: .56;
+  }
+}
+
+/* Float*/
+@keyframes lumi-float-soft {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -5px, 0);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Shine */
+@keyframes lumi-soft-shine {
+  0% {
+    transform: translateX(-120%) skewX(-12deg);
+    opacity: 0;
+  }
+
+  30% {
+    opacity: .22;
+  }
+
+  100% {
+    transform: translateX(140%) skewX(-12deg);
+    opacity: 0;
+  }
+}
+
+/* Soft pulse */
+@keyframes lumi-soft-pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  38% {
+    transform: scale(1.025);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Animações */
+.lumi-animate-in {
+  animation: lumi-fade-up-soft var(--lumi-duration-slow) var(--lumi-ease-soft) both;
+}
+
+.lumi-animate-in-1 {
+  animation-delay: 60ms;
+}
+
+.lumi-animate-in-2 {
+  animation-delay: 120ms;
+}
+
+.lumi-animate-in-3 {
+  animation-delay: 180ms;
+}
+
+.lumi-animate-in-4 {
+  animation-delay: 240ms;
+}
+
+.lumi-hover-lift {
+  transition:
+    transform var(--lumi-duration-normal) var(--lumi-ease),
+    box-shadow var(--lumi-duration-normal) var(--lumi-ease),
+    background var(--lumi-duration-normal) var(--lumi-ease),
+    border-color var(--lumi-duration-normal) var(--lumi-ease);
+}
+
+.lumi-hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 72px rgba(24, 23, 20, .09);
+}
+
+.lumi-hover-subtle {
+  transition:
+    transform var(--lumi-duration-fast) var(--lumi-ease),
+    opacity var(--lumi-duration-fast) var(--lumi-ease),
+    background var(--lumi-duration-fast) var(--lumi-ease);
+}
+
+.lumi-hover-subtle:hover {
+  transform: translateY(-1px);
+}
+
+.lumi-breathe {
+  animation: lumi-breathe-glow 6s ease-in-out infinite;
+}
+
+.lumi-float {
+  animation: lumi-float-soft 5.5s ease-in-out infinite;
+}
+
+.lumi-soft-pulse {
+  animation: lumi-soft-pulse 520ms var(--lumi-ease);
+}
+
+/* Shine opcional para cards hero */
+.lumi-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.lumi-shine::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 42%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.32),
+    transparent
+  );
+  transform: translateX(-120%) skewX(-12deg);
+  opacity: 0;
+}
+
+.lumi-shine:hover::after {
+  animation: lumi-soft-shine 1100ms var(--lumi-ease);
+}
+
+/* Botões premium */
+.lumi-motion-button {
+  transition:
+    transform var(--lumi-duration-fast) var(--lumi-ease),
+    box-shadow var(--lumi-duration-fast) var(--lumi-ease),
+    background var(--lumi-duration-fast) var(--lumi-ease);
+}
+
+.lumi-motion-button:hover {
+  transform: translateY(-1px);
+}
+
+.lumi-motion-button:active {
+  transform: translateY(0) scale(.985);
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

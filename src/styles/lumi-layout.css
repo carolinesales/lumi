@@ -1,0 +1,126 @@
+:root {
+  --lumi-page-bg: #F7F6F3;
+  --lumi-card-bg: rgba(255, 255, 255, 0.82);
+  --lumi-card-border: rgba(255, 255, 255, 0.78);
+  --lumi-card-shadow: 0 18px 54px rgba(24, 23, 20, 0.055);
+  --lumi-card-shadow-hover: 0 24px 72px rgba(24, 23, 20, 0.085);
+  --lumi-line-soft: rgba(236, 232, 225, 0.9);
+  --lumi-blur-card: blur(22px);
+}
+
+.lumi-page,
+body {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(255,255,255,.86) 0%, transparent 34%),
+    radial-gradient(circle at 92% 16%, rgba(226,216,198,.32) 0%, transparent 30%),
+    radial-gradient(circle at 55% 100%, rgba(232,226,217,.42) 0%, transparent 38%),
+    var(--lumi-page-bg);
+}
+
+.lumi-surface {
+  background: var(--lumi-card-bg);
+  border: 1px solid var(--lumi-card-border);
+  box-shadow: var(--lumi-card-shadow);
+  backdrop-filter: var(--lumi-blur-card);
+}
+
+.lumi-surface-hover {
+  transition:
+    transform 220ms var(--lumi-ease, cubic-bezier(.22,1,.36,1)),
+    box-shadow 220ms var(--lumi-ease, cubic-bezier(.22,1,.36,1)),
+    background 220ms var(--lumi-ease, cubic-bezier(.22,1,.36,1));
+}
+
+.lumi-surface-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--lumi-card-shadow-hover);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.lumi-card-premium {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--lumi-card-bg);
+  border: 1px solid var(--lumi-card-border);
+  box-shadow: var(--lumi-card-shadow);
+  backdrop-filter: var(--lumi-blur-card);
+}
+
+.lumi-card-premium::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 88% 0%, rgba(255,255,255,.48), transparent 32%),
+    linear-gradient(180deg, rgba(255,255,255,.18), transparent 52%);
+  opacity: .72;
+}
+
+.lumi-section-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #9A958E;
+}
+
+.lumi-section-title {
+  font-family: 'Montserrat', 'Geist Variable', system-ui, sans-serif;
+  font-size: clamp(22px, 2vw, 28px);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -.06em;
+  color: #181714;
+}
+
+.lumi-body-text {
+  font-size: 14px;
+  line-height: 1.75;
+  color: #77736C;
+}
+
+.lumi-button-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border-radius: 999px;
+  background: #181714;
+  color: #fff;
+  padding: 0 18px;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 0 14px 30px rgba(24, 23, 20, 0.14);
+  transition:
+    transform 220ms var(--lumi-ease, cubic-bezier(.22,1,.36,1)),
+    background 220ms var(--lumi-ease, cubic-bezier(.22,1,.36,1)),
+    box-shadow 220ms var(--lumi-ease, cubic-bezier(.22,1,.36,1));
+}
+
+.lumi-button-dark:hover {
+  transform: translateY(-1px);
+  background: #25231F;
+  box-shadow: 0 18px 40px rgba(24, 23, 20, 0.18);
+}
+
+@media (max-width: 640px) {
+  .lumi-page,
+  body {
+    background:
+      radial-gradient(circle at 18% 0%, rgba(255,255,255,.92) 0%, transparent 36%),
+      radial-gradient(circle at 100% 12%, rgba(226,216,198,.30) 0%, transparent 34%),
+      #F7F6F3;
+  }
+
+  .lumi-card-premium {
+    border-radius: 24px;
+  }
+
+  .lumi-section-title {
+    font-size: 22px;
+  }
+}

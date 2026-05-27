@@ -1,0 +1,41 @@
+/* src/styles/lumi-tokens.css */
+
+:root {
+  --lumi-bg: #F7F6F3;
+  --lumi-surface: rgba(255, 255, 255, 0.9);
+  --lumi-surface-solid: #FFFFFF;
+  --lumi-ink: #181714;
+  --lumi-text: #40464D;
+  --lumi-muted: #77736C;
+  --lumi-soft: #F5F3EF;
+  --lumi-line: #ECE8E1;
+
+  --lumi-radius-sm: 14px;
+  --lumi-radius-md: 20px;
+  --lumi-radius-lg: 24px;
+  --lumi-radius-xl: 30px;
+  --lumi-radius-full: 999px;
+
+  --lumi-shadow-soft: 0 16px 48px rgba(25, 25, 25, 0.045);
+  --lumi-shadow-float: 0 22px 70px rgba(25, 25, 25, 0.12);
+
+  --lumi-blur: blur(18px);
+  --lumi-ease: cubic-bezier(.22, 1, .36, 1);
+}
+
+body {
+  background: var(--lumi-bg);
+}
+
+.lumi-glass {
+  background: var(--lumi-surface);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: var(--lumi-shadow-soft);
+  backdrop-filter: var(--lumi-blur);
+}
+
+.lumi-page {
+  min-height: 100vh;
+  background: var(--lumi-bg);
+  color: var(--lumi-ink);
+}

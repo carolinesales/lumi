@@ -89,7 +89,12 @@ export default function Login() {
     setErro('')
     setLoading(true)
     try {
-      await signInWithEmailAndPassword(auth, email, senha)
+      const { user } = await signInWithEmailAndPassword(auth, email, senha)
+      // Conta não verificada → volta para a verificação OTP
+      if (!user.emailVerified) {
+        navigate('/verificar-email')
+        return
+      }
       navigate('/app/home')
     } catch (err) {
       setErro(ERROS[err.code] ?? t('login_erro_generico'))

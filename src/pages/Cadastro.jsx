@@ -1,14 +1,12 @@
-import { useState }                                                    from 'react'
-import { Link, useNavigate }                                           from 'react-router-dom'
-import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth'
-import { doc, serverTimestamp, setDoc }                                from 'firebase/firestore'
+import { useState }                                          from 'react'
+import { Link, useNavigate, useLocation }                    from 'react-router-dom'
+import { createUserWithEmailAndPassword, updateProfile }     from 'firebase/auth'
+import { doc, serverTimestamp, setDoc }                      from 'firebase/firestore'
 
 import { auth, db } from '@/lib/firebase'
 import { useIdioma } from '@/contexts/IdiomaContext'
 import { Button }    from '@/components/ui/button'
 import { cn }        from '@/lib/utils'
-
-// ─── Constantes ───────────────────────────────────────────────────────────────
 
 const PAISES = [
   { flag: '🇧🇷', ddi: '+55' }, { flag: '🇺🇸', ddi: '+1'   },
@@ -28,8 +26,6 @@ function formatarCelular(v) {
   if (n.length <= 7) return `(${n.slice(0,2)}) ${n.slice(2)}`
   return `(${n.slice(0,2)}) ${n.slice(2,7)}-${n.slice(7)}`
 }
-
-// ─── Sub-componentes compartilhados ──────────────────────────────────────────
 
 function AuthLayout({ photo, children }) {
   return (
@@ -90,11 +86,13 @@ function ErrorBox({ message }) {
   )
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 export default function Cadastro() {
   const { t, idioma } = useIdioma()
   const navigate      = useNavigate()
+  const location      = useLocation()
+
+  // Dados preservados ao voltar de "Corrigir e-mail" (senha nunca é preservada)
+  const preserv = location.state?.dadosCadastro ?? {}
 
   const ERROS = {
     'auth/email-already-in-use': t('cad_erro_email_uso'),
@@ -108,16 +106,16 @@ export default function Cadastro() {
     { key: 'numero',  label: t('cad_criterio_numero'),  test: v => /[0-9]/.test(v)    },
   ]
 
-  const [aba,        setAba]        = useState('dados')
-  const [nome,       setNome]       = useState('')
-  const [sobrenome,  setSobrenome]  = useState('')
-  const [email,      setEmail]      = useState('')
-  const [ddi,        setDdi]        = useState('+55')
-  const [celular,    setCelular]    = useState('')
-  const [senha,      setSenha]      = useState('')
-  const [confirmar,  setConfirmar]  = useState('')
-  const [erro,       setErro]       = useState('')
-  const [loading,    setLoading]    = useState(false)
+  const [aba,       setAba]       = useState('dados')
+  const [nome,      setNome]      = useState(preserv.nome      ?? '')
+  const [sobrenome, setSobrenome] = useState(preserv.sobrenome ?? '')
+  const [email,     setEmail]     = useState(preserv.email     ?? '')
+  const [ddi,       setDdi]       = useState(preserv.ddi       ?? '+55')
+  const [celular,   setCelular]   = useState(preserv.celular   ?? '')
+  const [senha,     setSenha]     = useState('')
+  const [confirmar, setConfirmar] = useState('')
+  const [erro,      setErro]      = useState('')
+  const [loading,   setLoading]   = useState(false)
 
   const criteriosOk = CRITERIOS.map(c => ({ ...c, ok: c.test(senha) }))
   const senhaValida  = criteriosOk.every(c => c.ok)
@@ -144,7 +142,6 @@ export default function Cadastro() {
       const idiomaAtual = localStorage.getItem('lumi_idioma') ?? idioma ?? 'pt'
       const { user }    = await createUserWithEmailAndPassword(auth, email, senha)
       await updateProfile(user, { displayName: `${nome} ${sobrenome}` })
-      await sendEmailVerification(user)
       await setDoc(doc(db, 'usuarios', user.uid), {
         nome, sobrenome, email,
         celular:        celular ? `${ddi} ${celular}` : '',
@@ -154,7 +151,7 @@ export default function Cadastro() {
         perfilCompleto: false,
         notificacoes:   { diaria: true, semanal: true, especialista: false },
       })
-      navigate('/verificar-email')
+      navigate('/verificar-email', { state: { dadosCadastro: { nome, sobrenome, email, ddi, celular } } })
     } catch (err) {
       setErro(ERROS[err.code] ?? t('cad_erro_generico'))
       setAba('dados')
@@ -167,13 +164,11 @@ export default function Cadastro() {
     <AuthLayout photo="/hero-cadastro.jpg">
       <div className="flex flex-col gap-8 lumi-animate-in">
 
-        {/* Título */}
         <div className="flex flex-col gap-2">
           <h2 className="font-['Montserrat'] text-2xl font-medium text-lumi-black">{t('cad_titulo')}</h2>
           <p className="font-nunito text-sm text-lumi-gray">{t('cad_sub')}</p>
         </div>
 
-        {/* Abas */}
         <div className="flex border-b border-lumi-border">
           {[{ id: 'dados', label: t('cad_aba_dados') }, { id: 'senha', label: t('cad_aba_senha') }].map(a => (
             <button key={a.id} type="button"
@@ -189,7 +184,6 @@ export default function Cadastro() {
           ))}
         </div>
 
-        {/* ABA 1 — Dados */}
         {aba === 'dados' && (
           <form onSubmit={avancar} className="flex flex-col gap-5">
             <div>
@@ -206,11 +200,9 @@ export default function Cadastro() {
                 placeholder="voce@email.com" required />
             </div>
 
-            {/* Celular */}
             <div>
               <FieldLabel>{t('pp_celular')}</FieldLabel>
               <div className="flex gap-2">
-                {/* DDI */}
                 <div className="relative flex h-[50px] w-[110px] shrink-0 items-center gap-2 rounded-xl border border-[#E8E8E8] px-3">
                   <span className="text-base">{paisAtual.flag}</span>
                   <span className="flex-1 font-nunito text-sm text-lumi-black">{ddi}</span>
@@ -229,7 +221,6 @@ export default function Cadastro() {
             </div>
 
             <ErrorBox message={erro} />
-
             <Button type="submit" size="lg" className="w-full">{t('cad_proximo')}</Button>
 
             <p className="text-center font-nunito text-sm text-lumi-black">
@@ -241,19 +232,16 @@ export default function Cadastro() {
           </form>
         )}
 
-        {/* ABA 2 — Senha */}
         {aba === 'senha' && (
           <form onSubmit={finalizar} className="flex flex-col gap-5">
             <PasswordField label={t('login_senha')}         value={senha}     onChange={e => setSenha(e.target.value)} />
             <PasswordField label={t('cad_confirmar_senha')} value={confirmar} onChange={e => setConfirmar(e.target.value)} />
 
-            {/* Barra de força */}
             <div className="h-1 overflow-hidden rounded-full bg-lumi-input">
               <div className="h-full rounded-full transition-all duration-300"
                 style={{ width: `${forcaPct}%`, background: forcaCor }} />
             </div>
 
-            {/* Critérios */}
             <div className="flex flex-col gap-2.5">
               {criteriosOk.map(c => (
                 <div key={c.key} className="flex items-center gap-2.5">

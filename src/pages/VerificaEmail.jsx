@@ -1,188 +1,309 @@
-import { useEffect, useState }                         from 'react'
-import { useNavigate }                                  from 'react-router-dom'
-import { reload, sendEmailVerification, signOut }       from 'firebase/auth'
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate, useLocation }     from 'react-router-dom'
+import { onAuthStateChanged, signOut }  from 'firebase/auth'
+import { httpsCallable }                from 'firebase/functions'
 
-import { auth }      from '@/lib/firebase'
-import { useIdioma } from '@/contexts/IdiomaContext'
-import { Button }    from '@/components/ui/button'
-import { cn }        from '@/lib/utils'
+import { auth, functions } from '@/lib/firebase'
+import { cn }              from '@/lib/utils'
+
+const TOTAL = 6
+
+// ─── Layout (espelha o AuthLayout do Login) ───────────────────────────────────
+
+function AuthLayout({ photo, children }) {
+  return (
+    <div className="flex h-screen overflow-hidden bg-white">
+      <div className="hidden w-[48%] shrink-0 lg:block">
+        <img
+          src={photo}
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full object-cover object-[center_20%] grayscale"
+        />
+      </div>
+      <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-6 py-14 lg:px-20">
+        <div className="w-full max-w-[360px]">
+          {children}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function VerificarEmail() {
-  const { t }    = useIdioma()
-  const navigate = useNavigate()
-  const user     = auth.currentUser
+  const navigate    = useNavigate()
+  const location    = useLocation()
+  const jaEnviouRef = useRef(false)
 
-  const [verificado,  setVerificado]  = useState(false)
-  const [verificando, setVerificando] = useState(false)
-  const [enviando,    setEnviando]    = useState(false)
-  const [msg,         setMsg]         = useState('')
-  const [isErro,      setIsErro]      = useState(false)
-  const [countdown,   setCountdown]   = useState(0)
+  // Dados do cadastro para devolver ao voltar (preserva preenchimento)
+  const dadosCadastro = location.state?.dadosCadastro ?? null
 
-  // Polling automático a cada 3s
+  const [user,       setUser]       = useState(null)
+  const [digitos,    setDigitos]    = useState(Array(TOTAL).fill(''))
+  const [erro,       setErro]       = useState('')
+  const [loading,    setLoading]    = useState(false)
+  const [enviando,   setEnviando]   = useState(false)
+  const [countdown,  setCountdown]  = useState(0)
+  const [verificado, setVerificado] = useState(false)
+  const [voltando,   setVoltando]   = useState(false)
+
+  const inputRefs = useRef([])
+
   useEffect(() => {
-    const interval = setInterval(async () => {
-      if (!user) return
-      await reload(user)
-      if (user.emailVerified) {
-        clearInterval(interval)
-        setVerificado(true)
-        setTimeout(() => navigate('/questionario'), 2800)
+    const unsub = onAuthStateChanged(auth, (u) => {
+      if (u && !jaEnviouRef.current) {
+        jaEnviouRef.current = true
+        setUser(u)
+        enviarOTP(u)
       }
-    }, 3000)
-    return () => clearInterval(interval)
-  }, [user, navigate])
+    })
+    return () => unsub()
+  }, []) // eslint-disable-line
 
-  // Countdown reenvio
   useEffect(() => {
     if (countdown <= 0) return
     const timer = setTimeout(() => setCountdown(c => c - 1), 1000)
     return () => clearTimeout(timer)
   }, [countdown])
 
-  async function verificarAgora() {
-    setVerificando(true)
-    await reload(user)
-    if (user.emailVerified) {
-      setVerificado(true)
-      setTimeout(() => navigate('/questionario'), 2800)
-    } else {
-      setMsg(t('ve_ainda_nao'))
-      setIsErro(true)
-      setTimeout(() => setMsg(''), 4000)
-    }
-    setVerificando(false)
-  }
-
-  async function reenviar() {
-    if (!user || countdown > 0) return
-    setEnviando(true)
+  async function enviarOTP(u, forcar = false) {
+    const currentUser = u ?? user
+    if (!currentUser) return
+    setEnviando(true); setErro('')
     try {
-      await sendEmailVerification(user)
-      setMsg(t('ve_reenviado'))
-      setIsErro(false)
+      const nome = currentUser.displayName?.split(' ')[0] ?? ''
+      const fn   = httpsCallable(functions, 'enviarCodigoOTP')
+      await fn({ uid: currentUser.uid, email: currentUser.email, nome, forcar })
       setCountdown(60)
-      setTimeout(() => setMsg(''), 4000)
-    } catch {
-      setMsg(t('ve_erro_reenvio'))
-      setIsErro(true)
+    } catch (err) {
+      setErro(err.message ?? 'Erro ao enviar código.')
     } finally {
       setEnviando(false)
     }
   }
 
-  return (
-    <div className="flex h-screen overflow-hidden bg-white">
-      {/* Foto desktop */}
-      <div className="hidden w-[48%] shrink-0 lg:block">
-        <img src="/hero-cadastro.jpg" alt="" aria-hidden="true"
-          className="h-full w-full object-cover object-[center_20%] grayscale" />
-      </div>
+  function reenviar() {
+    jaEnviouRef.current = true
+    enviarOTP(user, true)
+  }
 
-      {/* Conteúdo */}
-      <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8 py-14">
-        <div className="flex w-full max-w-[360px] flex-col items-center">
+  async function verificar(codigo) {
+    const code = codigo ?? digitos.join('')
+    if (code.length < TOTAL) { setErro('Digite todos os 6 dígitos.'); return }
+    setLoading(true); setErro('')
+    try {
+      const fn = httpsCallable(functions, 'verificarCodigoOTP')
+      const { data } = await fn({ uid: user.uid, codigo: code })
+      if (data?.sucesso) {
+        setVerificado(true)
+      } else {
+        // Falha esperada (código incorreto, expirado, etc) — retorna 200
+        setErro(data?.mensagem ?? 'Código inválido.')
+        setDigitos(Array(TOTAL).fill(''))
+        inputRefs.current[0]?.focus()
+      }
+    } catch (err) {
+      // Erro inesperado (rede, servidor)
+      setErro('Não foi possível verificar agora. Tente novamente.')
+      setDigitos(Array(TOTAL).fill(''))
+      inputRefs.current[0]?.focus()
+    } finally {
+      setLoading(false)
+    }
+  }
 
-          {/* Logo */}
-          <h1 className="mb-10 self-start font-serif text-[28px] italic text-lumi-black">
-            Lumi
-          </h1>
+  // Deleta a conta não verificada e volta ao cadastro (evita conta órfã)
+  async function corrigirEmail() {
+    setVoltando(true); setErro('')
+    try {
+      if (auth.currentUser) {
+        await auth.currentUser.delete()
+      }
+      navigate('/cadastro', { state: { dadosCadastro } })
+    } catch (err) {
+      // Se falhar (ex: precisa re-login), faz signOut como fallback
+      await signOut(auth)
+      navigate('/cadastro', { state: { dadosCadastro } })
+    }
+  }
 
-          {/* ── Aguardando verificação ── */}
-          {!verificado && (
-            <div className="flex w-full flex-col items-center gap-7 lumi-animate-in">
+  function handleChange(valor, idx) {
+    const v = valor.replace(/\D/g, '').slice(-1)
+    const novos = [...digitos]
+    novos[idx] = v
+    setDigitos(novos)
+    setErro('')
+    if (v && idx < TOTAL - 1) inputRefs.current[idx + 1]?.focus()
+    if (v && idx === TOTAL - 1 && novos.every(d => d !== '')) {
+      setTimeout(() => verificar(novos.join('')), 100)
+    }
+  }
 
-              {/* Ícone flutuante */}
-              <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full border border-lumi-border bg-lumi-bg"
-                style={{ animation: 'lumi-float-soft 4s ease-in-out infinite' }}>
-                <i className="fa-regular fa-envelope text-[28px] text-lumi-black" aria-hidden="true" />
-              </div>
+  function handleKeyDown(e, idx) {
+    if (e.key === 'Backspace' && !digitos[idx] && idx > 0) {
+      const novos = [...digitos]
+      novos[idx - 1] = ''
+      setDigitos(novos)
+      inputRefs.current[idx - 1]?.focus()
+    }
+    if (e.key === 'Enter') verificar()
+  }
 
-              {/* Texto */}
-              <div className="text-center">
-                <h2 className="mb-2.5 font-['Montserrat'] text-xl font-medium tracking-tight text-lumi-black">
-                  {t('ve_titulo')}
-                </h2>
-                <p className="font-nunito text-sm leading-6 text-lumi-gray">{t('ve_sub')}</p>
-                <p className="mt-1 font-nunito text-sm font-bold text-lumi-black">{user?.email}</p>
-              </div>
+  function handlePaste(e) {
+    e.preventDefault()
+    const texto = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, TOTAL)
+    if (!texto) return
+    const novos = Array(TOTAL).fill('')
+    texto.split('').forEach((c, i) => { novos[i] = c })
+    setDigitos(novos)
+    inputRefs.current[Math.min(texto.length, TOTAL - 1)]?.focus()
+    if (texto.length === TOTAL) setTimeout(() => verificar(texto), 100)
+  }
 
-              {/* Feedback */}
-              {msg && (
-                <div className={cn(
-                  'w-full rounded-xl border px-4 py-3 text-center font-nunito text-sm',
-                  isErro
-                    ? 'border-red-200 bg-red-50 text-[#dc3232]'
-                    : 'border-green-200 bg-green-50 text-green-700',
-                )}>
-                  {msg}
+  const nome = user?.displayName?.split(' ')[0] ?? ''
+
+  // ── Tela de boas-vindas pós-verificação ──────────────────────────────────
+  if (verificado) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white px-6">
+        <div className="flex w-full max-w-[400px] flex-col items-center gap-8 text-center">
+          <div
+            className="flex h-20 w-20 items-center justify-center rounded-full bg-black"
+            style={{ animation: 'lumi-pop-in .4s cubic-bezier(.22,1,.36,1) both' }}
+          >
+            <i className="fa-solid fa-check text-[32px] text-white" aria-hidden="true" />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <h2 className="font-['Montserrat'] text-2xl font-medium tracking-tight text-lumi-black">
+              Olá, {nome}! 👋
+            </h2>
+            <p className="font-nunito text-base leading-relaxed text-lumi-gray">
+              Seu e-mail foi confirmado. Agora vamos conhecer seus fios e montar sua rotina personalizada.
+            </p>
+          </div>
+
+          <div className="w-full rounded-2xl border border-[#E8E8E8] bg-white p-5 text-left">
+            {[
+              { icon: 'fa-magnifying-glass', text: 'Diagnóstico capilar personalizado' },
+              { icon: 'fa-calendar-days',    text: 'Cronograma de cuidados semanal'    },
+              { icon: 'fa-chart-line',       text: 'Acompanhamento do Hair Score'      },
+            ].map((item, i, arr) => (
+              <div key={item.icon} className={cn(
+                'flex items-center gap-3 py-2.5 first:pt-0 last:pb-0',
+                i < arr.length - 1 && 'border-b border-[#F0F0F0]',
+              )}>
+                <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-lumi-bg">
+                  <i className={cn('fa-solid text-sm text-lumi-black', item.icon)} aria-hidden="true" />
                 </div>
-              )}
-
-              {/* Botões */}
-              <div className="flex w-full flex-col gap-2.5">
-                <Button size="lg" className="w-full" onClick={verificarAgora} disabled={verificando}>
-                  {verificando
-                    ? <><i className="fa-solid fa-spinner fa-spin text-sm" aria-hidden="true" />{t('ve_verificando')}</>
-                    : t('ve_ja_verifiquei')}
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full"
-                  onClick={reenviar}
-                  disabled={enviando || countdown > 0}
-                >
-                  {enviando
-                    ? t('ve_enviando')
-                    : countdown > 0
-                    ? `${t('ve_reenviar_em')} ${countdown}s`
-                    : t('ve_reenviar')}
-                </Button>
-
-                <button
-                  type="button"
-                  onClick={() => { signOut(auth); navigate('/') }}
-                  className="py-2 font-nunito text-sm text-lumi-muted transition hover:text-lumi-gray"
-                >
-                  {t('ve_outro_email')}
-                </button>
+                <span className="font-nunito text-sm text-lumi-black">{item.text}</span>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
 
-          {/* ── Email verificado ── */}
-          {verificado && (
-            <div className="flex flex-col items-center gap-8 text-center lumi-animate-in">
-              {/* Check animado */}
-              <svg width="80" height="80" viewBox="0 0 90 90" aria-label="Email verificado">
-                <circle cx="45" cy="45" r="42" fill="#181714"
-                  style={{ animation: 'lumi-soft-pulse 0.6s var(--lumi-ease) both' }} />
-                <path d="M 26 45 L 39 59 L 64 31" fill="none" stroke="#fff"
-                  strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"
-                  style={{ strokeDasharray: 56, strokeDashoffset: 0,
-                    animation: 'lumi-fade-up-soft 0.5s 0.3s ease forwards' }} />
-              </svg>
-
-              <div>
-                <h2 className="mb-2 font-['Montserrat'] text-xl font-medium text-lumi-black">
-                  {t('ve_verificado_titulo')}
-                </h2>
-                <p className="font-nunito text-sm leading-6 text-lumi-gray max-w-[260px]">
-                  {t('ve_verificado_sub')}
-                </p>
-              </div>
-
-              {/* Barra de progresso */}
-              <div className="h-0.5 w-[180px] overflow-hidden rounded-full bg-lumi-border">
-                <div className="h-full rounded-full bg-lumi-black"
-                  style={{ animation: 'load 2.8s var(--lumi-ease) forwards', width: 0 }} />
-              </div>
-            </div>
-          )}
+          <button
+            type="button"
+            onClick={() => navigate('/questionario')}
+            className="flex w-full items-center justify-center gap-2 rounded-[24px] bg-black px-6 py-3.5 font-nunito text-sm text-white transition hover:opacity-90"
+          >
+            Começar diagnóstico
+            <i className="fa-solid fa-arrow-right text-xs" aria-hidden="true" />
+          </button>
         </div>
       </div>
-    </div>
+    )
+  }
+
+  // ── Tela de OTP ──────────────────────────────────────────────────────────
+  return (
+    <AuthLayout photo="/hero-cadastro.jpg">
+      <div className="flex flex-col gap-8">
+
+        {/* Cabeçalho */}
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-2">
+            <h2 className="font-['Montserrat'] text-2xl font-medium leading-[40px] text-lumi-black">
+              Confirme seu e-mail
+            </h2>
+            <p className="font-nunito text-base leading-[22px] text-lumi-gray">
+              Enviamos um código de 6 dígitos para
+            </p>
+          </div>
+          <p className="text-center font-nunito text-base font-semibold leading-6 text-lumi-black">
+            {user?.email}
+          </p>
+        </div>
+
+        {/* Inputs OTP — flexíveis com gap */}
+        <div className="flex items-center gap-2" onPaste={handlePaste}>
+          {digitos.map((d, i) => (
+            <input
+              key={i}
+              ref={el => inputRefs.current[i] = el}
+              type="text"
+              inputMode="numeric"
+              maxLength={1}
+              value={d}
+              onChange={e => handleChange(e.target.value, i)}
+              onKeyDown={e => handleKeyDown(e, i)}
+              aria-label={`Dígito ${i + 1} do código`}
+              className={cn(
+                'h-[72px] min-w-0 flex-1 rounded-[8px] border bg-white text-center font-["Montserrat"] text-2xl font-medium text-lumi-black outline-none transition sm:h-[80px]',
+                d || erro
+                  ? erro ? 'border-[#dc3232]' : 'border-black'
+                  : 'border-[#E0E0E0] focus:border-black',
+              )}
+            />
+          ))}
+        </div>
+
+        {/* Erro */}
+        {erro && (
+          <p className="text-center font-nunito text-sm text-[#dc3232]">{erro}</p>
+        )}
+
+        {/* Botão + reenvio */}
+        <div className="flex flex-col items-center gap-8">
+          <button
+            type="button"
+            onClick={() => verificar()}
+            disabled={loading || digitos.some(d => !d)}
+            className="flex w-full items-center justify-center rounded-[24px] bg-black px-6 py-3 font-nunito text-sm text-white transition hover:opacity-90 disabled:opacity-40"
+          >
+            {loading
+              ? <i className="fa-solid fa-spinner fa-spin text-sm" aria-hidden="true" />
+              : 'Confirmar'}
+          </button>
+
+          <p className="text-center font-nunito text-sm">
+            <span className="text-lumi-black">Não recebeu o código?</span>{' '}
+            {countdown > 0 ? (
+              <span className="font-semibold text-lumi-black">Reenviar em {countdown}s</span>
+            ) : (
+              <button
+                type="button"
+                onClick={reenviar}
+                disabled={enviando}
+                className="font-semibold text-lumi-black underline underline-offset-2 transition hover:opacity-70 disabled:opacity-40"
+              >
+                {enviando ? 'Enviando...' : 'Reenviar'}
+              </button>
+            )}
+          </p>
+
+          <button
+            type="button"
+            onClick={corrigirEmail}
+            disabled={voltando}
+            className="font-nunito text-sm text-lumi-gray transition hover:text-lumi-black disabled:opacity-40"
+          >
+            {voltando ? 'Voltando...' : 'E-mail errado? Corrigir'}
+          </button>
+        </div>
+
+      </div>
+    </AuthLayout>
   )
 }

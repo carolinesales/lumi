@@ -1,22 +1,25 @@
-import * as React from "react"
+import { forwardRef } from 'react'
+import { cn } from '@/lib/utils'
 
-import { cn } from "@/lib/utils"
-
-function Input({
-  className,
-  type,
-  ...props
-}) {
+const Input = forwardRef(function Input({ className, error, disabled, ...props }, ref) {
   return (
     <input
-      type={type}
-      data-slot="input"
+      ref={ref}
+      disabled={disabled}
       className={cn(
-        "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
-        className
+        'w-full rounded-[8px] border bg-white px-4 py-3.5',
+        'font-nunito text-base text-lumi-black outline-none transition',
+        'placeholder:text-lumi-muted',
+        disabled
+          ? 'cursor-not-allowed border-lumi-border bg-lumi-input text-lumi-gray'
+          : error
+          ? 'border-[#dc3232] focus:border-[#dc3232]'
+          : 'border-lumi-border hover:border-lumi-gray focus:border-lumi-black',
+        className,
       )}
-      {...props} />
-  );
-}
+      {...props}
+    />
+  )
+})
 
-export { Input }
+export default Input

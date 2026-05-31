@@ -454,7 +454,7 @@ export default function RegistroModal({ onClose, onConcluido, onSaved }) {
         className="flex w-full max-w-[560px] flex-col overflow-hidden rounded-t-[28px] bg-white shadow-[0_-12px_60px_rgba(0,0,0,.14)] md:max-w-[800px] md:rounded-[28px] md:max-h-[88vh]"
         style={{ maxHeight: '94vh', animation: 'rmSlideUp .32s cubic-bezier(.22,1,.36,1) both' }}
       >
-        
+        {/* Alça — mobile only */}
         <div className="flex shrink-0 justify-center pb-1 pt-3 md:hidden">
           <div className="h-1 w-[38px] rounded-full bg-[#DCDCDC]" />
         </div>
@@ -639,7 +639,7 @@ export default function RegistroModal({ onClose, onConcluido, onSaved }) {
                   onChange={e => setObservacao(e.target.value)}
                   placeholder="Ex.: experimentei um produto novo e os fios ficaram mais pesados..."
                   maxLength={240}
-                  className="w-full resize-none rounded-2xl border-[1.5px] border-[#EDEDED] bg-[#F9F9F9] px-3.5 py-3 font-nunito text-sm leading-relaxed text-lumi-black outline-none transition placeholder:text-[#BCBCBC] focus:border-[#3D6B8A]"
+                  className="w-full resize-none rounded-[8px] border-[1.5px] border-[#EDEDED] bg-[#F9F9F9] px-3.5 py-3 font-nunito text-sm leading-relaxed text-lumi-black outline-none transition placeholder:text-[#BCBCBC] focus:border-[#3D6B8A]"
                   rows={3}
                 />
               </Section>

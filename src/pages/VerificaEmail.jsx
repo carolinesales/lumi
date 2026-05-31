@@ -21,7 +21,7 @@ function AuthLayout({ photo, children }) {
           className="h-full w-full object-cover object-[center_20%] grayscale"
         />
       </div>
-      <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-6 py-14 lg:px-20">
+      <div className="flex flex-1 flex-col items-center overflow-y-auto px-6 pt-8 pb-14 lg:justify-center lg:px-20 lg:pt-14">
         <div className="w-full max-w-[360px]">
           {children}
         </div>

@@ -6,6 +6,7 @@ import { doc, serverTimestamp, setDoc }                      from 'firebase/fire
 import { auth, db } from '@/lib/firebase'
 import { useIdioma } from '@/contexts/IdiomaContext'
 import { Button }    from '@/components/ui/button'
+import Input         from '@/components/ui/input'
 import { cn }        from '@/lib/utils'
 
 const PAISES = [
@@ -34,7 +35,7 @@ function AuthLayout({ photo, children }) {
         <img src={photo} alt="" aria-hidden="true"
           className="h-full w-full object-cover object-[center_20%] grayscale" />
       </div>
-      <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-6 py-14 lg:px-20">
+      <div className="flex flex-1 flex-col items-center overflow-y-auto px-6 pt-14 pb-14 lg:justify-center lg:px-20">
         <div className="w-full max-w-[360px]">{children}</div>
       </div>
     </div>
@@ -46,17 +47,7 @@ function FieldLabel({ children }) {
 }
 
 function FieldInput({ className, ...props }) {
-  return (
-    <input
-      className={cn(
-        'w-full rounded-xl border border-[#E8E8E8] bg-white px-4 py-3.5',
-        'font-nunito text-base text-lumi-black outline-none transition',
-        'placeholder:text-lumi-muted focus:border-lumi-black',
-        className,
-      )}
-      {...props}
-    />
-  )
+  return <Input className={className} {...props} />
 }
 
 function PasswordField({ label, value, onChange }) {
@@ -142,6 +133,7 @@ export default function Cadastro() {
       const idiomaAtual = localStorage.getItem('lumi_idioma') ?? idioma ?? 'pt'
       const { user }    = await createUserWithEmailAndPassword(auth, email, senha)
       await updateProfile(user, { displayName: `${nome} ${sobrenome}` })
+      // sendEmailVerification removido — verificação agora é via OTP na tela VerificaEmail
       await setDoc(doc(db, 'usuarios', user.uid), {
         nome, sobrenome, email,
         celular:        celular ? `${ddi} ${celular}` : '',
@@ -203,7 +195,7 @@ export default function Cadastro() {
             <div>
               <FieldLabel>{t('pp_celular')}</FieldLabel>
               <div className="flex gap-2">
-                <div className="relative flex h-[50px] w-[110px] shrink-0 items-center gap-2 rounded-xl border border-[#E8E8E8] px-3">
+                <div className="relative flex h-[50px] w-[110px] shrink-0 items-center gap-2 rounded-[8px] border border-[#E8E8E8] px-3">
                   <span className="text-base">{paisAtual.flag}</span>
                   <span className="flex-1 font-nunito text-sm text-lumi-black">{ddi}</span>
                   <i className="fa-solid fa-chevron-down text-[10px] text-lumi-gray" aria-hidden="true" />

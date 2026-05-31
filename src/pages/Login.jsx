@@ -5,6 +5,7 @@ import { signInWithEmailAndPassword }      from 'firebase/auth'
 import { auth }      from '@/lib/firebase'
 import { useIdioma } from '@/contexts/IdiomaContext'
 import { Button }    from '@/components/ui/button'
+import Input         from '@/components/ui/input'
 import { cn }        from '@/lib/utils'
 
 // ─── Componentes internos ─────────────────────────────────────────────────────
@@ -22,7 +23,7 @@ function AuthLayout({ photo, children }) {
         />
       </div>
       {/* Formulário */}
-      <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-6 py-14 lg:px-20">
+      <div className="flex flex-1 flex-col items-center overflow-y-auto px-6 pt-14 pb-14 lg:justify-center lg:px-20">
         <div className="w-full max-w-[360px]">
           {children}
         </div>
@@ -40,18 +41,7 @@ function FieldLabel({ children }) {
 }
 
 function FieldInput({ className, ...props }) {
-  return (
-    <input
-      className={cn(
-        'w-full rounded-xl border border-[#E8E8E8] bg-white px-4 py-3.5',
-        'font-nunito text-base text-lumi-black outline-none transition',
-        'placeholder:text-lumi-muted',
-        'focus:border-lumi-black',
-        className,
-      )}
-      {...props}
-    />
-  )
+  return <Input className={className} {...props} />
 }
 
 function ErrorBox({ message }) {

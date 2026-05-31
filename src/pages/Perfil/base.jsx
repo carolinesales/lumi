@@ -1,7 +1,12 @@
-import { useState }        from 'react'
+/**
+ * src/pages/perfil/base.jsx
+ * Primitivos de layout para as páginas de perfil.
+ * Usa Button do shadcn e Tailwind puro — zero inline styles.
+ */
 import { useNavigate }     from 'react-router-dom'
 import { useIdioma }       from '@/contexts/IdiomaContext'
 import { Button }          from '@/components/ui/button'
+import Input               from '@/components/ui/input'
 import { cn }              from '@/lib/utils'
 
 // ─── PageLayout ───────────────────────────────────────────────────────────────
@@ -136,29 +141,18 @@ export function FieldInput({
   hint,
   disabled,
 }) {
-  const [focused, setFocused] = useState(false)
-
   return (
     <div className="flex flex-col gap-1.5">
       <label className="font-nunito text-[11px] font-semibold uppercase tracking-[.06em] text-lumi-gray">
         {label}
       </label>
-      <input
+      <Input
         type={type}
         value={value}
         onChange={e => onChange?.(e.target.value)}
         placeholder={placeholder}
         disabled={disabled}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        className={cn(
-          'w-full rounded-xl border px-4 py-3.5 font-nunito text-sm outline-none transition',
-          disabled
-            ? 'cursor-not-allowed bg-lumi-input text-lumi-gray'
-            : focused
-            ? 'border-lumi-black bg-white text-lumi-black'
-            : 'border-lumi-border bg-white text-lumi-black hover:border-lumi-gray',
-        )}
+        className="py-3.5 text-sm"
       />
       {hint && (
         <p className="font-nunito text-[11px] leading-relaxed text-lumi-muted">{hint}</p>

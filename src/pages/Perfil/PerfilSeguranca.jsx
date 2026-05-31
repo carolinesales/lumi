@@ -215,7 +215,7 @@ export default function PerfilSeguranca() {
               value={senhaExclusao}
               onChange={e => setSenhaExclusao(e.target.value)}
               placeholder={t('ps_excluir_ph')}
-              className="mb-2 w-full rounded-xl border border-lumi-border bg-lumi-bg px-4 py-3.5 font-nunito text-sm outline-none transition focus:border-lumi-black"
+              className="mb-2 w-full rounded-[8px] border border-lumi-border bg-lumi-bg px-4 py-3.5 font-nunito text-sm outline-none transition focus:border-lumi-black"
             />
             {erroExclusao && (
               <p className="mb-3 text-center font-nunito text-sm text-[#dc3232]">{erroExclusao}</p>

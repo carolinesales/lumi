@@ -13,11 +13,11 @@ import {
   getTimelineInsight,
 } from '@/features/hairScore/utils/hairTimeline.utils'
 
-// ─── Constantes estáveis ──────────────────────────────────────────────────────
+// constantes e helpers para manipulação dos dados, formatação de labels e configuração do gráfico
 
 const CHART_MARGIN  = Object.freeze({ top: 8, right: 16, left: 16, bottom: 0 })
 const ACTIVE_DOT    = Object.freeze({ r: 5, fill: '#3D6B8A', stroke: '#FAF9FC', strokeWidth: 2 })
-const CURSOR_STYLE  = Object.freeze({ stroke: '#E2E8EE', strokeWidth: 1, strokeDasharray: '4 4' })
+const CURSOR_STYLE  = Object.freeze({ stroke: 'rgba(150,150,150,0.25)', strokeWidth: 1, strokeDasharray: '4 4' })
 
 const FILTROS = [
   { label: '7d',  dias: 7  },
@@ -31,7 +31,7 @@ const INFO_ITEMS = Object.freeze([
   { icon: 'fa-circle-info', text: 'É uma orientação de autocuidado e não substitui avaliação profissional.' },
 ])
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// helpers para manipulação dos dados e formatação de labels
 
 function deduplicateByDay(items = []) {
   const map = new Map()
@@ -75,7 +75,7 @@ function yDomain(items) {
   ]
 }
 
-// ─── Recharts custom components ───────────────────────────────────────────────
+// componentes do gráfico
 
 function CustomDot({ cx, cy, index, dataLength, payload }) {
   const isLast = index === dataLength - 1
@@ -96,7 +96,7 @@ function CustomTooltip({ active, payload }) {
   if (!active || !payload?.length) return null
   const { score, label } = payload[0].payload
   return (
-    <div className="rounded-[10px] bg-lumi-black px-2.5 py-1.5 shadow-lumi-float">
+    <div className="rounded-[10px] bg-ink px-2.5 py-1.5 shadow-lumi-float">
       <div className="font-heading text-[13px] font-semibold leading-[18px] text-white">{score}</div>
       <div className="font-nunito text-[10px] leading-[14px] text-white/60">{label}</div>
     </div>
@@ -114,18 +114,18 @@ function CustomTick({ x, y, payload, index, visibleTicksCount }) {
       fontFamily='"Nunito Sans", sans-serif'
       fontSize={9}
       fontWeight={isToday ? 700 : 600}
-      fill={isToday ? '#3D6B8A' : '#A8B4BE'}
+      fill={isToday ? '#3D6B8A' : '#999999'}
     >
       {payload.value}
     </text>
   )
 }
 
-// ─── Sub-componentes ──────────────────────────────────────────────────────────
+// sub-componentes
 
 function EmptyState() {
   return (
-    <div className="rounded-2xl bg-[#FAF9FC] p-6 text-center">
+    <div className="rounded-2xl bg-surface-subtle p-6 text-center">
       <div className="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-full bg-[#E8F2FA] text-[#6BA8D4]">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -150,12 +150,12 @@ function InfoModal({ onClose }) {
       style={{ animation: 'lumi-fade-up-soft .18s ease both' }}
     >
       <div
-        className="w-full max-w-[480px] rounded-t-[30px] border border-white/80 bg-[#F7F4EF] px-4 pb-5 pt-3 shadow-lumi-float md:rounded-[30px] md:px-6 md:pb-6 md:pt-5"
+        className="w-full max-w-[480px] rounded-t-[30px] bg-surface px-4 pb-5 pt-3 shadow-lumi-float md:rounded-[30px] md:px-6 md:pb-6 md:pt-5"
         onClick={e => e.stopPropagation()}
         style={{ animation: 'lumi-fade-up-soft .28s cubic-bezier(.22,1,.36,1) both' }}
       >
         <div className="mx-auto mb-4 h-1 w-9 rounded-full bg-lumi-border md:hidden" />
-        <div className="overflow-hidden rounded-[26px] border border-white/80 bg-white p-5 shadow-lumi-card">
+        <div className="overflow-hidden rounded-[26px] bg-transparent p-5 shadow-lumi-card">
           <h3 className="font-heading text-[22px] font-semibold leading-none tracking-tight text-lumi-black">
             Como o Lumi lê seus fios?
           </h3>
@@ -177,7 +177,7 @@ function InfoModal({ onClose }) {
   )
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
+// export principal do componente de timeline do hair score
 
 export default function HairTimeline({ scores = [], className }) {
   const [showInfo, setShowInfo] = useState(false)
@@ -198,10 +198,10 @@ export default function HairTimeline({ scores = [], className }) {
 
   return (
     <>
-      <LumiCard className={cn('overflow-hidden border border-white/80 bg-white p-0 shadow-lumi-card', className)}>
+      <div className={cn("overflow-hidden rounded-[28px] bg-surface p-0 shadow-lumi-card", className)}>
         <div className="flex flex-col gap-4 p-6">
 
-          {/* Header */}
+          {/* header */}
           <header className="flex items-start justify-between gap-2">
             <div className="flex flex-col gap-2">
               <h3 className="font-heading text-base font-semibold text-lumi-black">
@@ -215,7 +215,7 @@ export default function HairTimeline({ scores = [], className }) {
               type="button"
               onClick={() => setShowInfo(true)}
               aria-label="Entender leitura dos fios"
-              className="shrink-0 text-[#A8A29E] transition-all duration-200 hover:rotate-[15deg] hover:scale-110 hover:text-lumi-black"
+              className="shrink-0 text-text-tertiary transition-all duration-200 hover:rotate-[15deg] hover:scale-110 hover:text-lumi-black"
             >
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor" strokeWidth="1.8">
@@ -225,7 +225,7 @@ export default function HairTimeline({ scores = [], className }) {
             </button>
           </header>
 
-          {/* ── Filtro de período ── */}
+          {/* filtro de período */}
           <div className="flex items-center gap-1.5" role="group" aria-label="Filtrar período">
             {FILTROS.map(f => (
               <button
@@ -235,7 +235,7 @@ export default function HairTimeline({ scores = [], className }) {
                 className={cn(
                   'rounded-full px-3 py-1 font-nunito text-xs font-semibold transition-colors',
                   filtroDias === f.dias
-                    ? 'bg-lumi-black text-white'
+                    ? 'bg-ink text-white'
                     : 'bg-lumi-input text-lumi-gray hover:bg-lumi-border',
                 )}
                 aria-pressed={filtroDias === f.dias}
@@ -248,12 +248,12 @@ export default function HairTimeline({ scores = [], className }) {
             </span>
           </div>
 
-          {/* Body */}
+          {/* body */}
           {items.length === 0 ? <EmptyState /> : (
             <div className="flex flex-col gap-4">
 
-              {/* Gráfico */}
-              <div className="overflow-hidden rounded-2xl bg-[#FAF9FC] pt-4">
+              {/* gráfico */}
+              <div className="overflow-hidden rounded-2xl bg-surface-subtle pt-4">
                 <ResponsiveContainer width="100%" height={160}>
                   <AreaChart data={chartData} margin={CHART_MARGIN}>
                     <defs>
@@ -262,7 +262,7 @@ export default function HairTimeline({ scores = [], className }) {
                         <stop offset="100%" stopColor="#7EB5D6" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid horizontal vertical={false} stroke="#E8EDF0" strokeWidth={0.6} />
+                    <CartesianGrid horizontal vertical={false} stroke="rgba(150,150,150,0.18)" strokeWidth={0.6} />
                     <XAxis dataKey="label" axisLine={false} tickLine={false}
                       tick={<CustomTick />} interval={0} height={28} />
                     <YAxis hide domain={domain} />
@@ -281,7 +281,7 @@ export default function HairTimeline({ scores = [], className }) {
               </div>
 
               {/* Insight */}
-              <div className="rounded-2xl border border-[#ECEAF0] bg-[#F7F6FB] p-3.5">
+              <div className="rounded-2xl bg-surface-subtle p-3.5">
                 <span className="mb-1.5 block font-nunito text-sm font-semibold text-lumi-black">
                   Insights Lumi
                 </span>
@@ -290,7 +290,7 @@ export default function HairTimeline({ scores = [], className }) {
             </div>
           )}
         </div>
-      </LumiCard>
+      </div>
 
       {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
     </>

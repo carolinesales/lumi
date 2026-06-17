@@ -5,7 +5,7 @@ export default function InsightCard({ clima, text }) {
 
   return (
     <div style={{
-      background: '#FFF',
+      background: 'var(--surface)',
       borderRadius: 16,
       padding: 24,
       display: 'flex',
@@ -14,13 +14,13 @@ export default function InsightCard({ clima, text }) {
       boxSizing: 'border-box',
     }}>
 
-      {/* ── row superior: cidade + temperatura | umidade + sensação ── */}
+      {/* cidade + temperatura | umidade + sensação termica ── */}
       <div style={{
         display: 'flex',
         alignItems: 'flex-start',
         gap: 12,
       }}>
-        {/* esquerda: cidade + temperatura */}
+        {/*cidade + temperatura */}
         <div style={{
           flex: '1 0 0',
           display: 'flex',
@@ -32,7 +32,7 @@ export default function InsightCard({ clima, text }) {
             fontSize: 12,
             fontWeight: 500,
             lineHeight: '20px',
-            color: '#1E1E1F',
+            color: 'var(--text-primary)',
           }}>
             {hasWeather ? formatCidade(clima.cidade) : 'Insight do dia'}
           </span>
@@ -43,7 +43,7 @@ export default function InsightCard({ clima, text }) {
               fontSize: 36,
               fontWeight: 600,
               lineHeight: '40px',
-              color: '#000',
+              color: 'var(--text-primary)',
               letterSpacing: '-0.5px',
             }}>
               {clima.temperatura}°C
@@ -51,7 +51,7 @@ export default function InsightCard({ clima, text }) {
           )}
         </div>
 
-        {/* direita: umidade + sensação */}
+        {/*umidade + sensação termica */}
         {hasWeather && (
           <div style={{
             display: 'flex',
@@ -63,7 +63,7 @@ export default function InsightCard({ clima, text }) {
             {/* umidade */}
             <div style={{
               display: 'flex',
-              alignItems: 'center',
+              alignItems: 'center', color: 'var(--text-secondary)',
               gap: 6,
             }}>
               <DropletIcon />
@@ -72,16 +72,16 @@ export default function InsightCard({ clima, text }) {
                 fontSize: 12,
                 fontWeight: 500,
                 lineHeight: '20px',
-                color: '#495059',
+                color: 'var(--text-secondary)',
               }}>
                 {clima.umidade}%
               </span>
             </div>
 
-            {/* sensação */}
+            {/* sensação termica */}
             <div style={{
               display: 'flex',
-              alignItems: 'center',
+              alignItems: 'center', color: 'var(--text-secondary)',
               gap: 6,
             }}>
               <ThermometerIcon />
@@ -90,7 +90,7 @@ export default function InsightCard({ clima, text }) {
                 fontSize: 12,
                 fontWeight: 500,
                 lineHeight: '20px',
-                color: '#495059',
+                color: 'var(--text-secondary)',
                 whiteSpace: 'nowrap',
               }}>
                 Sensação {clima.sensacao ?? clima.temperatura - 2}°
@@ -100,11 +100,11 @@ export default function InsightCard({ clima, text }) {
         )}
       </div>
 
-      {/* ── área de insight ── */}
+      {/* insight lumi ── */}
       {text && (
         <div style={{
-          background: '#FAF9FC',
-          border: '1px solid #ECEAF0',
+          background: 'var(--surface-subtle)',
+          border: '1px solid var(--surface-muted)',
           borderRadius: 16,
           padding: '10px 14px',
           boxSizing: 'border-box',
@@ -115,7 +115,7 @@ export default function InsightCard({ clima, text }) {
             fontSize: 12,
             fontWeight: 400,
             lineHeight: '20px',
-            color: '#495059',
+            color: 'var(--text-secondary)',
             margin: 0,
           }}>
             {text}
@@ -127,14 +127,14 @@ export default function InsightCard({ clima, text }) {
   )
 }
 
-// ── formata cidade  ──────────────────────
+// formata a cidade
 function formatCidade(cidade = '') {
   if (!cidade) return ''
   if (cidade.includes(',')) return cidade
   return cidade
 }
 
-// ─── ícones SVG ──────────────────────────────────────────────────────────────
+//icones
 
 function DropletIcon() {
   return (
@@ -142,7 +142,7 @@ function DropletIcon() {
       xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, display: 'block' }}>
       <path
         d="M8 2C8 2 3.5 7.2 3.5 10.5C3.5 12.985 5.515 15 8 15C10.485 15 12.5 12.985 12.5 10.5C12.5 7.2 8 2 8 2Z"
-        fill="#495059"
+        fill="currentColor"
       />
     </svg>
   )
@@ -154,10 +154,10 @@ function ThermometerIcon() {
       xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, display: 'block' }}>
       <path
         d="M14 13.76V7a2 2 0 0 0-4 0v6.76a4 4 0 1 0 4 0Z"
-        stroke="#495059" strokeWidth="1.4"
+        stroke="currentColor" strokeWidth="1.4"
         strokeLinecap="round" strokeLinejoin="round"
       />
-      <circle cx="12" cy="17" r="1.5" fill="#495059" />
+      <circle cx="12" cy="17" r="1.5" fill="currentColor" />
     </svg>
   )
 }

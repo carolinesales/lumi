@@ -10,7 +10,7 @@ import { cn }                                 from '@/lib/utils'
 import medalhaConquistada  from '@/assets/medalhas/Medalha_conquistada.svg'
 import medalhaDesabilitada from '@/assets/medalhas/Medalha_desabilitada.svg'
 
-// ─── Sub-componentes ──────────────────────────────────────────────────────────
+// Sub-componentes 
 
 function Medalha({ desbloqueada = true, size = 56 }) {
   return (
@@ -117,7 +117,7 @@ function ConquistasConteudo({ desbloqueadas, progressos }) {
   )
 }
 
-// ─── useFocusTrap ─────────────────────────────────────────────────────────────
+// Focus trap para acessibilidade do modal ou drawer
 
 function useFocusTrap(ref, active) {
   useEffect(() => {
@@ -142,7 +142,7 @@ function useFocusTrap(ref, active) {
   }, [active, ref])
 }
 
-// ─── Drawer mobile ────────────────────────────────────────────────────────────
+// Drawer mobile
 
 function Drawer({ onClose, desbloqueadas, progressos, triggerRef }) {
   const startY   = useRef(null)
@@ -210,7 +210,7 @@ function Drawer({ onClose, desbloqueadas, progressos, triggerRef }) {
   )
 }
 
-// ─── Modal desktop ────────────────────────────────────────────────────────────
+// Modal desktop
 
 function Modal({ onClose, desbloqueadas, progressos, triggerRef }) {
   const modalRef = useRef(null)
@@ -254,7 +254,7 @@ function Modal({ onClose, desbloqueadas, progressos, triggerRef }) {
   )
 }
 
-// ─── Export principal ─────────────────────────────────────────────────────────
+// export principal do drawer ou modal
 
 export default function ConquistasDrawer({
   open,

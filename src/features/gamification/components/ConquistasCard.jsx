@@ -8,7 +8,7 @@ import { cn }              from '@/lib/utils'
 import medalhaConquistada  from '@/assets/medalhas/Medalha_conquistada.svg'
 import medalhaDesabilitada from '@/assets/medalhas/Medalha_desabilitada.svg'
 
-// ─── Medalha ──────────────────────────────────────────────────────────────────
+// medalhas
 
 function Medalha({ desbloqueada = true }) {
   return (
@@ -22,18 +22,18 @@ function Medalha({ desbloqueada = true }) {
   )
 }
 
-// ─── ConquistaItem ────────────────────────────────────────────────────────────
+// conquista individual
 
 function ConquistaItem({ conquista, desbloqueada }) {
   return (
     <div className={cn(
       'flex min-w-0 flex-1 flex-col items-center justify-start gap-4 rounded-2xl px-2 py-4',
-      desbloqueada ? 'bg-[#FAF9FC]' : 'bg-[#F5F4F4]',
+      desbloqueada ? 'bg-surface-subtle' : 'bg-surface-muted',
     )}>
       <Medalha desbloqueada={desbloqueada} />
       <span className={cn(
         'w-full text-center font-nunito text-xs font-medium leading-[14px]',
-        desbloqueada ? 'text-lumi-black' : 'text-[#A8A29E]',
+        desbloqueada ? 'text-lumi-black' : 'text-text-tertiary',
       )}>
         {conquista.nome}
       </span>
@@ -41,7 +41,7 @@ function ConquistaItem({ conquista, desbloqueada }) {
   )
 }
 
-// ─── Card principal ───────────────────────────────────────────────────────────
+// card principal de conquistas
 
 export default function ConquistasCard({ desbloqueadas = [], progressData = {} }) {
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -60,16 +60,16 @@ export default function ConquistasCard({ desbloqueadas = [], progressData = {} }
     bloqueadasList.filter(c => !ids.has(c.id)).slice(0, extra).forEach(c => visiveisMobile.push(c))
   }
 
-  // Desktop: todas, máximo 6
+  // Desktop: 6 recentes
   const visiveisDesktop = [...desbloqueadasList, ...bloqueadasList].slice(0, 6)
 
   return (
     <>
-      <div className="w-full rounded-2xl bg-white px-4 pb-8 pt-6">
+      <div className="w-full rounded-2xl bg-surface px-4 pb-8 pt-6">
 
         {/* Header */}
         <div className="mb-2 flex items-start gap-2">
-          <span className="flex-1 font-heading text-base font-semibold leading-5 text-[#1E1E1F]">
+          <span className="flex-1 font-heading text-base font-semibold leading-5 text-text">
             Conquistas
           </span>
           <button
@@ -87,14 +87,14 @@ export default function ConquistasCard({ desbloqueadas = [], progressData = {} }
           Sua evolução dentro da jornada Lumi
         </p>
 
-        {/* Mobile — 1 linha de 3 */}
+        {/* Mobile */}
         <div className="flex items-start gap-3.5 xl:hidden">
           {visiveisMobile.map(c => (
             <ConquistaItem key={c.id} conquista={c} desbloqueada={desbloqueadas.includes(c.id)} />
           ))}
         </div>
 
-        {/* Desktop — grid 3 colunas, 2 linhas */}
+        {/* Desktop*/}
         <div className="hidden grid-cols-3 gap-3.5 xl:grid">
           {visiveisDesktop.map(c => (
             <ConquistaItem key={c.id} conquista={c} desbloqueada={desbloqueadas.includes(c.id)} />

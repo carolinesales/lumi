@@ -9,6 +9,7 @@ import { aplicarDeltaHairScore }     from '@/features/hairScore/services/hairSco
 import { EVENTOS_CAPILARES, aplicarImpactoEventosDoDia } from '@/lib/reavaliacaoService'
 import { calcularStreakReal, calcularCuidado7Dias }       from '@/features/gamification/utils/gamificationUtils'
 import { Button }                    from '@/components/ui/button'
+import FotoCapilarUpload          from '@/features/jornada/components/FotoCapilarUpload'
 import { cn }                        from '@/lib/utils'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -31,13 +32,12 @@ function formatDataCompleta(date) {
 
 const EVENTOS_FILTRADOS = EVENTOS_CAPILARES.filter(e => !['calor','piscina_mar'].includes(e.id))
 
-// ─── CupSVG ───────────────────────────────────────────────────────────────────
+// ─── copinhos ───────────────────────────────────────────────────────────────────
 
 function CupSVG({ filled, fillPct = 0 }) {
-  const accent   = '#3D6B8A'
-  const accentBg = '#EBF2F7'
-  const border   = filled ? accent   : '#D1D5DB'
-  const bg       = filled ? accentBg : '#F9FAFB'
+  const accent   = 'var(--text-primary)'
+  const border   = filled ? 'var(--text-primary)' : 'var(--lumi-border)'
+  const bg       = filled ? 'var(--surface-muted)' : 'var(--surface-subtle)'
   const id       = `cup-${Math.random().toString(36).slice(2,7)}`
 
   return (
@@ -68,15 +68,16 @@ function Chip({ selected, onClick, icon, children }) {
       type="button"
       onClick={onClick}
       className={cn(
-        'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border-[1.5px] px-3.5 py-[7px] font-nunito text-sm font-semibold transition-all',
+        'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border-[1.5px] py-1 pl-1 pr-3.5 font-nunito text-sm font-semibold transition-all',
         selected
-          ? 'border-[#3D6B8A] bg-[#EBF2F7] text-[#3D6B8A]'
-          : 'border-[#EDEDED] bg-white text-lumi-black hover:border-[#3D6B8A] hover:bg-[#EBF2F7]',
+          ? 'border-ink bg-ink text-white'
+          : 'border-transparent bg-surface-subtle text-text hover:bg-surface-muted',
       )}
     >
       {icon && (
-        <i className={cn('fa-solid text-xs transition-colors', icon, selected ? 'text-[#3D6B8A]' : 'text-[#9CA3AF]')}
-          aria-hidden="true" />
+        <span className={cn('flex h-6 w-6 shrink-0 items-center justify-center rounded-full', selected ? 'bg-white' : 'bg-surface')}>
+          <i className={cn('fa-solid text-[11px]', icon, selected ? 'text-ink' : 'text-text-tertiary')} aria-hidden="true" />
+        </span>
       )}
       <span>{children}</span>
     </button>
@@ -85,13 +86,15 @@ function Chip({ selected, onClick, icon, children }) {
 
 function Section({ title, subtitle, children, className }) {
   return (
-    <div className={cn('mb-6', className)}>
-      <h3 className="mb-2.5 font-heading text-[15px] font-semibold tracking-[-0.02em] text-lumi-black">
-        {title}
-      </h3>
-      {subtitle && (
-        <p className="-mt-1.5 mb-2.5 font-nunito text-[11px] leading-snug text-lumi-gray">{subtitle}</p>
-      )}
+    <div className={cn('mb-4 flex flex-col gap-4 rounded-[12px] border border-paper-200 bg-surface p-4', className)}>
+      <div className="flex flex-col gap-0.5">
+        <h3 className="font-heading text-[15px] font-semibold tracking-[-0.02em] text-text">
+          {title}
+        </h3>
+        {subtitle && (
+          <p className="font-nunito text-[11px] leading-snug text-text-secondary">{subtitle}</p>
+        )}
+      </div>
       {children}
     </div>
   )
@@ -107,11 +110,11 @@ function WaterCups({ value, onChange }) {
   }
 
   return (
-    <div className="mb-6">
-      <div className="mb-3.5 flex items-baseline justify-between">
-        <h3 className="font-heading text-[15px] font-semibold tracking-[-0.02em] text-lumi-black">Água</h3>
-        <span className="font-heading text-xl font-medium tracking-tight text-lumi-black">
-          {value * ML_PER}<span className="ml-1 font-nunito text-xs text-lumi-gray">ml / {TOTAL * ML_PER}ml</span>
+    <div className="mb-4 flex flex-col gap-4 rounded-[12px] border border-paper-200 bg-surface p-4">
+      <div className="flex items-baseline justify-between">
+        <h3 className="font-heading text-[15px] font-semibold tracking-[-0.02em] text-text">Água</h3>
+        <span className="font-heading text-xl font-medium tracking-tight text-text">
+          {value * ML_PER}<span className="ml-1 font-nunito text-xs text-text-secondary">ml / {TOTAL * ML_PER}ml</span>
         </span>
       </div>
       <div className="grid grid-cols-6 gap-1.5">
@@ -123,15 +126,12 @@ function WaterCups({ value, onChange }) {
               key={i} type="button"
               onClick={() => onChange(i + 1 === value ? i : i + 1)}
               aria-label={label(i)}
-              className={cn(
-                'flex flex-col items-center gap-[3px] border-none bg-transparent p-0 transition-transform active:scale-[.92]',
-                filled ? 'cursor-pointer' : 'cursor-pointer',
-              )}
+              className="flex cursor-pointer flex-col items-center gap-[3px] border-none bg-transparent p-0 transition-transform active:scale-[.92]"
             >
               <CupSVG filled={filled} fillPct={fillPct} />
               <span className={cn(
                 'font-nunito text-[8.5px] font-bold transition-colors',
-                filled ? 'text-[#3D6B8A]' : 'text-[#9CA3AF]',
+                filled ? 'text-text' : 'text-text-tertiary',
               )}>
                 {label(i)}
               </span>
@@ -145,15 +145,13 @@ function WaterCups({ value, onChange }) {
 
 function ScoreBox({ label, value, variant }) {
   return (
-    <div className={cn(
-      'rounded-2xl border-[1.5px] border-[#EDEDED] p-3.5 text-center',
-    )}>
-      <span className="mb-1.5 block font-nunito text-[10px] font-bold uppercase tracking-[.1em] text-lumi-gray">
+    <div className="rounded-2xl border-[1.5px] border-paper-200 p-3.5 text-center">
+      <span className="mb-1.5 block font-nunito text-[10px] font-bold uppercase tracking-[.1em] text-text-secondary">
         {label}
       </span>
       <strong className={cn(
         'font-heading text-[28px] font-normal tracking-[-0.04em]',
-        variant === 'positive' ? 'text-[#2E6A45]' : variant === 'negative' ? 'text-[#9B3F3F]' : 'text-lumi-black',
+        variant === 'positive' ? 'text-state-positive' : variant === 'negative' ? 'text-state-negative' : 'text-text',
       )}>
         {value}
       </strong>
@@ -291,7 +289,6 @@ export default function RegistroModal({ onClose, onConcluido, onSaved }) {
   function irAnterior() { setSelectedDate(p => addDays(p, -1)) }
   function irSeguinte() { setSelectedDate(p => { const n = addDays(p, 1); return isFuture(n) ? p : n }) }
   function handleBack() {
-    if (window.matchMedia('(max-width:767px)').matches) { onClose(); return }
     irAnterior()
   }
   function toggleLista(setter, lista, val) {
@@ -441,6 +438,7 @@ export default function RegistroModal({ onClose, onConcluido, onSaved }) {
   return (
     <div
       className="fixed inset-0 z-[1000] flex animate-[rmFadeIn_.2s_ease_both] items-end justify-center bg-black/[.38] md:items-center md:bg-black/30 md:p-6"
+      onClick={onClose}
       style={{ '--animate-rmFadeIn': 'from{opacity:0}to{opacity:1}' }}
     >
       <style>{`
@@ -451,31 +449,32 @@ export default function RegistroModal({ onClose, onConcluido, onSaved }) {
 
       {/* Sheet */}
       <div
-        className="flex w-full max-w-[560px] flex-col overflow-hidden rounded-t-[28px] bg-white shadow-[0_-12px_60px_rgba(0,0,0,.14)] md:max-w-[800px] md:rounded-[28px] md:max-h-[88vh]"
+        className="flex w-full max-w-[560px] flex-col overflow-hidden rounded-t-[28px] bg-surface shadow-[0_-12px_60px_rgba(0,0,0,.14)] md:max-w-[800px] md:rounded-[28px] md:max-h-[88vh]"
+        onClick={e => e.stopPropagation()}
         style={{ maxHeight: '94vh', animation: 'rmSlideUp .32s cubic-bezier(.22,1,.36,1) both' }}
       >
         {/* Alça — mobile only */}
         <div className="flex shrink-0 justify-center pb-1 pt-3 md:hidden">
-          <div className="h-1 w-[38px] rounded-full bg-[#DCDCDC]" />
+          <div className="h-1 w-[38px] rounded-full bg-paper-300" />
         </div>
 
         {/* Header */}
-        <header className="grid shrink-0 grid-cols-[40px_1fr_40px] items-center border-b border-[#EDEDED] px-5 pb-4 pt-1 md:grid-cols-[80px_1fr_80px] md:px-8 md:py-5">
+        <header className="grid shrink-0 grid-cols-[40px_1fr_40px] items-center border-b border-paper-200 px-5 pb-4 pt-1 md:grid-cols-[80px_1fr_80px] md:px-8 md:py-5">
           <div className="flex justify-start">
             <button
               type="button"
               onClick={handleBack}
               aria-label="Voltar"
-              className="grid h-9 w-9 place-items-center rounded-full bg-transparent transition hover:bg-[#F9F9F9]"
+              className="grid h-9 w-9 place-items-center rounded-full bg-transparent transition hover:bg-surface-subtle"
             >
-              <i className="fa-solid fa-chevron-left text-[13px] text-lumi-gray" aria-hidden="true" />
+              <i className="fa-solid fa-chevron-left text-[13px] text-text-secondary" aria-hidden="true" />
             </button>
           </div>
           <div className="text-center">
-            <h2 className="font-heading text-lg font-semibold tracking-[-0.04em] text-lumi-black md:text-xl">
+            <h2 className="font-heading text-lg font-semibold tracking-[-0.04em] text-text md:text-xl">
               {resultado ? 'Registro salvo' : formatDia(selectedDate)}
             </h2>
-            <p className="mt-[3px] font-nunito text-[11px] font-medium text-lumi-gray">
+            <p className="mt-[3px] font-nunito text-[11px] font-medium text-text-secondary">
               {formatDataCompleta(selectedDate)}
             </p>
           </div>
@@ -485,32 +484,32 @@ export default function RegistroModal({ onClose, onConcluido, onSaved }) {
               onClick={irSeguinte}
               disabled={!canGoNext}
               aria-label="Próximo dia"
-              className="grid h-9 w-9 place-items-center rounded-full bg-transparent transition hover:bg-[#F9F9F9] disabled:cursor-not-allowed disabled:opacity-[.28]"
+              className="grid h-9 w-9 place-items-center rounded-full bg-transparent transition hover:bg-surface-subtle disabled:cursor-not-allowed disabled:opacity-[.28]"
             >
-              <i className="fa-solid fa-chevron-right text-[13px] text-lumi-gray" aria-hidden="true" />
+              <i className="fa-solid fa-chevron-right text-[13px] text-text-secondary" aria-hidden="true" />
             </button>
           </div>
         </header>
 
         {/* Body */}
-        <main className="flex-1 overflow-y-auto px-5 py-5 md:px-8 md:py-7">
+        <main className="flex-1 overflow-y-auto bg-surface-subtle px-5 py-5 md:px-8 md:py-7">
           {carregando ? (
-            <div className="grid min-h-[240px] place-items-center font-nunito text-sm text-lumi-gray">
+            <div className="grid min-h-[240px] place-items-center font-nunito text-sm text-text-secondary">
               Carregando registro...
             </div>
           ) : resultado ? (
             /* ── Resultado ── */
             <div className="py-7 text-center">
               <div
-                className="mx-auto mb-[18px] grid h-[72px] w-[72px] place-items-center rounded-full bg-lumi-black text-white"
+                className="mx-auto mb-[18px] grid h-[72px] w-[72px] place-items-center rounded-full bg-ink text-white"
                 style={{ animation: 'rmPopIn .4s ease both' }}
               >
                 <i className="fa-solid fa-check text-[28px]" aria-hidden="true" />
               </div>
-              <h3 className="mb-2 font-heading text-[22px] font-semibold tracking-[-0.04em] text-lumi-black">
+              <h3 className="mb-2 font-heading text-[22px] font-semibold tracking-[-0.04em] text-text">
                 Seu dia foi registrado
               </h3>
-              <p className="mx-auto mb-5 max-w-[320px] font-nunito text-sm leading-relaxed text-lumi-gray">
+              <p className="mx-auto mb-5 max-w-[320px] font-nunito text-sm leading-relaxed text-text-secondary">
                 O Lumi salvou seu registro e atualizou a evolução dos seus fios.
               </p>
 
@@ -529,15 +528,14 @@ export default function RegistroModal({ onClose, onConcluido, onSaved }) {
                   {resultado.conquistasNovas.map(c => (
                     <div
                       key={c.id}
-                      className="mt-2 flex items-center gap-2.5 rounded-2xl p-3"
-                      style={{ background: c.cor?.bg ?? '#F5F3EF' }}
+                      className="mt-2 flex items-center gap-2.5 rounded-2xl bg-surface-subtle p-3"
                     >
-                      <i className={cn('fa-solid', c.icon)} style={{ color: c.cor?.icon ?? '#181714' }} aria-hidden="true" />
+                      <i className={cn('fa-solid', c.icon)} style={{ color: c.cor?.icon ?? 'var(--text-primary)' }} aria-hidden="true" />
                       <div className="text-left">
-                        <strong className="block font-nunito text-sm" style={{ color: c.cor?.text ?? '#181714' }}>
+                        <strong className="block font-nunito text-sm text-text">
                           {c.nome}
                         </strong>
-                        <p className="mt-0.5 font-nunito text-[11px] leading-snug" style={{ color: c.cor?.text ?? '#817B73' }}>
+                        <p className="mt-0.5 font-nunito text-[11px] leading-snug text-text-secondary">
                           {c.desc}
                         </p>
                       </div>
@@ -548,7 +546,7 @@ export default function RegistroModal({ onClose, onConcluido, onSaved }) {
             </div>
           ) : (
             /* ── Formulário ── */
-            <div className="md:grid md:grid-cols-2 md:gap-x-10">
+            <div className="md:grid md:grid-cols-2 md:items-start md:gap-x-4">
               <Section title="Como você está?">
                 <div className="flex flex-wrap gap-2">
                   {HUMORES.map(item => (
@@ -615,7 +613,7 @@ export default function RegistroModal({ onClose, onConcluido, onSaved }) {
                 </div>
               </Section>
 
-              <Section title="Aconteceu algo?" subtitle="Eventos que o Lumi deve levar em conta.">
+              <Section title="Aconteceu algo?" subtitle="Eventos que o Lumi deve levar em conta." className="md:col-span-2">
                 <div className="flex flex-wrap gap-2">
                   {EVENTOS_FILTRADOS.map(e => (
                     <Chip key={e.id} selected={eventosDia.includes(e.id)} onClick={() => toggleEvento(e.id)} icon={e.icon}>{e.label}</Chip>
@@ -639,7 +637,7 @@ export default function RegistroModal({ onClose, onConcluido, onSaved }) {
                   onChange={e => setObservacao(e.target.value)}
                   placeholder="Ex.: experimentei um produto novo e os fios ficaram mais pesados..."
                   maxLength={240}
-                  className="w-full resize-none rounded-[8px] border-[1.5px] border-[#EDEDED] bg-[#F9F9F9] px-3.5 py-3 font-nunito text-sm leading-relaxed text-lumi-black outline-none transition placeholder:text-[#BCBCBC] focus:border-[#3D6B8A]"
+                  className="w-full resize-none rounded-[8px] border-[1.5px] border-paper-200 bg-surface-subtle px-3.5 py-3 font-nunito text-sm leading-relaxed text-text outline-none transition placeholder:text-text-tertiary focus:border-ink"
                   rows={3}
                 />
               </Section>
@@ -648,7 +646,7 @@ export default function RegistroModal({ onClose, onConcluido, onSaved }) {
         </main>
 
         {/* Footer */}
-        <footer className="shrink-0 border-t border-[#EDEDED] bg-white px-5 pb-7 pt-3.5 md:px-8 md:pb-6">
+        <footer className="shrink-0 border-t border-paper-200 bg-surface px-5 pb-7 pt-3.5 md:px-8 md:pb-6">
           {resultado ? (
             <div className="flex md:justify-end">
               <Button size="lg" className="w-full md:w-[220px]" onClick={onClose}>Fechar</Button>

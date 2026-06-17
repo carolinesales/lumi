@@ -4,11 +4,13 @@ import { onAuthStateChanged, signOut }  from 'firebase/auth'
 import { httpsCallable }                from 'firebase/functions'
 
 import { auth, functions } from '@/lib/firebase'
+import { useAuth }         from '@/contexts/AuthContext'
 import { cn }              from '@/lib/utils'
+import BoasVindas          from '@/pages/BoasVindas'
 
 const TOTAL = 6
 
-// ─── Layout (espelha o AuthLayout do Login) ───────────────────────────────────
+// ─── Layout ───────────────────────────────────
 
 function AuthLayout({ photo, children }) {
   return (
@@ -21,7 +23,7 @@ function AuthLayout({ photo, children }) {
           className="h-full w-full object-cover object-[center_20%] grayscale"
         />
       </div>
-      <div className="flex flex-1 flex-col items-center overflow-y-auto px-6 pt-8 pb-14 lg:justify-center lg:px-20 lg:pt-14">
+      <div className="flex flex-1 flex-col items-center overflow-y-auto px-6 pt-14 pb-14 lg:justify-center lg:px-20">
         <div className="w-full max-w-[360px]">
           {children}
         </div>
@@ -35,6 +37,7 @@ function AuthLayout({ photo, children }) {
 export default function VerificarEmail() {
   const navigate    = useNavigate()
   const location    = useLocation()
+  const { refreshUser } = useAuth()
   const jaEnviouRef = useRef(false)
 
   // Dados do cadastro para devolver ao voltar (preserva preenchimento)
@@ -97,6 +100,10 @@ export default function VerificarEmail() {
       const fn = httpsCallable(functions, 'verificarCodigoOTP')
       const { data } = await fn({ uid: user.uid, codigo: code })
       if (data?.sucesso) {
+        // Atualiza o contexto para o frontend pegar emailVerified=true
+        // (a Cloud Function marcou no servidor; sem isso o ProtectedRoute bloqueia)
+        const atualizado = await refreshUser()
+        console.log('[OTP] emailVerified após refresh:', atualizado?.emailVerified)
         setVerificado(true)
       } else {
         // Falha esperada (código incorreto, expirado, etc) — retorna 200
@@ -166,54 +173,7 @@ export default function VerificarEmail() {
 
   // ── Tela de boas-vindas pós-verificação ──────────────────────────────────
   if (verificado) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white px-6">
-        <div className="flex w-full max-w-[400px] flex-col items-center gap-8 text-center">
-          <div
-            className="flex h-20 w-20 items-center justify-center rounded-full bg-black"
-            style={{ animation: 'lumi-pop-in .4s cubic-bezier(.22,1,.36,1) both' }}
-          >
-            <i className="fa-solid fa-check text-[32px] text-white" aria-hidden="true" />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <h2 className="font-['Montserrat'] text-2xl font-medium tracking-tight text-lumi-black">
-              Olá, {nome}! 👋
-            </h2>
-            <p className="font-nunito text-base leading-relaxed text-lumi-gray">
-              Seu e-mail foi confirmado. Agora vamos conhecer seus fios e montar sua rotina personalizada.
-            </p>
-          </div>
-
-          <div className="w-full rounded-2xl border border-[#E8E8E8] bg-white p-5 text-left">
-            {[
-              { icon: 'fa-magnifying-glass', text: 'Diagnóstico capilar personalizado' },
-              { icon: 'fa-calendar-days',    text: 'Cronograma de cuidados semanal'    },
-              { icon: 'fa-chart-line',       text: 'Acompanhamento do Hair Score'      },
-            ].map((item, i, arr) => (
-              <div key={item.icon} className={cn(
-                'flex items-center gap-3 py-2.5 first:pt-0 last:pb-0',
-                i < arr.length - 1 && 'border-b border-[#F0F0F0]',
-              )}>
-                <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-lumi-bg">
-                  <i className={cn('fa-solid text-sm text-lumi-black', item.icon)} aria-hidden="true" />
-                </div>
-                <span className="font-nunito text-sm text-lumi-black">{item.text}</span>
-              </div>
-            ))}
-          </div>
-
-          <button
-            type="button"
-            onClick={() => navigate('/questionario')}
-            className="flex w-full items-center justify-center gap-2 rounded-[24px] bg-black px-6 py-3.5 font-nunito text-sm text-white transition hover:opacity-90"
-          >
-            Começar diagnóstico
-            <i className="fa-solid fa-arrow-right text-xs" aria-hidden="true" />
-          </button>
-        </div>
-      </div>
-    )
+    return <BoasVindas nome={nome} />
   }
 
   // ── Tela de OTP ──────────────────────────────────────────────────────────

@@ -26,8 +26,9 @@ export default function TodayHeader({
     ?.join('')
     ?.toUpperCase() || 'L'
 
-  // Recalcula a data uma vez por mount. Se o app ficar aberto a noite toda,
-  // um reload natural do usuário vai atualizar — sem necessidade de timer.
+  // Recalcula a data uma vez por dia, no início do dia seguinte. Assim, se o usuário deixar a aba aberta, a data vai 
+  // atualizar automaticamente quando mudar para o próximo dia, sem precisar de um timer rodando constantemente.
+  // sem necessidade de timer
   const dataFormatada = useMemo(() => formatHoje(), [])
 
   return (

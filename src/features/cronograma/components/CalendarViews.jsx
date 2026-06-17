@@ -3,7 +3,7 @@ import { isSameDay, getWeekDays, getTreatment, WEEK_DAYS } from '../lib/calendar
 import { EventPill, WeekEventPill } from './EventPill'
 import { cn } from '@/lib/utils'
 
-// ─── Month View ───────────────────────────────────────────────────────────────
+// Visualização do Mês 
 
 export function MonthView({ calendarioMes, hoje, getEtapasDoDia, onAbrirEtapa, onAbrirDia }) {
   return (
@@ -112,7 +112,7 @@ function CheckBadge() {
   )
 }
 
-// ─── Week View ────────────────────────────────────────────────────────────────
+// Visualização da Semana
 
 export function WeekView({ semana, hoje, getEtapasDoDia, onAbrirEtapa, onAbrirDia }) {
   const days = getWeekDays(semana)
@@ -174,7 +174,7 @@ export function WeekView({ semana, hoje, getEtapasDoDia, onAbrirEtapa, onAbrirDi
   )
 }
 
-// ─── Day View ─────────────────────────────────────────────────────────────────
+//  Visualização do Dia 
 
 export function DayView({ dia, hoje, getEtapasDoDia, onAbrirEtapa }) {
   const isToday   = isSameDay(dia, hoje)

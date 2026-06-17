@@ -4,7 +4,7 @@ import { getTreatment, toDate } from '../lib/calendar'
 import { cn } from '@/lib/utils'
 import ilustracaoVazia from '@/assets/Milestone-4_Streamline_Milano.svg'
 
-// ─── Shared ───────────────────────────────────────────────────────────────────
+// Componentes de cards usados na sidebar direita do cronograma
 
 function Card({ children, className }) {
   return (
@@ -36,7 +36,7 @@ function StatusBadge({ concluida }) {
   )
 }
 
-// ─── TodayCard ────────────────────────────────────────────────────────────────
+// card usado na seção "Em foco hoje" 
 
 export function TodayCard({ etapa, dateLabel, onOpen, onObservacao }) {
   if (!etapa) return <TodayCardEmpty dateLabel={dateLabel} onObservacao={onObservacao} />
@@ -96,7 +96,7 @@ function TodayCardEmpty({ dateLabel, onObservacao }) {
   )
 }
 
-// ─── UpcomingCard ─────────────────────────────────────────────────────────────
+// card "Próximas etapas"
 
 export function UpcomingCard({ etapas, onOpen }) {
   return (
@@ -141,7 +141,7 @@ export function UpcomingCard({ etapas, onOpen }) {
   )
 }
 
-// ─── ProgressCard ─────────────────────────────────────────────────────────────
+// card "Progresso do ciclo"
 
 export function ProgressCard({ concluidas, total, etapas }) {
   const resumo = useMemo(() => {

@@ -2,7 +2,7 @@
 import { forwardRef, useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
 
-// ─── DiaCell ─────────────────────────────────────────────────────────────────
+// célula individual do dia
 
 const DiaCell = forwardRef(function DiaCell({ dia, temEtapa, onClick }, ref) {
   const isHoje = dia.isHoje
@@ -16,16 +16,16 @@ const DiaCell = forwardRef(function DiaCell({ dia, temEtapa, onClick }, ref) {
       className={cn(
         'mx-1 flex min-w-[52px] shrink-0 flex-col items-center gap-1.5 rounded-full px-1 py-2.5 transition-colors duration-150',
         isHoje
-          ? 'bg-[#1E1E1F]'
+          ? 'bg-ink'
           : temEtapa
-          ? 'cursor-pointer bg-[#F5F5F5] hover:bg-[#EBEBEB]'
-          : 'cursor-default bg-[#F5F5F5]',
+          ? 'cursor-pointer bg-surface hover:bg-paper-150'
+          : 'cursor-default bg-surface',
       )}
     >
       {/* Dia da semana */}
       <span className={cn(
         'font-nunito text-[11px] font-medium lowercase leading-none',
-        isHoje ? 'text-white/60' : 'text-[#495059]',
+        isHoje ? 'text-white/60' : 'text-text-secondary',
       )}>
         {dia.wd}
       </span>
@@ -33,7 +33,7 @@ const DiaCell = forwardRef(function DiaCell({ dia, temEtapa, onClick }, ref) {
       {/* Número */}
       <span className={cn(
         'font-nunito text-sm font-semibold leading-none',
-        isHoje ? 'text-white' : 'text-[#1E1E1F]',
+        isHoje ? 'text-white' : 'text-text',
       )}>
         {dia.n}
       </span>
@@ -55,7 +55,7 @@ const DiaCell = forwardRef(function DiaCell({ dia, temEtapa, onClick }, ref) {
   )
 })
 
-// ─── WeekCalendar ─────────────────────────────────────────────────────────────
+// calendario semanal
 
 export default function WeekCalendar({ semana = [], getEtapaDia, onOpenEtapa }) {
   const scrollRef = useRef(null)
@@ -77,10 +77,10 @@ export default function WeekCalendar({ semana = [], getEtapaDia, onOpenEtapa }) 
     : ''
 
   return (
-    <div className="flex flex-col gap-4 self-stretch overflow-hidden rounded-[24px] bg-white py-3.5">
+    <div className="flex flex-col gap-4 self-stretch py-3.5">
 
       {/* Mês */}
-      <span className="px-6 font-nunito text-[13px] font-medium leading-none text-[#495059]">
+      <span className="px-6 font-nunito text-[13px] font-medium leading-none text-text-secondary">
         {mesAnoLabel}
       </span>
 

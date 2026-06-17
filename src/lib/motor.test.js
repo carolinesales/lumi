@@ -12,7 +12,7 @@ import {
   calcularDeltaEventosCapilares,
 } from './motor'
 
-// ─── Fixtures ─────────────────────────────────────────────────────────────────
+// testes
 
 const saudavel = {
   estrutura: { tipoCurvatura: 'Cacheado', espessuraTextura: 'Médio', densidadeCapilar: 'Média', comprimento: 'Médio' },
@@ -43,7 +43,7 @@ const moderado = {
   vida:    { estresse: 'Moderado', sono: 'Média', alimentacao: 'Intermediária' },
 }
 
-// ─── avaliarFragilidade ───────────────────────────────────────────────────────
+// avalicação de fragilidade
 
 describe('avaliarFragilidade', () => {
   it('retorna ativa=false para cabelo saudável', () => {
@@ -95,7 +95,7 @@ describe('avaliarFragilidade', () => {
   })
 })
 
-// ─── calcularHairScore ────────────────────────────────────────────────────────
+// calcula o lumi score (0-100) a partir das respostas do diagnóstico
 
 describe('calcularHairScore', () => {
   it('retorna valor entre 0 e 100', () => {
@@ -136,7 +136,8 @@ describe('calcularHairScore', () => {
   })
 })
 
-// ─── calcularHairScoreDetalhado ───────────────────────────────────────────────
+// calcula o lumi score detalhado, com pontuação geral e eixos específicos de estrutura,
+// condição, couro e hábitos, além de avaliação de fragilidade ativa
 
 describe('calcularHairScoreDetalhado', () => {
   it('retorna estrutura com pontuacao e 4 eixos', () => {
@@ -177,7 +178,8 @@ describe('calcularHairScoreDetalhado', () => {
   })
 })
 
-// ─── classificarScore ────────────────────────────────────────────────────────
+// classifica o score em categorias qualitativas, considerando também a 
+// fragilidade ativa para rebaixar a classificação quando necessário
 
 describe('classificarScore', () => {
   it('score >= 85 retorna Radiante', () => {
@@ -228,7 +230,8 @@ describe('classificarScore', () => {
   })
 })
 
-// ─── gerarDiagnostico ────────────────────────────────────────────────────────
+// gera diagnóstico capilar detalhado a partir das respostas do usuário, 
+// incluindo avaliação de fragilidade ativa, nível de dano, risco de queda e tratamentos recomendados
 
 describe('gerarDiagnostico', () => {
   it('retorna estrutura completa', () => {
@@ -289,7 +292,9 @@ describe('gerarDiagnostico', () => {
   })
 })
 
-// ─── gerarRecomendacoes ───────────────────────────────────────────────────────
+// gera cronograma semanal e mensal personalizado a partir do diagnóstico, 
+// considerando os tratamentos recomendados, frequência ideal de lavagem e evitando 
+// sobrecarga em casos de fragilidade ativa
 
 describe('gerarRecomendacoes', () => {
   it('retorna array de recomendações', () => {
@@ -336,7 +341,9 @@ describe('gerarRecomendacoes', () => {
   })
 })
 
-// ─── gerarCronograma ─────────────────────────────────────────────────────────
+// gera cronograma semanal e mensal personalizado a partir do diagnóstico, 
+// considerando os tratamentos recomendados, frequência ideal de lavagem e evitando 
+// sobrecarga em casos de fragilidade ativa
 
 describe('gerarCronograma', () => {
   it('retorna semanas e frequenciaLavagem', () => {
@@ -390,7 +397,8 @@ describe('gerarCronograma', () => {
   })
 })
 
-// ─── calcularDeltaEventoCapilar ───────────────────────────────────────────────
+// calcula o impacto de um evento capilar no score, 
+// considerando a fragilidade ativa para moderação dos efeitos positivos e negativos
 
 describe('calcularDeltaEventoCapilar', () => {
   it('corte sem fragilidade retorna +1', () => {
@@ -426,7 +434,7 @@ describe('calcularDeltaEventoCapilar', () => {
   })
 })
 
-// ─── calcularDeltaEventosCapilares ─────────────────────────────────────────
+// calcula o impacto combinado de múltiplos eventos capilares no score,
 
 describe('calcularDeltaEventosCapilares', () => {
   it('lista com nada retorna 0', () => {

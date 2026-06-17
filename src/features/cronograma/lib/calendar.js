@@ -1,5 +1,4 @@
-// ─── Tratamentos ─────────────────────────────────────────────────────────────
-// Ícones importados de src/constants/ritualTipos.js para manter consistência
+// Tratamentos do cronograma
 
 import { RITUAL_TIPO_ICON } from '@/constants/ritualTipos'
 
@@ -15,21 +14,21 @@ export const TREATMENTS = {
   },
   Nutrição: {
     icon: RITUAL_TIPO_ICON.Nutrição,     // fa-leaf
-    iconBg: 'bg-[#E3F9EF]',
-    iconColor: 'text-[#3D7A4A]',
-    pillBg: 'bg-[#EDF6EE]',
-    pillText: 'text-[#3D7A4A]',
-    bar: 'bg-[#5EA06A]',
-    hex: '#5EA06A',
+    iconBg: 'bg-[#FBF3D6]',
+    iconColor: 'text-[#C9A227]',
+    pillBg: 'bg-[#FBF3D6]',
+    pillText: 'text-[#A8841E]',
+    bar: 'bg-[#F3D673]',
+    hex: '#C9A227',
   },
   Reconstrução: {
     icon: RITUAL_TIPO_ICON.Reconstrução, // fa-shield-heart
-    iconBg: 'bg-[#FAF0EA]',
-    iconColor: 'text-[#A95D35]',
-    pillBg: 'bg-[#FAF0EA]',
-    pillText: 'text-[#A95D35]',
-    bar: 'bg-[#C47A52]',
-    hex: '#C47A52',
+    iconBg: 'bg-[#E5DEF2]',
+    iconColor: 'text-[#6A4E98]',
+    pillBg: 'bg-[#E5DEF2]',
+    pillText: 'text-[#6A4E98]',
+    bar: 'bg-[#8B6FC4]',
+    hex: '#8B6FC4',
   },
   Umectação: {
     icon: RITUAL_TIPO_ICON.Umectação,    // fa-droplet
@@ -68,7 +67,7 @@ export const MONTHS = [
 export const WEEK_DAYS      = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 export const WEEK_DAYS_FULL = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
 
-// ─── Helpers de data ─────────────────────────────────────────────────────────
+// Funcao para formatar a data da etapa no card "Próximas etapas" 
 
 export function getTreatment(tipo) {
   return TREATMENTS[tipo] ?? TREATMENTS.Hidratação
@@ -89,7 +88,7 @@ export function isSameDay(a, b) {
   )
 }
 
-/** Retorna os 7 dias da semana (dom→sáb) que contém `date` */
+// retorna os dias da semana a partir de uma data (usada na visualização da Semana)
 export function getWeekDays(date) {
   const d      = new Date(date)
   const sunday = new Date(d)
@@ -101,7 +100,7 @@ export function getWeekDays(date) {
   })
 }
 
-/** Gera as células do calendário mensal (inclui dias adjacentes para completar semanas) */
+// Gera as células do calendário mensal (inclui dias adjacentes para completar semanas)
 export function buildMonthCalendar(ano, mes) {
   const primeiroDia  = new Date(ano, mes, 1).getDay()
   const totalDias    = new Date(ano, mes + 1, 0).getDate()

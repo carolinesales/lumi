@@ -49,7 +49,7 @@ export default function Cronograma() {
 
           {/* ── Header ── */}
           <header className="mb-5 sm:mb-8">
-            {/* Mobile: chevron + título */}
+            {/* Mobile*/}
             <div className="flex items-center gap-2 sm:hidden">
               <button
                 onClick={() => navigate(-1)}
@@ -61,7 +61,7 @@ export default function Cronograma() {
                 Minha rotina
               </h1>
             </div>
-            {/* Desktop: só título */}
+            {/* Desktop*/}
             <h1 className="hidden font-['Montserrat'] text-2xl font-semibold text-lumi-black sm:block">
               Minha rotina
             </h1>
@@ -88,7 +88,7 @@ export default function Cronograma() {
             </div>
           </div>
 
-          {/* ── Content ── */}
+          {/* ── conteudo ── */}
           {loading ? (
             <LoadingSkeleton />
           ) : etapas.length === 0 ? (
@@ -154,7 +154,7 @@ export default function Cronograma() {
   )
 }
 
-// ─── Sidebar ─────────────────────────────────────────────────────────────────
+// sidebar
 
 function Sidebar({ etapaHoje, dateLabel, proximasEtapas, concluidas, total, etapas, onOpen, onObservacao }) {
   return (
@@ -171,7 +171,7 @@ function Sidebar({ etapaHoje, dateLabel, proximasEtapas, concluidas, total, etap
   )
 }
 
-// ─── Empty State ──────────────────────────────────────────────────────────────
+// estado vazio (sem etapas criadas)
 
 function EmptyState({ onCreate }) {
   return (
@@ -198,7 +198,7 @@ function EmptyState({ onCreate }) {
   )
 }
 
-// ─── Loading Skeleton ─────────────────────────────────────────────────────────
+// skeleton de carregamento
 
 function LoadingSkeleton() {
   return (

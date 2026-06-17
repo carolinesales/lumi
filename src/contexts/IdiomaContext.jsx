@@ -8,7 +8,7 @@ import en from '../i18n/en'
 const TRADUCOES = { pt, en }
 const LS_KEY    = 'lumi_idioma'
 
-// ── Lê o idioma inicial do localStorage (funciona sem login) ──
+// Lê o idioma inicial do localStorage
 function lerIdiomaLocal() {
   try {
     const salvo = localStorage.getItem(LS_KEY)
@@ -17,7 +17,7 @@ function lerIdiomaLocal() {
   return 'pt'
 }
 
-// ── Salva no localStorage ─────────────────────────────────────
+// Salva no localStorage 
 function salvarIdiomaLocal(idioma) {
   try { localStorage.setItem(LS_KEY, idioma) } catch {}
 }
@@ -27,10 +27,10 @@ const IdiomaContext = createContext({ t: (k) => k, idioma: 'pt', setIdiomaApp: (
 export function IdiomaProvider({ children }) {
   const { user } = useAuth()
 
-  // Estado inicial vem do localStorage — funciona antes do login
+  // Estado inicial  do idioma é lido do localStorage para persistência entre sessões, mesmo sem login
   const [idioma, setIdioma] = useState(lerIdiomaLocal)
 
-  // ── Quando usuário faz login: sincroniza Firestore → localStorage ──
+  // Quando usuário faz login: sincroniza Firestore → localStorage
   useEffect(() => {
     if (!user) return
 
@@ -47,7 +47,7 @@ export function IdiomaProvider({ children }) {
     return unsub
   }, [user])
 
-  // ── Troca de idioma: salva local + Firestore (se logado) ──────
+  // Troca de idioma: salva local + Firestore (quando logado)
   async function setIdiomaApp(novoIdioma) {
     if (novoIdioma !== 'pt' && novoIdioma !== 'en') return
     setIdioma(novoIdioma)
@@ -59,7 +59,7 @@ export function IdiomaProvider({ children }) {
     }
   }
 
-  // ── Função de tradução com interpolação ───────────────────────
+  //  Função de tradução 
   function t(chave, vars) {
     const textos = TRADUCOES[idioma] ?? TRADUCOES.pt
     let texto = textos[chave] ?? TRADUCOES.pt[chave] ?? chave

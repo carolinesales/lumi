@@ -1,9 +1,8 @@
 import { getTreatment } from '../lib/calendar'
 import { cn } from '@/lib/utils'
 
-/**
- * Pill usado na view Mês (desktop) — borda esquerda colorida + bg suave
- */
+// Pill usado na visualização do Mês (desktop)
+ 
 export function EventPill({ etapa, onClick, faded = false }) {
   const t = getTreatment(etapa.tipoCuidado)
 
@@ -30,9 +29,8 @@ export function EventPill({ etapa, onClick, faded = false }) {
   )
 }
 
-/**
- * Card usado na view Semana — igual ao pill do mês, sem arredondamento
- */
+//Card usado na visualização da Semana
+ 
 export function WeekEventPill({ etapa, onClick }) {
   const t = getTreatment(etapa.tipoCuidado)
 

@@ -256,62 +256,86 @@ export default function Home() {
     <QuickCheckinCard regHoje={regHoje} onOpen={() => setShowReg(true)} />
   )
 
+  // Estado vazio: usuário ainda não fez o diagnóstico (pulou o onboarding)
+  const semDiagnostico = !hairScore
+  const diagnosticoBanner = semDiagnostico && (
+    <div className="flex flex-col gap-3 rounded-[20px] border border-paper-200 bg-surface p-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-start gap-4">
+        <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-surface-muted">
+          <i className="fa-solid fa-wand-magic-sparkles text-lg text-text" aria-hidden="true" />
+        </div>
+        <div>
+          <h3 className="font-heading text-base font-semibold text-text">
+            Comece seu diagnóstico capilar
+          </h3>
+          <p className="mt-0.5 font-nunito text-sm leading-relaxed text-text-secondary">
+            Responda algumas perguntas e o Lumi monta sua rotina e seu Hair Score personalizados.
+          </p>
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={() => navigate('/questionario')}
+        className="flex shrink-0 items-center justify-center gap-2 rounded-[24px] bg-ink px-5 py-3 font-nunito text-sm text-white transition hover:opacity-90"
+      >
+        Fazer diagnóstico
+        <i className="fa-solid fa-arrow-right text-xs" aria-hidden="true" />
+      </button>
+    </div>
+  )
+
   return (
     <AppShell onPrimaryAction={() => setShowReg(true)}>
-      <main className="mx-auto flex min-h-dvh w-full max-w-[1120px] flex-col gap-6 bg-[#F5F4F5] px-4 pb-32 pt-4 lg:rounded-[32px] lg:p-6 lg:pb-6">
+      <main className="min-h-dvh bg-surface-muted px-4 pb-32 pt-4 sm:px-6 lg:px-10 lg:pb-6 lg:pt-8">
+        <div className="mx-auto flex w-full max-w-[1320px] flex-col gap-6">
 
-        {/* Header mobile */}
-        <div className="lg:hidden">
-          <TodayHeader nome={nome} foto={foto} onProfile={() => navigate('/app/perfil')} />
-        </div>
-
-        {/* ── Desktop ── */}
-        <div className="hidden flex-col gap-6 lg:flex">
-          {hairScoreCard}
-
-          <div className="grid grid-cols-[minmax(0,1fr)_300px] items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-
-            {/* Coluna principal */}
-            <div className="flex flex-col gap-6">
-          
-              <WeekCalendar
-                semana={semana}
-                getEtapaDia={getEtapaDia}
-                onOpenEtapa={abrirEtapa}
-              />
-              {routineCard}
-              {trendCard}
-              {conquistasCard}
-              {diaryCard}
-            </div>
-
-            {/* Sidebar */}
-            <aside className="flex flex-col gap-5">
-              <div className="rounded-[20px] bg-white p-5">
-                <MonthCalendar
-                  etapas={etapas}
-                  proximasEtapas={proximasEtapas}
-                  onOpenEtapa={abrirEtapa}
-                />
-              </div>
-              {climaCard}
-            </aside>
+          {/* Header mobile */}
+          <div className="lg:hidden">
+            <TodayHeader nome={nome} foto={foto} onProfile={() => navigate('/app/perfil')} />
           </div>
-        </div>
 
-        {/* ── Mobile ── */}
-        <div className="flex flex-col gap-6 lg:hidden">
-          {hairScoreCard}
-          <WeekCalendar
-            semana={semana}
-            getEtapaDia={getEtapaDia}
-            onOpenEtapa={abrirEtapa}
-          />
-          {routineCard}
-          {climaCard}
-          {trendCard}
-          {conquistasCard}
-          {diaryCard}
+          {/* ── Desktop ── */}
+          <div className="hidden flex-col gap-6 lg:flex">
+            {semDiagnostico ? diagnosticoBanner : hairScoreCard}
+
+            <div className="grid grid-cols-[540px_540px] items-start gap-6">
+
+              {/* Coluna esquerda */}
+              <div className="flex flex-col gap-6">
+                {routineCard}
+                {trendCard}
+                {conquistasCard}
+              </div>
+
+              {/* Coluna direita */}
+              <div className="flex flex-col gap-6">
+                <div className="rounded-[16px] bg-surface p-6">
+                  <MonthCalendar
+                    etapas={etapas}
+                    proximasEtapas={proximasEtapas}
+                    onOpenEtapa={abrirEtapa}
+                  />
+                </div>
+                {diaryCard}
+                {climaCard}
+              </div>
+            </div>
+          </div>
+
+          {/* ── Mobile ── */}
+          <div className="flex flex-col gap-6 lg:hidden">
+            {semDiagnostico ? diagnosticoBanner : hairScoreCard}
+            <WeekCalendar
+              semana={semana}
+              getEtapaDia={getEtapaDia}
+              onOpenEtapa={abrirEtapa}
+            />
+            {routineCard}
+            {climaCard}
+            {trendCard}
+            {conquistasCard}
+            {diaryCard}
+          </div>
         </div>
       </main>
 

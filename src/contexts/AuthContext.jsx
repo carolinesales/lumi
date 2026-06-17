@@ -16,8 +16,20 @@ export function AuthProvider({ children }) {
     return unsub
   }, [])
 
+  // Recarrega o usuário do Firebase e atualiza o estado
+
+  async function refreshUser() {
+    if (!auth.currentUser) return null
+    await auth.currentUser.reload()
+    await auth.currentUser.getIdToken(true)
+
+    // Clona o objeto para forçar nova referência e atualizar componentes dependentes
+    setUser(Object.assign(Object.create(Object.getPrototypeOf(auth.currentUser)), auth.currentUser))
+    return auth.currentUser
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, logout: () => signOut(auth) }}>
+    <AuthContext.Provider value={{ user, loading, refreshUser, logout: () => signOut(auth) }}>
       {!loading && children}
     </AuthContext.Provider>
   )

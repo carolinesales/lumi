@@ -7,7 +7,7 @@ export function CalendarToolbar({ label, view, onPrev, onNext, onToday, onViewCh
   return (
     <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
 
-      {/* ── Mobile: < Label > centralizados ── */}
+      {/* ── Mobile: Botões de navegação e label centralizados ── */}
       <div className="flex flex-1 items-center sm:hidden">
         <NavButton onClick={onPrev} icon={ChevronLeft} />
         <div className="flex flex-1 justify-center">
@@ -16,7 +16,7 @@ export function CalendarToolbar({ label, view, onPrev, onNext, onToday, onViewCh
         <NavButton onClick={onNext} icon={ChevronRight} />
       </div>
 
-      {/* ── Desktop: < > Label Hoje à esquerda ── */}
+      {/* ── Desktop: Botões de navegação e label ── */}
       <div className="hidden items-center gap-2 sm:flex">
         <NavButton onClick={onPrev} icon={ChevronLeft} />
         <NavButton onClick={onNext} icon={ChevronRight} />
@@ -29,7 +29,7 @@ export function CalendarToolbar({ label, view, onPrev, onNext, onToday, onViewCh
         </button>
       </div>
 
-      {/* ── View switcher — só desktop ── */}
+      {/* ── View switcher — só no desktop ── */}
       <div className="hidden items-center rounded-full bg-lumi-input p-[3px] sm:flex">
         {VIEWS.map(v => (
           <button
@@ -62,7 +62,6 @@ function NavButton({ onClick, icon: Icon }) {
 }
 
 function ToolbarLabel({ label }) {
-  // Separa "Maio" de "2026" para estilizar diferente
   const parts = label.split(' ')
   const year  = parts.find(p => /^\d{4}$/.test(p))
   const rest  = parts.filter(p => p !== year).join(' ')

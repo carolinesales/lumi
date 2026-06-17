@@ -168,7 +168,7 @@ export default function HairScoreCard({
         style={{
           position: 'relative',
           height: 420,
-          background: '#F5F4F5',
+          background: 'var(--surface-muted)',
           overflow: 'hidden',
           marginBottom: 8,
         }}

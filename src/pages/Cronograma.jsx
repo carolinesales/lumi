@@ -5,7 +5,9 @@ import { useNavigate } from 'react-router-dom'
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/contexts/AuthContext'
 import AppShell from '@/components/lumi/AppShell'
+import { useIdioma } from '@/contexts/IdiomaContext'
 import ilustracaoVazia from '@/assets/Milestone-4_Streamline_Milano.svg'
+import RegistroModal from './RegistroModal'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -21,21 +23,21 @@ const TREATMENTS = {
   },
   Nutrição: {
     icon: 'fa-leaf',
-    iconBg: 'bg-[#E3F9EF]',
-    iconColor: 'text-[#3D7A4A]',
-    pillBg: 'bg-[#EDF6EE]',
-    pillText: 'text-[#3D7A4A]',
-    bar: 'bg-[#5EA06A]',
-    hex: '#5EA06A',
+    iconBg: 'bg-[#FBF3D6]',
+    iconColor: 'text-[#C9A227]',
+    pillBg: 'bg-[#FBF3D6]',
+    pillText: 'text-[#A8841E]',
+    bar: 'bg-[#F3D673]',
+    hex: '#C9A227',
   },
   Reconstrução: {
     icon: 'fa-gem',
-    iconBg: 'bg-[#FAF0EA]',
-    iconColor: 'text-[#A95D35]',
-    pillBg: 'bg-[#FAF0EA]',
-    pillText: 'text-[#A95D35]',
-    bar: 'bg-[#C47A52]',
-    hex: '#C47A52',
+    iconBg: 'bg-[#E5DEF2]',
+    iconColor: 'text-[#6A4E98]',
+    pillBg: 'bg-[#E5DEF2]',
+    pillText: 'text-[#6A4E98]',
+    bar: 'bg-[#8B6FC4]',
+    hex: '#8B6FC4',
   },
   Umectação: {
     icon: 'fa-oil-can',
@@ -105,6 +107,8 @@ function getWeekDays(date) {
 
 export default function Cronograma() {
   const { user } = useAuth()
+  const { t: tr, idioma } = useIdioma()
+  const locale = idioma === 'en' ? 'en-US' : 'pt-BR'
   const navigate = useNavigate()
 
   const [etapas, setEtapas] = useState([])
@@ -113,6 +117,7 @@ export default function Cronograma() {
   const [diaAtual, setDiaAtual] = useState(new Date())
   const [loading, setLoading] = useState(true)
   const [view, setView] = useState('Mês')
+  const [showReg, setShowReg] = useState(false)
 
   useEffect(() => {
     if (!user?.uid) { setEtapas([]); setLoading(false); return }
@@ -182,6 +187,8 @@ export default function Cronograma() {
     return dias
   }, [ano, mes, primeiroDia, totalDias, diasAnterior])
 
+  const numLinhas = Math.ceil(calendarioMes.length / 7)
+
   const concluidas = etapas.filter(e => e.concluida).length
   const total = etapas.length
 
@@ -214,69 +221,69 @@ export default function Cronograma() {
 
   function toolbarLabel() {
     if (view === 'Mês') return (
-      <span className="font-['Montserrat'] text-base font-semibold text-[#333333]">
-        {MONTHS[mes]} <span className="font-normal text-[#AAAAAA]">{ano}</span>
+      <span className="font-['Montserrat'] text-base font-semibold text-text">
+        {tr('cron_meses')[mes]} <span className="font-normal text-text-tertiary">{ano}</span>
       </span>
     )
     if (view === 'Semana') {
       const days = getWeekDays(semanaAtual)
       const p = days[0], u = days[6]
       const label = p.getMonth() === u.getMonth()
-        ? `${p.getDate()} – ${u.getDate()} de ${MONTHS[p.getMonth()]} ${p.getFullYear()}`
-        : `${p.getDate()} ${MONTHS[p.getMonth()].slice(0,3)} – ${u.getDate()} ${MONTHS[u.getMonth()].slice(0,3)} ${u.getFullYear()}`
-      return <span className="font-['Montserrat'] text-base font-semibold text-[#333333]">{label}</span>
+        ? `${p.toLocaleDateString(locale, { day: '2-digit', month: 'long' })} – ${u.toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric' })}`
+        : `${p.toLocaleDateString(locale, { day: '2-digit', month: 'short' })} – ${u.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })}`
+      return <span className="font-['Montserrat'] text-base font-semibold text-text">{label}</span>
     }
     return (
-      <span className="font-['Montserrat'] text-base font-semibold capitalize text-[#333333]">
-        {diaAtual.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
+      <span className="font-['Montserrat'] text-base font-semibold capitalize text-text">
+        {diaAtual.toLocaleDateString(locale, { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
       </span>
     )
   }
 
-  const dateLabel = hoje.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })
+  const dateLabel = hoje.toLocaleDateString(locale, { day: '2-digit', month: 'long' })
 
   return (
     <AppShell onPrimaryAction={() => navigate('/app/home')}>
-      <main className="min-h-screen bg-[#F5F5F5] px-4 pb-28 pt-5 sm:px-6 lg:px-10 lg:pb-14 lg:pt-8">
+      <main className="min-h-screen bg-surface-muted px-4 pb-28 pt-5 sm:px-6 lg:px-10 lg:pb-14 lg:pt-8">
         <div className="mx-auto max-w-[1320px]">
 
           {/* ── Header ── */}
           <header className="mb-5 sm:mb-8">
-            
+
             <div className="flex items-center gap-2 sm:hidden">
               <button
                 onClick={() => navigate(-1)}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#333333] transition hover:bg-[#F0F0F0]"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-text transition hover:bg-surface-subtle"
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
-              <h1 className="font-['Montserrat'] text-xl font-semibold text-[#1E1E1E]">
-                Minha rotina
+              <h1 className="font-['Montserrat'] text-xl font-semibold text-text">
+                {tr('cron_minha_rotina')}
               </h1>
             </div>
-            
-            <h1 className="hidden font-['Montserrat'] text-2xl font-semibold text-[#1E1E1E] sm:block">
-              Minha rotina
+
+            <h1 className="hidden font-['Montserrat'] text-2xl font-semibold text-text sm:block">
+              {tr('cron_minha_rotina')}
             </h1>
-            <p className="mt-1 font-['Nunito_Sans'] text-sm leading-5 text-[#495059]">
-              Visualize seu ciclo de cuidados, acompanhe os próximos rituais e mantenha sua rotina capilar em equilíbrio.
+            <p className="mt-1 font-['Nunito_Sans'] text-sm leading-5 text-text-secondary">
+              {tr('cron_descricao')}
             </p>
           </header>
 
-          
+
           <div className="mb-4 sm:hidden">
-            <div className="flex items-center rounded-full bg-[#EBEBEB] p-[3px]">
+            <div className="flex items-center rounded-full bg-surface-subtle p-[3px]">
               {['Mês', 'Semana', 'Dia'].map(v => (
                 <button
                   key={v}
                   onClick={() => setView(v)}
                   className={`flex-1 rounded-full py-2 font-['Nunito_Sans'] text-sm font-semibold transition ${
-                    view === v ? 'bg-white text-[#1E1E1E]' : 'text-[#888888]'
+                    view === v ? 'bg-surface text-text' : 'text-text-tertiary'
                   }`}
                 >
-                  {v}
+                  {v === 'Mês' ? tr('cron_view_mes') : v === 'Semana' ? tr('cron_view_semana') : tr('cron_view_dia')}
                 </button>
               ))}
             </div>
@@ -286,60 +293,60 @@ export default function Cronograma() {
           {loading ? (
             <LoadingSkeleton />
           ) : etapas.length === 0 ? (
-            <EmptyState onCreate={() => navigate('/app/onboarding')} />
+            <EmptyState onCreate={() => navigate('/questionario')} />
           ) : (
-            <div className="grid gap-4 sm:gap-6 xl:grid-cols-[1fr_340px]">
+            <div className="grid gap-4 sm:gap-6 xl:grid-cols-[1fr_340px] xl:items-stretch">
 
               {/* ── Calendar ── */}
-              <div className="min-w-0 overflow-hidden rounded-2xl border border-[#EEEEEE] bg-white sm:rounded-3xl">
+              <div className="flex min-w-0 flex-col overflow-hidden rounded-2xl bg-surface sm:rounded-3xl">
 
                 {/* Toolbar */}
                 <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
 
-                  
+
                   <div className="flex flex-1 items-center sm:hidden">
-                    <button onClick={navAnterior} className="flex h-8 w-8 items-center justify-center rounded-full text-[#6B7280] transition hover:bg-[#F5F5F5]">
+                    <button onClick={navAnterior} className="flex h-8 w-8 items-center justify-center rounded-full text-text-secondary transition hover:bg-surface-subtle">
                       <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
                         <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </button>
                     <div className="flex flex-1 justify-center">{toolbarLabel()}</div>
-                    <button onClick={navProximo} className="flex h-8 w-8 items-center justify-center rounded-full text-[#6B7280] transition hover:bg-[#F5F5F5]">
+                    <button onClick={navProximo} className="flex h-8 w-8 items-center justify-center rounded-full text-text-secondary transition hover:bg-surface-subtle">
                       <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
                         <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </button>
                   </div>
 
-                  
+
                   <div className="hidden items-center gap-2 sm:flex">
-                    <button onClick={navAnterior} className="flex h-7 w-7 items-center justify-center rounded-full text-[#6B7280] transition hover:bg-[#F5F5F5] hover:text-[#333333]">
+                    <button onClick={navAnterior} className="flex h-7 w-7 items-center justify-center rounded-full text-text-secondary transition hover:bg-surface-subtle hover:text-text">
                       <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
                         <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </button>
-                    <button onClick={navProximo} className="flex h-7 w-7 items-center justify-center rounded-full text-[#6B7280] transition hover:bg-[#F5F5F5] hover:text-[#333333]">
+                    <button onClick={navProximo} className="flex h-7 w-7 items-center justify-center rounded-full text-text-secondary transition hover:bg-surface-subtle hover:text-text">
                       <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
                         <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </button>
                     {toolbarLabel()}
-                    <button onClick={navHoje} className="rounded-full border border-[#E5E5E5] px-3 py-1 font-['Nunito_Sans'] text-xs font-semibold text-[#6B7280] transition hover:bg-[#F5F5F5]">
-                      Hoje
+                    <button onClick={navHoje} className="rounded-full border border-paper-200 px-3 py-1 font-['Nunito_Sans'] text-xs font-semibold text-text-secondary transition hover:bg-surface-subtle">
+                      {tr('cron_hoje')}
                     </button>
                   </div>
 
                   {/* Pill switcher — desktop */}
-                  <div className="hidden items-center rounded-full bg-[#F0F0F0] p-[3px] sm:flex">
+                  <div className="hidden items-center rounded-full bg-surface-subtle p-[3px] sm:flex">
                     {['Mês', 'Semana', 'Dia'].map(v => (
                       <button
                         key={v}
                         onClick={() => setView(v)}
                         className={`rounded-full px-4 py-1.5 font-['Nunito_Sans'] text-sm font-semibold transition ${
-                          view === v ? 'bg-white text-[#1E1E1E]' : 'text-[#888888] hover:text-[#444444]'
+                          view === v ? 'bg-surface text-text' : 'text-text-tertiary hover:text-text-secondary'
                         }`}
                       >
-                        {v}
+                        {v === 'Mês' ? tr('cron_view_mes') : v === 'Semana' ? tr('cron_view_semana') : tr('cron_view_dia')}
                       </button>
                     ))}
                   </div>
@@ -347,18 +354,21 @@ export default function Cronograma() {
 
                 {/* ── VIEW: MÊS ── */}
                 {view === 'Mês' && (
-                  <>
-                  
-                    <div className="grid grid-cols-7 border-t border-b border-[#EEEEEE]">
+                  <div className="flex flex-1 flex-col">
+
+                    <div className="grid grid-cols-7 border-t border-b border-paper-200">
                       {WEEK_DAYS.map(day => (
-                        <div key={day} className="py-2.5 text-center font-['Nunito_Sans'] text-xs font-semibold text-[#6B7280] sm:text-sm">
+                        <div key={day} className="py-2.5 text-center font-['Nunito_Sans'] text-xs font-semibold text-text-secondary sm:text-sm">
                           {day}
                         </div>
                       ))}
                     </div>
 
-                    
-                    <div className="grid grid-cols-7">
+
+                    <div
+                      className="grid flex-1 grid-cols-7"
+                      style={{ gridTemplateRows: `repeat(${numLinhas}, minmax(0, 1fr))` }}
+                    >
                       {calendarioMes.map(({ date, outOfMonth }, i) => {
                         const isToday        = isSameDay(date, hoje)
                         const isWeekend      = date.getDay() === 0 || date.getDay() === 6
@@ -374,26 +384,26 @@ export default function Cronograma() {
                             key={i}
                             onClick={() => abrirDia(date)}
                             className={`
-                              group cursor-pointer bg-white transition hover:bg-[#FAFAFA]
-                              ${isLastCol ? '' : 'border-r border-[#EEEEEE]'}
-                              ${isLastRow ? '' : 'border-b border-[#EEEEEE]'}
+                              group flex cursor-pointer flex-col bg-surface transition hover:bg-surface-subtle
+                              ${isLastCol ? '' : 'border-r border-paper-200'}
+                              ${isLastRow ? '' : 'border-b border-paper-200'}
                             `}
                           >
-                            
-                            <div className="flex min-h-[72px] flex-col items-center justify-start px-1 pb-2 pt-2.5 sm:hidden">
+
+                            <div className="flex min-h-[72px] flex-1 flex-col items-center justify-start px-1 pb-2 pt-2.5 sm:hidden">
                               <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full font-['Nunito_Sans'] text-sm font-semibold ${
-                                isToday        ? 'bg-[#1E1E1E] text-white'
-                                : outOfMonth   ? 'text-[#C8C8C8]'
-                                : isWeekend    ? 'text-[#E53935]'
-                                :                'text-[#333333]'
+                                isToday        ? 'bg-ink text-white'
+                                : outOfMonth   ? 'text-text-tertiary'
+                                : isWeekend    ? 'text-lumi-weekend'
+                                :                'text-text'
                               }`}>
                                 {date.getDate()}
                               </span>
 
-                              
+
                               <div className="mt-1.5 flex h-6 w-6 items-center justify-center">
                                 {!outOfMonth && todasConcluidas && (
-                                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#4CB050]">
+                                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#5E8C6A]">
                                     <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
                                       <path d="M2 6L5 9L10 3" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                                     </svg>
@@ -408,22 +418,22 @@ export default function Cronograma() {
                             </div>
 
                             {/* ── Desktop: número + pills ── */}
-                            <div className="hidden min-h-[96px] flex-col p-2 sm:flex lg:min-h-[108px]">
+                            <div className="hidden min-h-[108px] flex-1 flex-col p-2 sm:flex">
                               {/* Número do dia */}
                               <div className="mb-1.5">
                                 <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full font-['Nunito_Sans'] text-sm font-semibold transition ${
-                                  isToday        ? 'bg-[#1E1E1E] text-white'
-                                  : outOfMonth   ? 'text-[#C8C8C8]'
-                                  : isWeekend    ? 'text-[#E53935]'
-                                  :                'text-[#333333] group-hover:text-[#111111]'
+                                  isToday        ? 'bg-ink text-white'
+                                  : outOfMonth   ? 'text-text-tertiary'
+                                  : isWeekend    ? 'text-lumi-weekend'
+                                  :                'text-text group-hover:text-text'
                                 }`}>
                                   {date.getDate()}
                                 </span>
                               </div>
 
                               {/* Pills */}
-                              <div className="flex flex-col gap-0.5">
-                                {etapasDia.slice(0, 3).map(etapa => (
+                              <div className="flex flex-1 flex-col gap-0.5">
+                                {etapasDia.slice(0, 4).map(etapa => (
                                   <DesktopEventPill
                                     key={etapa.id}
                                     etapa={etapa}
@@ -431,9 +441,9 @@ export default function Cronograma() {
                                     onClick={e => { e.stopPropagation(); abrirEtapa(etapa) }}
                                   />
                                 ))}
-                                {etapasDia.length > 3 && (
-                                  <span className="pl-1 font-['Nunito_Sans'] text-[10px] text-[#6B7280]">
-                                    +{etapasDia.length - 3}
+                                {etapasDia.length > 4 && (
+                                  <span className="pl-1 font-['Nunito_Sans'] text-[10px] text-text-secondary">
+                                    +{etapasDia.length - 4}
                                   </span>
                                 )}
                               </div>
@@ -442,7 +452,7 @@ export default function Cronograma() {
                         )
                       })}
                     </div>
-                  </>
+                  </div>
                 )}
 
                 {/* ── VIEW: SEMANA ── */}
@@ -458,14 +468,14 @@ export default function Cronograma() {
 
               {/* ── Sidebar (só desktop) ── */}
               <aside className="hidden flex-col gap-4 xl:flex">
-                <TodayCard etapa={etapaHoje} dateLabel={dateLabel} onOpen={abrirEtapa} onObservacao={() => navigate('/app/observacao')} />
+                <TodayCard etapa={etapaHoje} dateLabel={dateLabel} onOpen={abrirEtapa} onObservacao={() => setShowReg(true)} />
                 <UpcomingCard etapas={proximasEtapas} onOpen={abrirEtapa} />
                 <ProgressCard concluidas={concluidas} total={total} etapas={etapas} />
               </aside>
 
               {/* ── Cards mobile (abaixo do calendário) ── */}
               <div className="flex flex-col gap-4 xl:hidden">
-                <TodayCard etapa={etapaHoje} dateLabel={dateLabel} onOpen={abrirEtapa} onObservacao={() => navigate('/app/observacao')} />
+                <TodayCard etapa={etapaHoje} dateLabel={dateLabel} onOpen={abrirEtapa} onObservacao={() => setShowReg(true)} />
                 <UpcomingCard etapas={proximasEtapas} onOpen={abrirEtapa} />
                 <ProgressCard concluidas={concluidas} total={total} etapas={etapas} />
               </div>
@@ -473,6 +483,13 @@ export default function Cronograma() {
           )}
         </div>
       </main>
+      {showReg && (
+        <RegistroModal
+          onClose={() => setShowReg(false)}
+          onSaved={() => setShowReg(false)}
+          onConcluido={() => setShowReg(false)}
+        />
+      )}
     </AppShell>
   )
 }
@@ -486,7 +503,7 @@ function DesktopEventPill({ etapa, onClick, faded = false }) {
       type="button"
       onClick={onClick}
       style={{ borderLeft: `2.5px solid ${t.hex}` }}
-      className={`flex w-full items-center rounded-sm px-2 py-0.5 text-left transition hover:opacity-70 ${t.pillBg} ${
+      className={`flex w-full items-center rounded-[8px] px-2 py-1 text-left transition hover:opacity-70 ${t.pillBg} ${
         faded ? 'opacity-30' : etapa.concluida ? 'opacity-50' : ''
       }`}
     >
@@ -500,31 +517,32 @@ function DesktopEventPill({ etapa, onClick, faded = false }) {
 // ─── Week View ────────────────────────────────────────────────────────────────
 
 function WeekView({ semana, hoje, getEtapasDoDia, onOpen, onAbrirDia }) {
+  const { t: tr } = useIdioma()
   const days = getWeekDays(semana)
   return (
-    <div className="border-t border-[#EEEEEE]">
+    <div className="flex flex-1 flex-col border-t border-paper-200">
       {days.map((date, i) => {
         const isToday   = isSameDay(date, hoje)
         const isWeekend = date.getDay() === 0 || date.getDay() === 6
         const etapasDia = getEtapasDoDia(date)
         return (
-          <div key={i} className={`flex ${i < days.length - 1 ? 'border-b border-[#EEEEEE]' : ''} ${isToday ? 'bg-[#FAFAFA]' : 'bg-white'}`}>
+          <div key={i} className={`flex flex-1 ${i < days.length - 1 ? 'border-b border-paper-200' : ''} ${isToday ? 'bg-surface-subtle' : 'bg-surface'}`}>
             <button
               onClick={() => onAbrirDia(date)}
-              className={`flex w-[80px] shrink-0 flex-col justify-center gap-0.5 border-r border-[#EEEEEE] px-3 py-4 text-left transition hover:bg-[#F5F5F5] sm:w-[100px] sm:px-4 ${isToday ? 'bg-[#F7F7F7]' : ''}`}
+              className={`flex w-[80px] shrink-0 flex-col justify-center gap-0.5 border-r border-paper-200 px-3 py-4 text-left transition hover:bg-surface-subtle sm:w-[100px] sm:px-4 ${isToday ? 'bg-surface-muted' : ''}`}
             >
-              <span className={`font-['Nunito_Sans'] text-[10px] font-semibold uppercase tracking-wider sm:text-[11px] ${isWeekend ? 'text-[#E53935]' : 'text-[#AAAAAA]'}`}>
+              <span className={`font-['Nunito_Sans'] text-[10px] font-semibold uppercase tracking-wider sm:text-[11px] ${isWeekend ? 'text-lumi-weekend' : 'text-text-tertiary'}`}>
                 {WEEK_DAYS[date.getDay()]}
               </span>
               <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full font-['Montserrat'] text-base font-semibold sm:text-lg ${
-                isToday ? 'bg-[#1E1E1E] text-white' : isWeekend ? 'text-[#E53935]' : 'text-[#333333]'
+                isToday ? 'bg-ink text-white' : isWeekend ? 'text-lumi-weekend' : 'text-text'
               }`}>
                 {date.getDate()}
               </span>
             </button>
-            <div className="flex min-h-[64px] flex-1 flex-wrap items-center gap-2 px-3 py-3 sm:px-4">
+            <div className="flex min-h-[64px] flex-1 flex-wrap content-center items-center gap-2 px-3 py-3 sm:px-4">
               {etapasDia.length === 0 ? (
-                <span className="font-['Nunito_Sans'] text-xs text-[#9CA3AF]">Nenhum cuidado</span>
+                <span className="font-['Nunito_Sans'] text-xs text-text-tertiary">{tr('cron_nenhum_cuidado')}</span>
               ) : (
                 etapasDia.map(etapa => (
                   <WeekEventCard key={etapa.id} etapa={etapa} onClick={() => onOpen(etapa)} />
@@ -539,23 +557,24 @@ function WeekView({ semana, hoje, getEtapasDoDia, onOpen, onAbrirDia }) {
 }
 
 function WeekEventCard({ etapa, onClick }) {
+  const { t: tr } = useIdioma()
   const t = getTreatment(etapa.tipoCuidado)
   return (
     <button
       type="button"
       onClick={onClick}
       style={{ borderLeft: `2.5px solid ${t.hex}` }}
-      className={`flex items-center gap-2 rounded-sm px-2.5 py-1.5 text-left transition hover:opacity-80 ${t.pillBg} ${etapa.concluida ? 'opacity-50' : ''}`}
+      className={`flex items-center gap-2 rounded-[8px] px-2.5 py-1.5 text-left transition hover:opacity-80 ${t.pillBg} ${etapa.concluida ? 'opacity-50' : ''}`}
     >
-      <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${t.iconBg}`}>
+      <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] ${t.iconBg}`}>
         <i className={`fa-solid ${t.icon} text-[9px] ${t.iconColor}`} />
       </div>
       <div className="flex flex-col">
         <span className={`font-['Nunito_Sans'] text-xs font-semibold ${t.pillText} ${etapa.concluida ? 'line-through' : ''}`}>
           {etapa.tipoCuidado}
         </span>
-        <span className="font-['Nunito_Sans'] text-[10px] text-[#6B7280]">
-          {etapa.concluida ? 'Concluído' : 'Pendente'}
+        <span className="font-['Nunito_Sans'] text-[10px] text-text-secondary">
+          {etapa.concluida ? tr('cron_concluido') : tr('cron_pendente')}
         </span>
       </div>
     </button>
@@ -565,33 +584,35 @@ function WeekEventCard({ etapa, onClick }) {
 // ─── Day View ─────────────────────────────────────────────────────────────────
 
 function DayView({ dia, hoje, getEtapasDoDia, onOpen }) {
+  const { t: tr, idioma } = useIdioma()
+  const locale = idioma === 'en' ? 'en-US' : 'pt-BR'
   const isToday   = isSameDay(dia, hoje)
   const etapasDia = getEtapasDoDia(dia)
   return (
-    <div className="border-t border-[#EEEEEE] p-4 sm:p-6">
+    <div className="flex flex-1 flex-col border-t border-paper-200 p-4 sm:p-6">
       <div className="mb-6 flex items-center gap-3">
         <span className={`flex h-12 w-12 items-center justify-center rounded-full font-['Montserrat'] text-xl font-semibold ${
-          isToday ? 'bg-[#1E1E1E] text-white' : 'bg-[#F0F0F0] text-[#333333]'
+          isToday ? 'bg-ink text-white' : 'bg-surface-subtle text-text'
         }`}>
           {dia.getDate()}
         </span>
         <div>
-          <p className="font-['Montserrat'] text-base font-semibold capitalize text-[#333333]">
-            {dia.toLocaleDateString('pt-BR', { weekday: 'long' })}
+          <p className="font-['Montserrat'] text-base font-semibold capitalize text-text">
+            {dia.toLocaleDateString(locale, { weekday: 'long' })}
           </p>
-          <p className="font-['Nunito_Sans'] text-sm text-[#6B7280]">
-            {dia.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+          <p className="font-['Nunito_Sans'] text-sm text-text-secondary">
+            {dia.toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric' })}
           </p>
         </div>
       </div>
 
       {etapasDia.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 py-14 text-center">
-          <span className="font-['Nunito_Sans'] text-sm font-semibold text-[#495059]">Nenhum cuidado programado</span>
-          <span className="font-['Nunito_Sans'] text-xs text-[#6B7280]">Aproveite para descansar seus fios</span>
+        <div className="flex flex-1 flex-col items-center justify-center gap-2 py-14 text-center">
+          <span className="font-['Nunito_Sans'] text-sm font-semibold text-text-secondary">{tr('cron_nenhum_programado')}</span>
+          <span className="font-['Nunito_Sans'] text-xs text-text-secondary">{tr('cron_descansar')}</span>
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-1 flex-col gap-3">
           {etapasDia.map(etapa => {
             const t = getTreatment(etapa.tipoCuidado)
             return (
@@ -600,23 +621,23 @@ function DayView({ dia, hoje, getEtapasDoDia, onOpen }) {
                 type="button"
                 onClick={() => onOpen(etapa)}
                 style={{ borderLeft: `3px solid ${t.hex}` }}
-                className={`flex items-center gap-4 rounded-2xl p-4 text-left transition hover:opacity-80 ${t.pillBg} ${etapa.concluida ? 'opacity-50' : ''}`}
+                className={`flex items-center gap-4 rounded-[16px] p-4 text-left transition hover:opacity-80 ${t.pillBg} ${etapa.concluida ? 'opacity-50' : ''}`}
               >
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${t.iconBg}`}>
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] ${t.iconBg}`}>
                   <i className={`fa-solid ${t.icon} text-sm ${t.iconColor}`} />
                 </div>
                 <div className="flex flex-1 flex-col">
                   <span className={`font-['Nunito_Sans'] text-sm font-semibold ${t.pillText} ${etapa.concluida ? 'line-through' : ''}`}>
                     {etapa.tipoCuidado}
                   </span>
-                  <span className="font-['Nunito_Sans'] text-xs text-[#6B7280]">
-                    {etapa.concluida ? 'Concluído' : 'Pendente'}
+                  <span className="font-['Nunito_Sans'] text-xs text-text-secondary">
+                    {etapa.concluida ? tr('cron_concluido') : tr('cron_pendente')}
                   </span>
                 </div>
                 <span className={`shrink-0 rounded-full px-4 py-1.5 font-['Nunito_Sans'] text-xs font-semibold text-white ${
-                  etapa.concluida ? 'bg-emerald-500' : 'bg-[#1E1E1F]'
+                  etapa.concluida ? 'bg-[#5E8C6A]' : 'bg-ink'
                 }`}>
-                  {etapa.concluida ? 'Feito' : 'Iniciar'}
+                  {etapa.concluida ? tr('cron_feito') : tr('cron_iniciar')}
                 </span>
               </button>
             )
@@ -630,23 +651,24 @@ function DayView({ dia, hoje, getEtapasDoDia, onOpen }) {
 // ─── Today Card ───────────────────────────────────────────────────────────────
 
 function TodayCard({ etapa, dateLabel, onOpen, onObservacao }) {
+  const { t: tr } = useIdioma()
   if (!etapa) {
     return (
-      <div className="flex flex-col gap-6 rounded-[24px] border border-[#EEEEEE] bg-white p-6">
+      <div className="flex flex-col gap-6 rounded-[24px] bg-surface p-6">
         <div className="flex flex-col gap-0.5">
-          <p className="font-['Montserrat'] text-base font-semibold text-[#1E1E1F]">Em foco hoje</p>
-          <p className="font-['Nunito_Sans'] text-sm text-[#495059]">{dateLabel}</p>
+          <p className="font-['Montserrat'] text-base font-semibold text-text">{tr('cron_em_foco')}</p>
+          <p className="font-['Nunito_Sans'] text-sm text-text-secondary">{dateLabel}</p>
         </div>
-        <div className="flex flex-col items-center gap-6 rounded-[20px] border border-[#F0F0F0] p-6">
-          <img src={ilustracaoVazia} alt="Nenhum cuidado programado" className="h-[180px] w-[180px] object-contain" />
+        <div className="flex flex-col items-center gap-6 rounded-[20px] p-6">
+          <img src={ilustracaoVazia} alt={tr("cron_nenhum_programado")} className="h-[180px] w-[180px] object-contain" />
           <div className="flex flex-col items-center gap-2">
-            <p className="text-center font-['Montserrat'] text-sm font-semibold text-[#495059]">Nenhum cuidado programado</p>
-            <p className="text-center font-['Nunito_Sans'] text-xs leading-5 text-[#495059]">
-              Aproveite para observar seus fios e registrar como eles estão
+            <p className="text-center font-['Montserrat'] text-sm font-semibold text-text-secondary">{tr('cron_nenhum_programado')}</p>
+            <p className="text-center font-['Nunito_Sans'] text-xs leading-5 text-text-secondary">
+              {tr('cron_observar_fios')}
             </p>
           </div>
-          <button type="button" onClick={onObservacao} className="w-full rounded-[24px] bg-[#1E1E1F] py-3 font-['Nunito_Sans'] text-xs font-semibold text-white transition hover:opacity-90">
-            Registrar observação
+          <button type="button" onClick={onObservacao} className="w-full rounded-[24px] bg-ink py-3 font-['Nunito_Sans'] text-xs font-semibold text-white transition hover:opacity-90">
+            {tr('cron_registrar_obs')}
           </button>
         </div>
       </div>
@@ -655,21 +677,21 @@ function TodayCard({ etapa, dateLabel, onOpen, onObservacao }) {
 
   const t = getTreatment(etapa.tipoCuidado)
   return (
-    <div className="flex flex-col gap-3 rounded-[24px] border border-[#EEEEEE] bg-white p-6">
+    <div className="flex flex-col gap-3 rounded-[24px] bg-surface p-6">
       <div className="flex flex-col gap-0.5">
-        <p className="font-['Montserrat'] text-base font-semibold text-[#1E1E1F]">Em foco hoje</p>
-        <p className="font-['Nunito_Sans'] text-sm text-[#495059]">{dateLabel}</p>
+        <p className="font-['Montserrat'] text-base font-semibold text-text">{tr('cron_em_foco')}</p>
+        <p className="font-['Nunito_Sans'] text-sm text-text-secondary">{dateLabel}</p>
       </div>
       <button type="button" onClick={() => onOpen(etapa)} className="flex w-full items-center gap-3 text-left transition hover:opacity-80">
         <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${t.iconBg}`}>
           <i className={`fa-solid ${t.icon} text-sm ${t.iconColor}`} />
         </div>
         <div className="flex flex-1 flex-col">
-          <span className="font-['Nunito_Sans'] text-sm font-semibold text-[#090A0A]">{etapa.tipoCuidado}</span>
-          <span className="font-['Nunito_Sans'] text-xs text-[#72777A]">{etapa.concluida ? 'Concluído' : 'Pendente'}</span>
+          <span className="font-['Nunito_Sans'] text-sm font-semibold text-text">{etapa.tipoCuidado}</span>
+          <span className="font-['Nunito_Sans'] text-xs text-text-secondary">{etapa.concluida ? tr('cron_concluido') : tr('cron_pendente')}</span>
         </div>
-        <span className={`shrink-0 rounded-[24px] px-4 py-1.5 font-['Nunito_Sans'] text-xs font-semibold text-white ${etapa.concluida ? 'bg-emerald-500' : 'bg-[#1E1E1F]'}`}>
-          {etapa.concluida ? 'Feito' : 'Iniciar'}
+        <span className={`shrink-0 rounded-[24px] px-4 py-1.5 font-['Nunito_Sans'] text-xs font-semibold text-white ${etapa.concluida ? 'bg-[#5E8C6A]' : 'bg-ink'}`}>
+          {etapa.concluida ? tr('cron_feito') : tr('cron_iniciar')}
         </span>
       </button>
     </div>
@@ -679,16 +701,18 @@ function TodayCard({ etapa, dateLabel, onOpen, onObservacao }) {
 // ─── Upcoming Card ────────────────────────────────────────────────────────────
 
 function UpcomingCard({ etapas, onOpen }) {
+  const { t: tr, idioma } = useIdioma()
+  const locale = idioma === 'en' ? 'en-US' : 'pt-BR'
   return (
-    <div className="flex flex-col gap-4 rounded-[24px] border border-[#EEEEEE] bg-white p-6">
+    <div className="flex flex-col gap-4 rounded-[24px] bg-surface p-6">
       <div className="flex flex-col gap-0.5">
-        <p className="font-['Montserrat'] text-base font-semibold text-[#1E1E1F]">Próximas etapas</p>
-        <p className="font-['Nunito_Sans'] text-sm text-[#495059]">Seu ciclo continua nos próximos dias</p>
+        <p className="font-['Montserrat'] text-base font-semibold text-text">{tr('cron_proximas_etapas')}</p>
+        <p className="font-['Nunito_Sans'] text-sm text-text-secondary">{tr('cron_proximas_sub')}</p>
       </div>
       {etapas.length === 0 ? (
-        <p className="font-['Nunito_Sans'] text-sm text-[#6B7280]">Nenhuma etapa pendente.</p>
+        <p className="font-['Nunito_Sans'] text-sm text-text-secondary">{tr('cron_nenhuma_pendente')}</p>
       ) : (
-        <div className="flex flex-col divide-y divide-[#F5F5F5]">
+        <div className="flex flex-col divide-y divide-paper-200">
           {etapas.map(etapa => {
             const data = toDate(etapa.dataEtapa)
             const t    = getTreatment(etapa.tipoCuidado)
@@ -698,12 +722,12 @@ function UpcomingCard({ etapas, onOpen }) {
                   <i className={`fa-solid ${t.icon} text-sm ${t.iconColor}`} />
                 </div>
                 <div className="flex flex-1 flex-col">
-                  <span className="font-['Nunito_Sans'] text-sm font-semibold text-[#1E1E1F]">{etapa.tipoCuidado}</span>
-                  <span className="font-['Nunito_Sans'] text-xs text-[#6B7280]">
-                    {data?.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                  <span className="font-['Nunito_Sans'] text-sm font-semibold text-text">{etapa.tipoCuidado}</span>
+                  <span className="font-['Nunito_Sans'] text-xs text-text-secondary">
+                    {data?.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })}
                   </span>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className="shrink-0 text-[#6B7280]">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className="shrink-0 text-text-secondary">
                   <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
@@ -718,6 +742,7 @@ function UpcomingCard({ etapas, onOpen }) {
 // ─── Progress Card ────────────────────────────────────────────────────────────
 
 function ProgressCard({ concluidas, total, etapas }) {
+  const { t: tr } = useIdioma()
   const resumo = useMemo(() => {
     const map = {}
     etapas.forEach(e => {
@@ -730,10 +755,10 @@ function ProgressCard({ concluidas, total, etapas }) {
   }, [etapas])
 
   return (
-    <div className="flex flex-col gap-4 rounded-[24px] border border-[#EEEEEE] bg-white p-6">
+    <div className="flex flex-col gap-4 rounded-[24px] bg-surface p-6">
       <div className="flex flex-col gap-0.5">
-        <p className="font-['Montserrat'] text-base font-semibold text-[#1E1E1F]">Progresso do ciclo</p>
-        <p className="font-['Nunito_Sans'] text-sm text-[#495059]">{concluidas} de {total} etapas concluídas</p>
+        <p className="font-['Montserrat'] text-base font-semibold text-text">{tr('cron_progresso')}</p>
+        <p className="font-['Nunito_Sans'] text-sm text-text-secondary">{concluidas} {tr('cron_de')} {total} {tr('cron_etapas_concluidas')}</p>
       </div>
       <div className="flex flex-col gap-4">
         {resumo.map(([tipo, item]) => {
@@ -742,10 +767,10 @@ function ProgressCard({ concluidas, total, etapas }) {
           return (
             <div key={tipo} className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
-                <span className="font-['Nunito_Sans'] text-sm font-semibold text-[#1E1E1F]">{tipo}</span>
-                <span className="font-['Nunito_Sans'] text-xs text-[#6B7280]">{item.done}/{item.total}</span>
+                <span className="font-['Nunito_Sans'] text-sm font-semibold text-text">{tipo}</span>
+                <span className="font-['Nunito_Sans'] text-xs text-text-secondary">{item.done}/{item.total}</span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-[#F0F0F0]">
+              <div className="h-1.5 overflow-hidden rounded-full bg-surface-subtle">
                 <div className={`h-full rounded-full ${t.bar} transition-all duration-500`} style={{ width: `${pct}%` }} />
               </div>
             </div>
@@ -759,19 +784,20 @@ function ProgressCard({ concluidas, total, etapas }) {
 // ─── Empty State ──────────────────────────────────────────────────────────────
 
 function EmptyState({ onCreate }) {
+  const { t: tr } = useIdioma()
   return (
-    <div className="mt-6 flex flex-col items-center gap-6 rounded-3xl border border-[#EEEEEE] bg-white px-6 py-16 text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1E1E1F] text-white">
+    <div className="mt-6 flex flex-col items-center gap-6 rounded-3xl bg-surface px-6 py-16 text-center">
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-ink text-white">
         <i className="fa-solid fa-calendar-plus text-lg" />
       </div>
       <div>
-        <h2 className="font-['Montserrat'] text-xl font-semibold text-[#1E1E1F]">Sua rotina ainda não foi criada</h2>
-        <p className="mx-auto mt-2 max-w-md font-['Nunito_Sans'] text-sm leading-6 text-[#495059]">
-          Monte um cronograma personalizado para acompanhar hidratação, nutrição, reconstrução e outros cuidados.
+        <h2 className="font-['Montserrat'] text-xl font-semibold text-text">{tr('cron_rotina_nao_criada')}</h2>
+        <p className="mx-auto mt-2 max-w-md font-['Nunito_Sans'] text-sm leading-6 text-text-secondary">
+          {tr('cron_rotina_nao_criada_sub')}
         </p>
       </div>
-      <button type="button" onClick={onCreate} className="rounded-full bg-[#1E1E1F] px-6 py-3 font-['Nunito_Sans'] text-sm font-semibold text-white transition hover:opacity-90">
-        Criar minha rotina
+      <button type="button" onClick={onCreate} className="rounded-full bg-ink px-6 py-3 font-['Nunito_Sans'] text-sm font-semibold text-white transition hover:opacity-90">
+        {tr('cron_criar_rotina')}
       </button>
     </div>
   )
@@ -782,11 +808,11 @@ function EmptyState({ onCreate }) {
 function LoadingSkeleton() {
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
-      <div className="h-[580px] animate-pulse rounded-3xl bg-white/80" />
+      <div className="h-[580px] animate-pulse rounded-3xl bg-surface/80" />
       <div className="flex flex-col gap-4">
-        <div className="h-[400px] animate-pulse rounded-[24px] bg-white/80" />
-        <div className="h-48 animate-pulse rounded-[24px] bg-white/80" />
-        <div className="h-52 animate-pulse rounded-[24px] bg-white/80" />
+        <div className="h-[400px] animate-pulse rounded-[24px] bg-surface/80" />
+        <div className="h-48 animate-pulse rounded-[24px] bg-surface/80" />
+        <div className="h-52 animate-pulse rounded-[24px] bg-surface/80" />
       </div>
     </div>
   )

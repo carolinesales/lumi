@@ -1,109 +1,43 @@
 // src/features/home/components/QuickCheckinCard.jsx
-import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import ilustracaoDiario from '@/assets/Diario.png'
 
 export default function QuickCheckinCard({ regHoje, onOpen }) {
-  const [hovered, setHovered] = useState(false)
   const done = !!regHoje
 
   return (
-    <div style={{
-      background: '#FFF',
-      borderRadius: 24,
-      padding: 24,
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 22,
-      boxSizing: 'border-box',
-    }}>
+    <div className="flex items-center gap-2 overflow-hidden rounded-[24px] bg-surface p-6">
 
-      {/* ── título + subtítulo ── */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <h3 style={{
-          margin: 0,
-          fontFamily: 'Montserrat, sans-serif',
-          fontSize: 16,
-          fontWeight: 600,
-          lineHeight: '20px',
-          color: '#1E1E1F',
-        }}>
-          Diário Lumi
-        </h3>
+      {/* Ilustração */}
+      <img
+        src={ilustracaoDiario}
+        alt=""
+        aria-hidden="true"
+        className="size-[132px] shrink-0 object-contain"
+      />
 
-        <p style={{
-          margin: 0,
-          fontFamily: '"Nunito Sans", sans-serif',
-          fontSize: 14,
-          fontWeight: 400,
-          lineHeight: '20px',
-          color: '#495059',
-        }}>
-          {done
-            ? 'Seu dia já foi registrado. O Lumi vai usar essas informações para acompanhar padrões e evolução dos seus fios.'
-            : 'Um resumo dos cuidados, hábitos e sensações do seu dia.'}
-        </p>
-      </div>
+      {/* Conteúdo */}
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-6">
+        <div className="flex flex-col gap-2">
+          <h3 className="font-['Montserrat'] text-base font-semibold leading-5 text-text">
+            Diário Lumi
+          </h3>
+          <p className="font-nunito text-sm leading-5 text-text-secondary">
+            {done
+              ? 'Seu dia já foi registrado. O Lumi vai usar essas informações para acompanhar padrões e evolução dos seus fios.'
+              : 'Um resumo dos cuidados, hábitos e sensações do seu dia.'}
+          </p>
+        </div>
 
-      {/* ── botão ── */}
-      <button
-        type="button"
-        onClick={onOpen}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        aria-label={done ? 'Abrir registro do dia' : 'Registrar meu dia'}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 10,
-          padding: '12px 16px',
-          background: '#1E1E1F',
-          borderRadius: 24,
-          border: 'none',
-          cursor: 'pointer',
-          width: '100%',
-          textAlign: 'left',
-          boxSizing: 'border-box',
-          opacity: hovered ? 0.85 : 1,
-          transition: 'opacity .2s ease',
-        }}
-      >
-        <span style={{
-          fontFamily: '"Nunito Sans", sans-serif',
-          fontSize: 14,
-          fontWeight: 500,
-          lineHeight: '14px',
-          color: '#FFF',
-          flex: '1 0 0',
-          textAlign: 'left',
-        }}>
+        <Button
+          onClick={onOpen}
+          size="default"
+          className="w-full"
+          aria-label={done ? 'Abrir registro do dia' : 'Registrar meu dia'}
+        >
           {done ? 'Abrir registro' : 'Registrar'}
-        </span>
-
-        <span style={{
-          display: 'flex',
-          width: 24,
-          height: 24,
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexShrink: 0,
-          background: '#FFF',
-          borderRadius: '50%',
-        }}>
-          <ArrowIcon />
-        </span>
-      </button>
-
+        </Button>
+      </div>
     </div>
-  )
-}
-
-function ArrowIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-      xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, display: 'block' }}>
-      <path d="M2 7H12" stroke="#1E1E1F" strokeWidth="1.6" strokeLinecap="round" />
-      <path d="M7.5 2.5L12 7L7.5 11.5" stroke="#1E1E1F" strokeWidth="1.6"
-        strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   )
 }

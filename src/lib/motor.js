@@ -1,5 +1,5 @@
 
-// ── UTILITÁRIOS ───────────────────────────────────────────────────
+// utilitarios
 function clamp(value, min = 0, max = 100) {
   return Math.max(min, Math.min(max, Math.round(value)))
 }
@@ -26,7 +26,7 @@ function temProcedimentoCritico(respostas) {
   )
 }
 
-// ── FRAGILIDADE ATIVA ─────────────────────────────────────────────
+// fragilidade ativa: dano severo recente que ainda não se recuperou, causando maior risco de quebra e sensibilidade
 export function avaliarFragilidade(respostas) {
   const estado = respostas?.estado ?? {}
   const quimica = respostas?.quimica ?? {}

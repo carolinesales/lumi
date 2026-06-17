@@ -30,7 +30,7 @@ function formatarCelular(v) {
 
 function AuthLayout({ photo, children }) {
   return (
-    <div className="flex h-screen overflow-hidden bg-white">
+    <div className="force-light flex h-screen overflow-hidden bg-white">
       <div className="hidden w-[48%] shrink-0 lg:block">
         <img src={photo} alt="" aria-hidden="true"
           className="h-full w-full object-cover object-[center_20%] grayscale" />
@@ -119,6 +119,7 @@ export default function Cadastro() {
     if (!nome.trim())      return setErro(t('cad_erro_nome'))
     if (!sobrenome.trim()) return setErro(t('cad_erro_sobrenome'))
     if (!email.trim())     return setErro(t('cad_erro_email_vazio'))
+    if (celular && celular.replace(/\D/g, '').length < 10) return setErro(t('cad_erro_celular'))
     setErro('')
     setAba('senha')
   }

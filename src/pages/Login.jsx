@@ -12,7 +12,7 @@ import { cn }        from '@/lib/utils'
 
 function AuthLayout({ photo, children }) {
   return (
-    <div className="flex h-screen overflow-hidden bg-white">
+    <div className="force-light flex h-screen overflow-hidden bg-white">
       {/* Foto — só desktop */}
       <div className="hidden w-[48%] shrink-0 lg:block">
         <img
@@ -141,12 +141,12 @@ export default function Login() {
               </button>
             </div>
             <div className="mt-2 text-right">
-              <button
-                type="button"
+              <Link
+                to="/esqueceu-senha"
                 className="font-nunito text-xs text-lumi-gray transition hover:text-lumi-black"
               >
                 {t('login_esqueceu')}
-              </button>
+              </Link>
             </div>
           </div>
 

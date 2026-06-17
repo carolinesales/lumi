@@ -85,7 +85,7 @@ function LegalSheet({ conteudo, fechar, onClose, isMobile }) {
         ref={sheetRef}
         onClick={e => e.stopPropagation()}
         className={cn(
-          'flex max-h-[88vh] w-full flex-col bg-white',
+          'force-light flex max-h-[88vh] w-full flex-col bg-white',
           isMobile ? 'rounded-t-[24px]' : 'max-w-[520px] rounded-[24px]',
         )}
         style={{ animation: isMobile ? 'drawerUp .32s cubic-bezier(.32,0,.67,0) forwards' : 'lumi-fade-up-soft .25s ease forwards' }}
@@ -174,7 +174,7 @@ export default function Splash() {
       <div className="relative z-10 flex flex-1 flex-col">
 
         {/* Top bar */}
-        <div className="splash-fi flex items-center justify-between px-6 pt-[67px] lg:px-[68px] lg:pt-[68px]">
+        <div className="splash-fi flex items-center justify-between px-6 pt-10 lg:px-[68px] lg:pt-12">
           <h1 className="font-serif text-[32px] italic font-normal leading-none text-white lg:text-[64px]">
             Lumi
           </h1>
@@ -223,7 +223,7 @@ export default function Splash() {
           <div className="splash-fu1 flex flex-col gap-4 lg:flex-row">
             <Button
               size="lg"
-              className="w-full bg-white text-lumi-black hover:bg-white/90 lg:w-auto lg:min-w-[200px]"
+              className="w-full bg-white text-[#1E1E1F] hover:bg-white/90 lg:w-auto lg:min-w-[200px]"
               onClick={() => navigate('/cadastro')}
             >
               {t('splash_criar')}

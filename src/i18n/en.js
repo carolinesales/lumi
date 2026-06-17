@@ -1,5 +1,5 @@
 const en = {
-  // ── General ────────────────────────────────────────────────
+  // global
   app_nome: 'Lumi',
   salvar: 'Save',
   salvando: 'Saving...',
@@ -14,14 +14,14 @@ const en = {
   sim: 'Yes',
   nao: 'No',
 
-  // ── Nav ───────────────────────────────────────────────────
+  // nav
   nav_inicio: 'Home',
   nav_rotina: 'Routine',
   nav_analises: 'Analysis',
   nav_perfil: 'Profile',
   nav_historico: 'History',
 
-  // ── Splash ────────────────────────────────────────────────
+  // splash
   splash_headline: 'Intelligent diagnosis for your hair',
   splash_criar: 'Create my account',
   splash_entrar: 'I already have an account',
@@ -31,7 +31,7 @@ const en = {
   splash_termos_link2: 'privacy policy',
   splash_lang: 'English',
 
-  // ── Login ─────────────────────────────────────────────────
+  // login
   login_titulo: 'Login',
   login_sub: 'Sign in and track your personalized evolution.',
   login_email: 'Email',
@@ -42,7 +42,7 @@ const en = {
   login_sem_conta: "Don't have an account?",
   login_criar: 'Create account',
 
-  // ── Cronograma ────────────────────────────────────────────
+  // cronograma
   cron_titulo: 'Routine',
   cron_etapas_concluidas: 'steps completed',
   cron_etapas_restantes: 'steps remaining',
@@ -52,8 +52,31 @@ const en = {
   cron_etapas_do_mes: 'Steps for',
   cron_meses: ['January','February','March','April','May','June','July','August','September','October','November','December'],
   cron_dias: ['SUN.','MON.','TUE.','WED.','THU.','FRI.','SAT.'],
+  cron_minha_rotina: 'My routine',
+  cron_descricao: 'View your care cycle, follow upcoming rituals and keep your hair routine in balance.',
+  cron_view_mes: 'Month',
+  cron_view_semana: 'Week',
+  cron_view_dia: 'Day',
+  cron_hoje: 'Today',
+  cron_em_foco: 'In focus today',
+  cron_nenhum_programado: 'No care scheduled',
+  cron_observar_fios: 'Take this time to observe your hair and record how it looks',
+  cron_registrar_obs: 'Record observation',
+  cron_proximas_etapas: 'Upcoming steps',
+  cron_proximas_sub: 'Your cycle continues in the coming days',
+  cron_nenhuma_pendente: 'No pending steps.',
+  cron_progresso: 'Cycle progress',
+  cron_nenhum_cuidado: 'No care',
+  cron_descansar: 'Take this time to rest your hair',
+  cron_concluido: 'Done',
+  cron_pendente: 'Pending',
+  cron_feito: 'Done',
+  cron_iniciar: 'Start',
+  cron_rotina_nao_criada: 'Your routine has not been created yet',
+  cron_rotina_nao_criada_sub: 'Build a personalized schedule to track hydration, nutrition, reconstruction and other care.',
+  cron_criar_rotina: 'Create my routine',
 
-  // ── Etapa Detalhe ─────────────────────────────────────────
+  // etapa
   etapa_por_que: 'Why it matters',
   etapa_ver_mais: 'See detailed explanation',
   etapa_ver_menos: 'See less',
@@ -72,7 +95,7 @@ const en = {
   etapa_sucesso_sub: 'Your hair thanks you.',
   etapa_hoje: 'Today',
 
-  // ── Home ──────────────────────────────────────────────────
+  // homepage
   home_hair_score: 'Hair Score',
   home_cabelo_radiante: 'Radiant hair.',
   home_evolucao: 'Consistent progress.',
@@ -105,7 +128,7 @@ const en = {
   home_label_construcao: 'Routine in progress',
   home_label_cuidado: 'Hair needs care',
 
-  // ── Análise ───────────────────────────────────────────────
+  // analise
   analise_elasticidade: 'Elasticity',
   analise_porosidade: 'Porosity',
   analise_couro: 'Scalp',
@@ -113,7 +136,7 @@ const en = {
   analise_em_analise: 'Under analysis',
   analise_em_evolucao: 'In progress',
 
-  // ── Tipo de ritual ────────────────────────────────────────
+  // tipo de ritual
   ritual_hidratacao: 'Hydration',
   ritual_nutricao: 'Nutrition',
   ritual_reconstrucao: 'Reconstruction',
@@ -121,7 +144,7 @@ const en = {
   ritual_umectacao: 'Umectation',
   ritual_lavagem: 'Wash',
 
-  // ── Descrições de ritual ──────────────────────────────────
+  // descrição do ritual
   ritual_desc_hidratacao: 'Restore moisture and bring back softness and shine.',
   ritual_desc_nutricao: 'Replenish essential oils and protect against dryness.',
   ritual_desc_reconstrucao: 'Strengthen the hair fiber and reduce signs of fragility.',
@@ -129,14 +152,14 @@ const en = {
   ritual_desc_umectacao: 'Deep nourishment for more aligned and protected hair.',
   ritual_desc_lavagem: 'Gentle cleansing to maintain balance and natural lightness.',
 
-  // ── Clima ─────────────────────────────────────────────────
+  // clima
   clima_sem_dados: 'Log how your hair feels today to refine your next recommendations.',
   clima_umidade_baixa: 'Low humidity in {cidade}. Boost your hair hydration today.',
   clima_umidade_alta: 'High humidity in {cidade}. Prefer a light finish today.',
   clima_calor: 'Intense heat in {cidade}. Avoid heat sources on your hair.',
   clima_equilibrado: 'Balanced weather in {cidade}. Great day to focus on {foco}.',
 
-  // ── Registro Modal ────────────────────────────────────────
+  // modal de registro diário
   reg_titulo_1: 'How are you today?',
   reg_titulo_2: 'How did you sleep?',
   reg_titulo_3: "Today's rituals",
@@ -179,7 +202,7 @@ const en = {
   reg_cuidado_protecao: 'Heat protection',
   reg_cuidado_nenhum: 'No ritual today',
 
-  // ── Questionário ──────────────────────────────────────────
+  // questionario
   q_intro_titulo: "Let's understand your hair",
   q_intro_sub: 'Answer a few quick questions to create your personalized plan.',
   q_intro_micro: 'Takes less than 1 minute • You can adjust later',
@@ -304,13 +327,14 @@ const en = {
   q9_recuperar: 'Repair damage',
   q9_recuperar_desc: 'After chemicals, heat or coloring',
 
-  // ── Profile ───────────────────────────────────────────────
+  // perfil
   perfil_titulo: 'Profile',
+  perfil_subtitulo: 'Manage your data, preferences and account security.',
   perfil_dados: 'Personal data',
   perfil_dados_desc: 'Name, phone, location',
   perfil_notif: 'Notifications',
   perfil_notif_desc: 'Reminders and weekly summaries',
-  perfil_idioma: 'Language & units',
+  perfil_idioma: 'Language',
   perfil_idioma_desc: 'English · Inches',
   perfil_seguranca: 'Security',
   perfil_seguranca_desc: 'Password, privacy and data',
@@ -319,13 +343,13 @@ const en = {
   perfil_sair: 'Sign out',
   perfil_sair_desc: 'End session',
 
-  // ── Personal Profile ──────────────────────────────────────
+  // dados pessoais
   pp_titulo: 'Personal data',
   pp_info_basicas: 'Basic information',
   pp_nome: 'First name',
   pp_sobrenome: 'Last name',
   pp_email: 'Email',
-  pp_email_hint: 'To change your email please contact support.',
+  pp_email_hint: 'You can change your email with a security confirmation.',
   pp_celular: 'Phone',
   pp_celular_ph: '(000) 000-0000',
   pp_localizacao: 'Location',
@@ -335,7 +359,7 @@ const en = {
   pp_estado: 'State',
   pp_estado_ph: 'ST',
 
-  // ── Notifications ─────────────────────────────────────────
+  // notificações
   pn_titulo: 'Notifications',
   pn_lembretes: 'Reminders',
   pn_lembretes_hint: 'Choose which notifications you want to receive from Lumi.',
@@ -363,7 +387,7 @@ const en = {
   pi_pol_desc: 'Imperial system — standard in the US',
   pi_aviso: 'The language change will be applied the next time you open the app.',
 
-  // ── Security ──────────────────────────────────────────────
+  // segurança
   ps_titulo: 'Security',
   ps_acesso: 'Access',
   ps_acesso_hint: 'Manage how you access your Lumi account.',
@@ -387,11 +411,11 @@ const en = {
   ps_excluindo: 'Deleting...',
   ps_senha_errada: 'Wrong password. Please try again.',
 
-  // ── Terms / Privacy ───────────────────────────────────────
+  // termos e privacidade
   termos_titulo: 'Terms of Use',
   privacidade_titulo: 'Privacy Policy',
 
-  // ── Login errors ──────────────────────────────────────────
+  // login e cadastro
   login_erro_nao_encontrado: 'User not found.',
   login_erro_senha:          'Wrong password.',
   login_erro_credencial:     'Incorrect email or password.',
@@ -399,7 +423,7 @@ const en = {
   login_erro_tentativas:     'Too many attempts. Please wait.',
   login_erro_generico:       'Error signing in. Please try again.',
 
-  // ── Sign up ───────────────────────────────────────────────
+  // signup
   cad_titulo:             'Create your account',
   cad_sub:                'Start your hair care journey.',
   cad_aba_dados:          'My details',
@@ -415,6 +439,7 @@ const en = {
   cad_criterio_numero:    'At least 1 number',
   cad_erro_nome:          'Please enter your first name.',
   cad_erro_sobrenome:     'Please enter your last name.',
+  cad_erro_celular:      'Enter a valid phone number with area code.',
   cad_erro_email_vazio:   'Please enter your email.',
   cad_erro_criterios:     'Password does not meet the requirements.',
   cad_erro_senhas_diferentes: 'Passwords do not match.',
@@ -437,14 +462,14 @@ const en = {
   ve_verificado_titulo: 'Email verified',
   ve_verificado_sub:    'All set! You will be redirected to the diagnosis in a moment.',
 
-  // ── Analyzing ─────────────────────────────────────────────
+  // análise
   an_titulo: 'Analyzing your profile',
   an_sub:    'Identifying unique patterns and needs for your hair.',
   an_step1:  'Mapping your hair type',
   an_step2:  'Calculating your needs',
   an_step3:  'Building your routine',
 
-  // ── Result ────────────────────────────────────────────────
+  // resultado
   res_titulo:             'Your diagnosis',
   res_de_100:             'out of 100 points',
   res_diagnostico_titulo: 'Main diagnosis',
@@ -455,6 +480,131 @@ const en = {
   res_cronograma:         'Routine — week 1',
   res_lavagem:            'Recommended wash frequency:',
   res_cta:                'Go to my dashboard',
+
+  // analises
+  ana_titulo: 'Analytics',
+  ana_subtitulo: 'Track your hair progress based on your logs, completed care and routine habits.',
+  ana_7d: '7 days',
+  ana_30d: '30 days',
+  ana_90d: '90 days',
+  ana_filtrar_periodo: 'Filter period',
+  ana_consistencia_titulo: 'Routine consistency',
+  ana_consistencia_sub: 'How often you logged your routine during this period.',
+  ana_dias_registrados: '{n} of {total} days logged',
+  ana_evolucao_titulo: 'Lumi Score evolution',
+  ana_evolucao_sub: 'See how your score changed across your latest records.',
+  ana_score_vazio: 'Take a new assessment to see your evolution over time.',
+  ana_ponto: 'point',
+  ana_pontos: 'points',
+  ana_vs_anterior: 'vs. previous',
+  ana_eventos_titulo: 'Hair events in this period',
+  ana_eventos_sub: 'Procedures, changes and situations that can influence how your hair evolves.',
+  ana_dicas_titulo: 'Lumi tips',
+  ana_dicas_texto: 'The more you log your routine, the more accurate your analytics and recommendations become. How about logging today?',
+  ana_registrar_rotina: 'Log routine',
+  ana_aderencia_titulo: 'Care adherence',
+  ana_aderencia_sub: 'See which types of care you completed most often.',
+  ana_insight: 'Lumi insight',
+  ana_insight_texto: 'You completed less {tipo} in this period. How about adding this care to your routine?',
+  ana_habitos_titulo: 'Habits and well-being',
+  ana_habitos_sub: 'Track signals from your routine that can impact hair health.',
+  ana_sono: 'Sleep',
+  ana_qualidade: 'Quality',
+  ana_sono_otima: 'great',
+  ana_sono_regular: 'regular',
+  ana_sono_baixa: 'low',
+  ana_estresse: 'Stress',
+  ana_nivel: 'Level',
+  ana_estr_baixo: 'low',
+  ana_estr_medio: 'medium',
+  ana_estr_alto: 'high',
+  ana_humor: 'Mood',
+  ana_mais_frequente: 'Most frequent',
+  ana_humor_otimo: 'Great',
+  ana_humor_bem: 'Good',
+  ana_humor_neutro: 'Neutral',
+  ana_humor_ruim: 'Bad',
+  ana_humor_cansada: 'Very tired',
+  ana_vazio_titulo: 'Your analytics show up here',
+  ana_vazio_texto: 'Take your assessment and log your routine to track your Lumi Score, habits and hair cycle.',
+  ana_fazer_diagnostico: 'Take assessment',
+  // steps 
+  etp_titulo: 'Scheduled care',
+  etp_subtitulo: 'See what to do, get ready calmly and log when you finish.',
+  etp_voltar: 'Back',
+  etp_no_score: 'on Hair Score',
+  etp_fazer_agora: 'Do it now',
+  etp_reagendar: 'Reschedule',
+  etp_pular: 'Skip care',
+  etp_concluir: 'Finish ritual',
+  etp_salvando: 'Saving...',
+  etp_antes: 'Before you start',
+  etp_antes_sub: 'Get the items you might need for this care.',
+  etp_etapas: 'Step by step',
+  etp_passo_a_passo: 'Follow the steps at your own pace. You can preview before starting or check them as you go.',
+  etp_marcar: 'Mark step',
+  etp_desmarcar: 'Unmark step',
+  etp_usar_timer: 'Use timer',
+  etp_como_ficaram: 'How does your hair feel?',
+  etp_opcional: 'Optional. Mark what you noticed.',
+  etp_min: 'minutes',
+  etp_iniciar: 'Start',
+  etp_pausar: 'Pause',
+  etp_pausa_ok: 'Pause complete',
+  etp_pausa_ok_sub: 'Time to continue the ritual.',
+  etp_timer_pronta: 'ready?',
+  etp_timer_aguardando: 'waiting',
+  etp_timer_fim: 'done',
+  etp_voltar_ritual: 'Back to the ritual',
+  etp_sem_timer: 'Back without using the timer',
+  etp_amanha: 'Tomorrow',
+  etp_dois_dias: 'In 2 days',
+  etp_reagendar_titulo: 'When works better?',
+  etp_reagendar_sub: "You're not behind, just adjusting the pace.",
+  etp_pular_titulo: 'Skip this care?',
+  etp_pular_sub: "It won't be logged today. You can reschedule if you'd rather adjust the pace.",
+  etp_pular_confirmar: 'Yes, skip care',
+  etp_concluido_titulo: 'Ritual complete',
+  etp_variacao: 'Change',
+  etp_voltar_inicio: 'Back to home',
+  etp_ver_rotina: 'See my routine',
+
+  // analise de evolução
+  ana_ev_corte: 'Cut my hair',
+  ana_ev_corte_pontas: 'Trimmed damaged ends',
+  ana_ev_corte_quimico: 'Had chemical breakage',
+  ana_ev_quimica: 'Did a chemical treatment',
+  ana_ev_coloracao: 'Changed the color',
+  ana_ev_descoloracao: 'Bleached my hair',
+  ana_ev_calor: 'Used a lot of heat',
+  ana_ev_piscina_mar: 'Pool or sea',
+  ana_ev_produto_novo: 'Tried a new product',
+  ana_ev_queda: 'Noticed more shedding',
+  ana_ev_couro: 'Scalp changed',
+  ana_ev_nada: 'Nothing different',
+
+  // perfil pessoal
+  pp_trocar_foto: 'Change photo',
+  pp_remover_foto: 'Remove photo',
+  pp_alterar_email: 'Change email',
+  pp_alterar_email_sub: 'Update the email used to access your account. We will ask for your password for security.',
+  pp_novo_email: 'New email',
+  pp_senha_atual: 'Current password',
+  pp_enviar_confirmacao: 'Send confirmation',
+  pp_email_invalido: 'Enter a valid email.',
+  pp_email_senha_req: 'Enter your current password.',
+  pp_email_em_uso: 'This email is already in use.',
+  pp_email_enviado_titulo: 'Confirm on your new email',
+  pp_email_enviado_msg: 'We sent a confirmation link to {email}. After confirming, your sign-in email will be updated.',
+  perfil_preferencias: 'Preferences',
+  perfil_aparencia: 'Appearance',
+  perfil_tema_claro: 'Light mode',
+  perfil_tema_escuro: 'Dark mode',
+  perfil_conta: 'Account',
+  perfil_sair_desc2: 'Sign out from this device.',
+  perfil_excluir: 'Delete my account',
+  perfil_excluir_desc: 'Erase your account and your data from Lumi.',
+  ps_excluir_confirmar: 'Yes, delete my account',
 }
 
 export default en

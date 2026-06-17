@@ -18,29 +18,41 @@ function gerarCodigo() {
 function templateEmail(nome, codigo) {
   return `<!DOCTYPE html>
 <html lang="pt-BR">
-<head><meta charset="UTF-8" /><title>Confirme seu email — Lumi</title></head>
-<body style="margin:0;padding:0;background:#F7F6F3;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F7F6F3;padding:40px 0;">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Seu código de acesso — Lumi</title></head>
+<body style="margin:0;padding:0;background:#F7F6F3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F7F6F3;padding:32px 16px;">
     <tr><td align="center">
-      <table width="480" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);">
-        <tr><td style="padding:40px 48px 32px;border-bottom:1px solid #F0EDE8;">
-          <p style="margin:0;font-size:26px;font-style:italic;font-weight:400;color:#181714;">Lumi</p>
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:440px;background:#ffffff;border-radius:20px;overflow:hidden;border:1px solid #EFEDE8;">
+
+        <tr><td style="padding:36px 40px 0;">
+          <p style="margin:0;font-size:28px;font-style:italic;font-weight:400;color:#1E1E1F;letter-spacing:-0.02em;">Lumi</p>
         </td></tr>
-        <tr><td style="padding:40px 48px;">
-          <p style="margin:0 0 8px;font-size:22px;font-weight:600;color:#181714;">Olá, ${nome} 👋</p>
-          <p style="margin:0 0 32px;font-size:15px;color:#495059;line-height:1.6;">Use o código abaixo para confirmar seu email.</p>
-          <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
-            <div style="display:inline-block;background:#F7F6F3;border-radius:16px;padding:24px 48px;">
-              <p style="margin:0 0 4px;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#9A958E;">Seu código</p>
-              <p style="margin:0;font-size:40px;font-weight:300;letter-spacing:0.18em;color:#181714;">${codigo}</p>
-            </div>
-          </td></tr></table>
-          <p style="margin:32px 0 0;font-size:13px;color:#9A958E;line-height:1.6;text-align:center;">Expira em <strong style="color:#495059;">10 minutos</strong>. Se não foi você, ignore.</p>
+
+        <tr><td style="padding:28px 40px 8px;">
+          <p style="margin:0 0 10px;font-size:20px;font-weight:600;color:#1E1E1F;letter-spacing:-0.02em;">Olá, ${nome}!</p>
+          <p style="margin:0;font-size:15px;color:#6B6B6B;line-height:1.65;">Que bom ter você por aqui. Use o código abaixo para confirmar seu e-mail e começar a cuidar dos seus fios com a gente.</p>
         </td></tr>
-        <tr><td style="padding:24px 48px;border-top:1px solid #F0EDE8;background:#FAFAFA;">
-          <p style="margin:0;font-size:12px;color:#C0BEB8;text-align:center;">Lumi — Sua jornada capilar inteligente</p>
+
+        <tr><td style="padding:28px 40px;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:#F7F6F3;border-radius:14px;">
+            <tr><td align="center" style="padding:28px 24px;">
+              <p style="margin:0 0 8px;font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:#A3A099;">Seu código</p>
+              <p style="margin:0;font-size:38px;font-weight:500;letter-spacing:0.16em;color:#1E1E1F;">${codigo}</p>
+            </td></tr>
+          </table>
         </td></tr>
+
+        <tr><td style="padding:0 40px 32px;">
+          <p style="margin:0;font-size:13px;color:#A3A099;line-height:1.6;text-align:center;">O código expira em <span style="color:#6B6B6B;font-weight:600;">10 minutos</span>.<br/>Se você não criou uma conta no Lumi, pode ignorar este e-mail com segurança.</p>
+        </td></tr>
+
+        <tr><td style="padding:20px 40px;border-top:1px solid #EFEDE8;">
+          <p style="margin:0;font-size:12px;color:#C4C1BA;text-align:center;line-height:1.5;">Lumi · Sua jornada de cuidado capilar<br/>Este é um e-mail automático, não precisa responder.</p>
+        </td></tr>
+
       </table>
+
+      <p style="margin:20px 0 0;font-size:11px;color:#C4C1BA;">Enviado com cuidado pela equipe Lumi</p>
     </td></tr>
   </table>
 </body></html>`
@@ -58,7 +70,7 @@ exports.enviarCodigoOTP = onCall(
     const db  = getFirestore()
     const ref = db.collection('otp_verificacao').doc(uid)
 
-    // Se já existe código válido e não está forçando reenvio, não gera novo
+
     if (!forcar) {
       const snap = await ref.get()
       if (snap.exists) {
@@ -84,7 +96,7 @@ exports.enviarCodigoOTP = onCall(
       await transporter.sendMail({
         from:    `"Lumi" <${GMAIL_USER.value()}>`,
         to:      email,
-        subject: `${codigo} é seu código de verificação — Lumi`,
+        subject: `Seu código de acesso é ${codigo}`,
         html:    templateEmail(nome || 'usuária', codigo),
       })
     } catch (err) {
@@ -101,7 +113,7 @@ exports.verificarCodigoOTP = onCall(
   async (request) => {
     const { uid, codigo } = request.data
 
-    // Argumentos ausentes: ainda é erro de programação, não de usuário
+
     if (!uid || !codigo) {
       throw new HttpsError('invalid-argument', 'uid e codigo são obrigatórios.')
     }
@@ -111,8 +123,7 @@ exports.verificarCodigoOTP = onCall(
     const ref  = db.collection('otp_verificacao').doc(uid)
     const snap = await ref.get()
 
-    // A partir daqui, falhas de verificação retornam 200 com { sucesso: false }
-    // para não poluir o console do navegador com erros HTTP esperados.
+
     if (!snap.exists) {
       return { sucesso: false, motivo: 'nao_encontrado', mensagem: 'Código não encontrado. Solicite um novo.' }
     }

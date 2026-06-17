@@ -20,7 +20,7 @@ const buttonVariants = cva(
       variant: {
         // ── Primário ───────────────────────────────────────
         default: [
-          'bg-lumi-black text-white',
+          'bg-ink text-white dark:bg-white dark:text-ink',
           'hover:bg-[#272522]',
           'active:scale-[.98]',
         ],
@@ -41,21 +41,21 @@ const buttonVariants = cva(
 
         // ── Outline ───────────────────────────────
         outline: [
-          'border border-lumi-border bg-white text-lumi-black',
-          'hover:bg-lumi-bg',
+          'border border-paper-200 bg-surface text-text',
+          'hover:bg-surface-subtle',
           'active:scale-[.98]',
         ],
 
         // ── Destructive ───────────────────────────────
         destructive: [
-          'bg-[#FCEBEB] text-[#dc3232]',
-          'hover:bg-[#F9D6D6]',
+          'bg-state-negative-soft text-state-negative',
+          'hover:opacity-90',
           'active:scale-[.98]',
         ],
 
         // ── Link ───────────────────────────────
         link: [
-          'bg-transparent text-lumi-black underline-offset-4',
+          'bg-transparent text-text underline-offset-4',
           'hover:underline',
         ],
       },

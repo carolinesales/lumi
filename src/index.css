@@ -5,13 +5,14 @@
 @import './styles/lumi-tokens.css';
 @import './styles/lumi-layout.css';
 @import './styles/lumi-motion.css';
+@import './styles/lumi-color-tokens.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  /* ── Shadcn CSS vars — modo Claro ───────────────────────────────────── */
+  /* ── Shadcn — modo Claro */
   :root {
     --background:           oklch(1 0 0);
     --foreground:           oklch(0.1 0.005 60);
@@ -42,7 +43,7 @@
     --radius:               1rem;
   }
 
-  /* ── Shadcn CSS vars — modo Escuro ───────────────────────────────────── */
+  /* ── Shadcn — modo Escuro  */
   .dark {
     --background:           oklch(0.12 0.005 60);
     --foreground:           oklch(0.95 0 0);
@@ -72,7 +73,7 @@
     --ring:                 oklch(0.75 0 0);
   }
 
-  /* ── tokens — modo Claro ──────────────────────────────────────── */
+  /* ── tokens — modo Claro  */
   @media (prefers-color-scheme: dark) {
     :root:not(.light) {
       --background:           oklch(0.12 0.005 60);
@@ -96,7 +97,7 @@
     }
   }
 
-  /* ── tokens — modo Escuro ──────────────────────────────────────── */
+  /* ── tokens — modo Escuro */
   .dark {
     --lumi-bg:           #111110;
     --lumi-surface:      rgba(30, 29, 28, 0.9);
@@ -121,7 +122,7 @@
     }
   }
 
-  /* ── Estilos globais ─────────────────────────────────────────────────── */
+  /* ── Estilos globais  */
   html {
     font-family: 'Nunito Sans', 'Geist Variable', sans-serif;
     -webkit-font-smoothing: antialiased;

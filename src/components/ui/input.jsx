@@ -7,14 +7,14 @@ const Input = forwardRef(function Input({ className, error, disabled, ...props }
       ref={ref}
       disabled={disabled}
       className={cn(
-        'w-full rounded-[8px] border bg-white px-4 py-3.5',
-        'font-nunito text-base text-lumi-black outline-none transition',
-        'placeholder:text-lumi-muted',
+        'w-full rounded-[8px] border bg-surface px-4 py-3.5',
+        'font-nunito text-base text-text outline-none transition',
+        'placeholder:text-text-tertiary',
         disabled
-          ? 'cursor-not-allowed border-lumi-border bg-lumi-input text-lumi-gray'
+          ? 'cursor-not-allowed border-paper-200 bg-surface-subtle text-text-tertiary'
           : error
-          ? 'border-[#dc3232] focus:border-[#dc3232]'
-          : 'border-lumi-border hover:border-lumi-gray focus:border-lumi-black',
+          ? 'border-state-negative focus:border-state-negative'
+          : 'border-paper-200 hover:border-text-tertiary focus:border-ink',
         className,
       )}
       {...props}

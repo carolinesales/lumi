@@ -1,16 +1,7 @@
 // src/hooks/useTheme.js
 import { useEffect, useState } from 'react'
 
-/**
- * Gerencia o tema claro/escuro do Lumi.
- *
- * Ordem de prioridade:
- *  1. Preferência salva no localStorage
- *  2. Preferência do sistema operacional (prefers-color-scheme)
- *
- * Adiciona/remove a classe .dark no <html> — shadcn e os tokens
- * Lumi respondem automaticamente.
- */
+// gerenciamento do tema claro/escuro
 export function useTheme() {
   const [tema, setTema] = useState(() => {
     const salvo = localStorage.getItem('lumi_tema')

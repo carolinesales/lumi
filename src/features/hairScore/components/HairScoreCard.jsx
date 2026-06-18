@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { getHairScoreDeltaMeta } from '../utils/hairScore.utils'
+import { useIdioma } from '@/contexts/IdiomaContext'
 
 const SCORE_THEME = {
   fragil: {
@@ -96,8 +97,9 @@ export default function HairScoreCard({
   className = '',
 }) {
   const theme = getTheme(score)
-  const stateLabel = getScoreMomentLabel({ state, fragilidade, trend, score })
-  const stateMessage = getScoreReading({ message, fragilidade, trend, delta, score })
+  const { t } = useIdioma()
+  const stateLabel = getScoreMomentLabel({ state, fragilidade, trend, score }, t)
+  const stateMessage = getScoreReading({ message, fragilidade, trend, delta, score }, t)
 
   return (
     <>
@@ -159,7 +161,7 @@ export default function HairScoreCard({
           onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'scale(1)' }}
           aria-label="Atualizar diagnóstico capilar"
         >
-          Atualizar diagnóstico
+          {t('hs_atualizar')}
         </button>
       </div>
 
@@ -255,7 +257,7 @@ export default function HairScoreCard({
             onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}
             aria-label="Atualizar diagnóstico capilar"
           >
-            Atualizar diagnóstico
+            {t('hs_atualizar')}
           </button>
         </div>
       </div>
@@ -263,23 +265,23 @@ export default function HairScoreCard({
   )
 }
 
-function getScoreMomentLabel({ state, fragilidade, trend, score }) {
-  if (fragilidade?.ativa) return 'Em recuperação'
-  if (score <= 25) return 'Fragilizado'
-  if (score <= 50) return 'Precisa de cuidado'
-  if (score <= 75) return 'Em evolução'
-  if (trend === 'up') return 'Em evolução'
-  if (trend === 'down') return 'Em observação'
+function getScoreMomentLabel({ state, fragilidade, trend, score }, t) {
+  if (fragilidade?.ativa) return t('hs_label_recuperacao')
+  if (score <= 25) return t('hs_label_fragilizado')
+  if (score <= 50) return t('hs_label_precisa_cuidado')
+  if (score <= 75) return t('hs_label_evolucao')
+  if (trend === 'up') return t('hs_label_evolucao')
+  if (trend === 'down') return t('hs_label_observacao')
   if (state?.label && state.label !== 'Aguardando diagnóstico') return state.label
-  return 'Cabelo radiante'
+  return t('hs_label_radiante')
 }
 
-function getScoreReading({ message, fragilidade, trend, delta, score }) {
-  if (fragilidade?.ativa) return 'Seus fios pedem uma rotina mais delicada nos próximos dias.'
-  if (score <= 25) return 'Seus fios precisam de recuperação gradual e cuidado constante.'
-  if (score <= 50) return 'Sua jornada de cuidado começa agora.'
-  if (score <= 75) return 'Sua rotina está começando a transformar seus fios.'
-  if (trend === 'up' || delta > 0) return 'Seus fios estão respondendo bem aos cuidados recentes.'
-  if (trend === 'down' || delta < 0) return 'O Lumi percebeu uma variação e ajusta o cuidado para recuperar equilíbrio.'
-  return message || 'Seus fios estão radiantes e cheios de vida.'
+function getScoreReading({ message, fragilidade, trend, delta, score }, t) {
+  if (fragilidade?.ativa) return t('hs_read_fragil')
+  if (score <= 25) return t('hs_read_baixo')
+  if (score <= 50) return t('hs_read_medio')
+  if (score <= 75) return t('hs_read_bom')
+  if (trend === 'up' || delta > 0) return t('hs_read_subindo')
+  if (trend === 'down' || delta < 0) return t('hs_read_descendo')
+  return message || t('hs_read_radiante')
 }

@@ -644,6 +644,23 @@ const pt = {
   conq_nova_fase_desc:       'Fez um segundo diagnóstico para releitura do perfil',
   conq_essencia_lumi_nome:   'Essência Lumi',
   conq_essencia_lumi_desc:   'Acumulou 500 XP — você é a Lumi em sua forma mais plena',
+
+  // ── Lumi Score ────────────────────────────────────────────
+  hs_atualizar: 'Atualizar diagnóstico',
+  hs_label_recuperacao: 'Em recuperação',
+  hs_label_fragilizado: 'Fragilizado',
+  hs_label_precisa_cuidado: 'Precisa de cuidado',
+  hs_label_evolucao: 'Em evolução',
+  hs_label_observacao: 'Em observação',
+  hs_label_radiante: 'Cabelo radiante',
+  hs_read_fragil: 'Seus fios pedem uma rotina mais delicada nos próximos dias.',
+  hs_read_baixo: 'Seus fios precisam de recuperação gradual e cuidado constante.',
+  hs_read_medio: 'Sua jornada de cuidado começa agora.',
+  hs_read_bom: 'Sua rotina está começando a transformar seus fios.',
+  hs_read_subindo: 'Seus fios estão respondendo bem aos cuidados recentes.',
+  hs_read_descendo: 'O Lumi percebeu uma variação e ajusta o cuidado para recuperar equilíbrio.',
+  hs_read_radiante: 'Seus fios estão radiantes e cheios de vida.',
+  hs_acompanhando: 'Seu diagnóstico está sendo acompanhado pelo Lumi.',
 }
 
 export default pt

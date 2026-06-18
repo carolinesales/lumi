@@ -228,6 +228,7 @@ export default function Home() {
       message={hairScoreVM.message || 'Seu diagnóstico está sendo acompanhado pelo Lumi.'}
       fragilidade={hairScoreVM.fragilidade}
       streak={streak}
+      onUpdateDiagnostic={() => navigate('/app/reavaliacao')}
     />
   )
 

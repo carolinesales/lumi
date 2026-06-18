@@ -1,5 +1,6 @@
 // src/features/routineEngine/components/AdaptiveRoutineCard.jsx
 import { Button } from '@/components/ui/button'
+import { useIdioma } from '@/contexts/IdiomaContext'
 import { cn }     from '@/lib/utils'
 import { ROUTINE_ACTION_COPY, ROUTINE_FOCUS_COPY } from '@/content/copy/routineCopies'
 import ilustracaoReminder from '@/assets/Reminder.png'
@@ -38,12 +39,17 @@ function todayLabel() {
 export default function AdaptiveRoutineCard({ routine, onStartAction, className }) {
   if (!routine) return null
 
-  const [main] = normalizeActions(routine.actions ?? [])
-  const actionCopy = main ? (ROUTINE_ACTION_COPY?.[main.id] ?? null) : null
-  const focusCopy  = routine.focus?.id ? (ROUTINE_FOCUS_COPY?.[routine.focus.id] ?? null) : null
+  const { t, idioma } = useIdioma()
 
-  const title       = actionCopy?.title       ?? focusCopy?.title       ?? 'Seu cuidado está pronto'
-  const description = actionCopy?.description ?? focusCopy?.description ?? 'O Lumi organizou um cuidado coerente para o momento atual dos seus fios.'
+  const [main] = normalizeActions(routine.actions ?? [])
+  const lang = idioma === 'en' ? 'en' : 'pt'
+  const actionRaw = main ? (ROUTINE_ACTION_COPY?.[main.id] ?? null) : null
+  const focusRaw  = routine.focus?.id ? (ROUTINE_FOCUS_COPY?.[routine.focus.id] ?? null) : null
+  const actionCopy = actionRaw ? (actionRaw[lang] ?? actionRaw.pt) : null
+  const focusCopy  = focusRaw  ? (focusRaw[lang]  ?? focusRaw.pt)  : null
+
+  const title       = actionCopy?.title       ?? focusCopy?.title       ?? t('rot_pronto_titulo')
+  const description = actionCopy?.description ?? focusCopy?.description ?? t('rot_pronto_desc')
 
   return (
     <div className={cn('overflow-hidden rounded-2xl bg-surface', className)}>
@@ -51,10 +57,10 @@ export default function AdaptiveRoutineCard({ routine, onStartAction, className 
 
         {/* cabeçalho */}
         <div className="flex items-center justify-between">
-          <span className="font-['Montserrat'] text-base font-semibold text-lumi-black">
-            Próximo cuidado
+          <span className="font-['Montserrat'] text-base font-semibold text-text">
+            {t('rot_proximo_cuidado')}
           </span>
-          <span className="rounded-full border border-paper-200 bg-surface-subtle px-3 py-1 font-['Montserrat'] text-[10px] font-medium capitalize tracking-[1px] text-lumi-secondary">
+          <span className="rounded-full border border-paper-200 bg-surface-subtle px-3 py-1 font-['Montserrat'] text-[10px] font-medium capitalize tracking-[1px] text-text-secondary">
             {todayLabel()}
           </span>
         </div>
@@ -71,28 +77,28 @@ export default function AdaptiveRoutineCard({ routine, onStartAction, className 
           <div className="flex min-w-0 flex-1 flex-col gap-4">
             {/* Título + descrição */}
             <div className="flex flex-col gap-1.5">
-              <h3 className="font-['Montserrat'] text-base font-semibold text-lumi-black">
+              <h3 className="font-['Montserrat'] text-base font-semibold text-text">
                 {title}
               </h3>
-              <p className="font-nunito text-sm leading-6 text-lumi-secondary">
+              <p className="font-nunito text-sm leading-6 text-text-secondary">
                 {description}
               </p>
             </div>
 
             {/* Meta — duração + score */}
             {main && (
-              <div className="flex items-center gap-2 font-nunito text-xs text-lumi-secondary">
+              <div className="flex items-center gap-2 font-nunito text-xs text-text-secondary">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                   <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.4"/>
                   <path d="M8 4.5V8.3L10.5 9.8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-                {main.duration ?? 20} min
-                <span className="text-lumi-muted">|</span>
+                {main.duration ?? 20} {t('rot_min')}
+                <span className="text-text-tertiary">|</span>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                   <path d="M1 12L5.5 7L9 9.5L14.5 3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M10.5 3.5H14.5V7.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-                +{main.scoreDelta ?? 8} no Lumi Score
+                +{main.scoreDelta ?? 8} {t('rot_no_score')}
               </div>
             )}
           </div>
@@ -106,7 +112,7 @@ export default function AdaptiveRoutineCard({ routine, onStartAction, className 
             className="w-full"
             aria-label={`Iniciar: ${title}`}
           >
-            Iniciar
+            {t('rot_iniciar')}
           </Button>
         )}
       </div>

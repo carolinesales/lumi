@@ -3,7 +3,7 @@ import { ChevronRight } from 'lucide-react'
 import { getTreatment, toDate } from '../lib/calendar'
 import { useIdioma } from '@/contexts/IdiomaContext'
 import { cn } from '@/lib/utils'
-import ilustracaoVazia from '@/assets/Milestone-4_Streamline_Milano.svg'
+import ilustracaoVazia from '@/assets/empty-routine.svg'
 
 const _TRAT_KEY = {
   'Hidratação': 'trat_hidratacao', 'Nutrição': 'trat_nutricao',
@@ -85,24 +85,24 @@ function TodayCardEmpty({ dateLabel, onObservacao }) {
   return (
     <Card>
       <CardHeader title="Em foco hoje" subtitle={dateLabel} />
-      <div className="flex flex-col items-center gap-6 rounded-[20px] border border-lumi-border p-6">
+      <div className="flex flex-col items-center gap-6">
         <img
           src={ilustracaoVazia}
           alt="Nenhum cuidado programado"
-          className="h-[180px] w-[180px] object-contain"
+          className="size-[200px] object-contain"
         />
         <div className="flex flex-col items-center gap-2">
-          <p className="text-center font-['Montserrat'] text-sm font-semibold text-lumi-secondary">
+          <p className="text-center font-['Montserrat'] text-sm font-semibold text-text-secondary">
             Nenhum cuidado programado
           </p>
-          <p className="text-center font-nunito text-xs leading-5 text-lumi-secondary">
+          <p className="text-center font-nunito text-xs leading-5 text-text-secondary">
             Aproveite para observar seus fios e registrar como eles estão
           </p>
         </div>
         <button
           type="button"
           onClick={onObservacao}
-          className="w-full rounded-[24px] bg-lumi-black py-3 font-nunito text-xs font-semibold text-white transition hover:opacity-90"
+          className="w-full rounded-[24px] bg-ink py-3 font-nunito text-sm font-semibold text-white transition hover:opacity-90"
         >
           Registrar observação
         </button>

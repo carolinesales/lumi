@@ -230,7 +230,6 @@ export default function Reavaliacao() {
     >
       <PageContainer>
         <PageHeader
-          eyebrow="Reavaliação"
           title="Reavaliação"
           description="Seu cabelo muda com o tempo. O Lumi acompanha essa evolução com você."
           actionLabel="Sair da reavaliação"
@@ -255,7 +254,7 @@ export default function Reavaliacao() {
             />
 
             {erro && (
-              <div className="mt-4 rounded-2xl border border-[#8C3D3D]/15 bg-[#FCEBEB] p-3 text-sm text-[#8C3D3D]">
+              <div className="mt-4 rounded-2xl border border-state-negative/15 bg-state-negative-soft p-3 text-sm text-state-negative">
                 {erro}
               </div>
             )}

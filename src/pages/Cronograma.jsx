@@ -6,7 +6,7 @@ import { db } from '@/lib/firebase'
 import { useAuth } from '@/contexts/AuthContext'
 import AppShell from '@/components/lumi/AppShell'
 import { useIdioma } from '@/contexts/IdiomaContext'
-import ilustracaoVazia from '@/assets/Milestone-4_Streamline_Milano.svg'
+import ilustracaoVazia from '@/assets/empty-routine.svg'
 import RegistroModal from './RegistroModal'
 
 const _TRAT_KEY = {

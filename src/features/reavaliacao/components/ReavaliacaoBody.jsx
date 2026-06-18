@@ -17,15 +17,11 @@ export default function ReavaliacaoBody({
   if (step === 1) {
     return (
       <>
-        <span className="mb-3 block text-[10px] font-black uppercase tracking-[.18em] text-[#9A958E]">
-          O que mudou?
-        </span>
-
-        <h2 className="mb-2 font-['Montserrat'] text-[22px] font-medium tracking-[-0.05em] text-[#181714]">
+        <h2 className="mb-2 font-['Montserrat'] text-base font-semibold text-text">
           O que mudou nos seus fios?
         </h2>
 
-        <p className="mb-5 max-w-xl text-sm leading-7 text-[#77736C]">
+        <p className="mb-5 max-w-xl font-['Nunito_Sans'] text-sm leading-6 text-text-secondary">
           Marque apenas o que aconteceu desde a última leitura. Se nada mudou, faremos só um check-in rápido.
         </p>
 
@@ -36,15 +32,11 @@ export default function ReavaliacaoBody({
 
   return (
     <>
-      <span className="mb-3 block text-[10px] font-black uppercase tracking-[.18em] text-[#9A958E]">
-        {semMudancas ? 'Check-in rápido' : step === 2 ? 'Detalhes da mudança' : 'Estado atual'}
-      </span>
-
-      <h2 className="mb-2 font-['Montserrat'] text-[22px] font-medium tracking-[-0.05em] text-[#181714]">
+      <h2 className="mb-2 font-['Montserrat'] text-base font-semibold text-text">
         {semMudancas ? 'Como seus fios estão hoje?' : step === 2 ? 'Vamos entender o contexto' : 'Como seus fios estão hoje?'}
       </h2>
 
-      <p className="mb-5 max-w-xl text-sm leading-7 text-[#77736C]">
+      <p className="mb-5 max-w-xl font-['Nunito_Sans'] text-sm leading-6 text-text-secondary">
         {semMudancas
           ? 'Como nada importante mudou, o Lumi só registra o momento atual e preserva sua rotina como base.'
           : step === 2

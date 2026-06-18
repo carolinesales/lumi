@@ -17,8 +17,8 @@ export default function PageHeader({
     <header className="mb-6 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
       <div>
         {eyebrow && (
-          <div className="mb-3 flex items-center gap-2 font-nunito text-xs text-lumi-gray">
-            <Link to={backTo} className="font-semibold text-lumi-gray transition hover:text-lumi-black">
+          <div className="mb-3 flex items-center gap-2 font-['Nunito_Sans'] text-xs text-text-tertiary">
+            <Link to={backTo} className="font-semibold text-text-tertiary transition hover:text-text">
               {backLabel}
             </Link>
             <i className="fa-solid fa-chevron-right text-[9px]" aria-hidden="true" />
@@ -26,12 +26,12 @@ export default function PageHeader({
           </div>
         )}
 
-        <h1 className="font-['Montserrat'] text-[34px] font-normal leading-none tracking-[-0.07em] text-lumi-black">
+        <h1 className="font-['Montserrat'] text-xl font-semibold leading-[40px] text-text sm:text-2xl">
           {title}
         </h1>
 
         {description && (
-          <p className="mt-3 max-w-xl font-nunito text-sm leading-7 text-lumi-secondary">
+          <p className="mt-1 max-w-xl font-['Nunito_Sans'] text-sm leading-5 text-text-secondary">
             {description}
           </p>
         )}

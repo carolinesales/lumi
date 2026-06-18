@@ -15,13 +15,13 @@ export default function EventGrid({ eventos, onChange }) {
             className={[
               'flex min-h-[116px] flex-col justify-between rounded-[22px] border p-4 text-left transition-all hover:-translate-y-0.5',
               selected
-                ? 'border-[#181714] bg-[#181714] text-white'
-                : 'border-[#EFECE6] bg-white text-[#181714]',
+                ? 'border-ink bg-ink text-white'
+                : 'border-paper-200 bg-surface text-text',
             ].join(' ')}
             onClick={() => onChange(prev => toggleEvento(prev, evento.id))}
           >
             <i className={`fa-solid ${evento.icon} text-lg`} />
-            <span className="max-w-[140px] text-[13px] font-black leading-tight">{evento.label}</span>
+            <span className="max-w-[140px] font-['Montserrat'] text-[13px] font-semibold leading-tight">{evento.label}</span>
           </button>
         )
       })}

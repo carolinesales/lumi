@@ -12,6 +12,7 @@ import AppShell                 from '@/components/lumi/AppShell'
 import { EVENTOS_CAPILARES }    from '@/lib/reavaliacaoService'
 import { cn }                   from '@/lib/utils'
 import ilustracaoDicas          from '@/assets/Financial Analyst.png'
+import RegistroModal            from './RegistroModal'
 
 const _TRAT_KEY = {
   'Hidratação': 'trat_hidratacao', 'Nutrição': 'trat_nutricao',
@@ -396,7 +397,7 @@ function SecaoEventos({ registros, tr }) {
 
 // ─── Seção: Dicas Lumi ────────────────────────────────────────────────────────
 
-function SecaoDicas({ navigate, tr }) {
+function SecaoDicas({ onRegistrar, tr }) {
   return (
     <div className="flex flex-col items-center gap-6 rounded-[16px] bg-surface p-6">
       <div className="flex w-full flex-col items-center gap-2">
@@ -408,7 +409,7 @@ function SecaoDicas({ navigate, tr }) {
           </p>
         </div>
       </div>
-      <button type="button" onClick={() => navigate('/app/home')}
+      <button type="button" onClick={onRegistrar}
         className="w-full rounded-[24px] bg-ink py-3 font-['Nunito_Sans'] text-sm font-semibold text-white transition hover:opacity-90">
         {tr('ana_registrar_rotina', 'Registrar rotina')}
       </button>
@@ -587,6 +588,7 @@ export default function Analises() {
   const [registros, setRegistros] = useState({})
   const [etapas,    setEtapas]    = useState([])
   const [loading,   setLoading]   = useState(true)
+  const [showReg,   setShowReg]   = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -649,7 +651,7 @@ export default function Analises() {
 
               {/* Coluna lateral */}
               <div className="flex flex-1 flex-col gap-6">
-                <SecaoDicas navigate={navigate} tr={tr} />
+                <SecaoDicas onRegistrar={() => setShowReg(true)} tr={tr} />
                 {etapas.length > 0 && <SecaoAderencia etapas={etapas} tr={tr} />}
                 {temRegistros && <SecaoHabitos registros={registros} tr={tr} />}
               </div>
@@ -657,6 +659,13 @@ export default function Analises() {
           )}
         </div>
       </main>
+      {showReg && (
+        <RegistroModal
+          onClose={() => setShowReg(false)}
+          onSaved={() => setShowReg(false)}
+          onConcluido={() => setShowReg(false)}
+        />
+      )}
     </AppShell>
   )
 }

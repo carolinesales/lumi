@@ -1,6 +1,7 @@
 // src/features/home/components/WeekCalendar.jsx
 import { forwardRef, useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
+import { useIdioma } from '@/contexts/IdiomaContext'
 
 // célula individual do dia
 
@@ -58,6 +59,8 @@ const DiaCell = forwardRef(function DiaCell({ dia, temEtapa, onClick }, ref) {
 // calendario semanal
 
 export default function WeekCalendar({ semana = [], getEtapaDia, onOpenEtapa }) {
+  const { idioma } = useIdioma()
+  const locale = idioma === 'en' ? 'en-US' : 'pt-BR'
   const scrollRef = useRef(null)
   const hojeRef   = useRef(null)
 
@@ -72,7 +75,7 @@ export default function WeekCalendar({ semana = [], getEtapaDia, onOpenEtapa }) 
   const diaRef      = semana.find(d => d.isHoje) ?? semana[0]
   const mesAnoLabel = diaRef
     ? diaRef.date
-        .toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+        .toLocaleDateString(locale, { month: 'long', year: 'numeric' })
         .replace(/^\w/, c => c.toUpperCase())
     : ''
 

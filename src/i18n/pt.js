@@ -19,6 +19,13 @@ const pt = {
   nav_rotina: 'Rotina',
   nav_analises: 'Análises',
   nav_perfil: 'Perfil',
+  nav_jornada: 'Jornada',
+  trat_hidratacao:   'Hidratação',
+  trat_nutricao:     'Nutrição',
+  trat_reconstrucao: 'Reconstrução',
+  trat_umectacao:    'Umectação',
+  trat_detox:        'Detox',
+  trat_lavagem:      'Lavagem',
   nav_historico: 'Histórico',
 
   // splash
@@ -586,6 +593,10 @@ const pt = {
 
   // perfil pessoal
   pp_trocar_foto: 'Trocar foto',
+  pp_foto_tipo:     'Formato inválido. Use JPG, PNG ou WEBP.',
+  pp_foto_tamanho:  'Imagem muito grande. O máximo é 5 MB.',
+  pp_foto_sucesso:  'Foto atualizada!',
+  pp_foto_removida: 'Foto removida.',
   pp_remover_foto: 'Remover foto',
   pp_alterar_email: 'Alterar e-mail',
   pp_alterar_email_sub: 'Atualize o e-mail usado para acessar sua conta. Pediremos sua senha por segurança.',
@@ -606,6 +617,33 @@ const pt = {
   perfil_excluir: 'Excluir minha conta',
   perfil_excluir_desc: 'Apague sua conta e seus dados do Lumi.',
   ps_excluir_confirmar: 'Sim, excluir minha conta',
+
+  // ── Conquistas · UI ───────────────────────────────────────
+  conq_titulo: 'Conquistas',
+  conq_ver_mais: 'ver mais',
+  conq_subtitulo: 'Sua evolução dentro da jornada Lumi',
+  conq_desbloqueadas_count: '{n} de {total} desbloqueadas',
+  conq_secao_desbloqueadas: 'Conquistadas',
+  conq_secao_progresso: 'Em progresso',
+  conq_fechar: 'Fechar conquistas',
+  conq_aria: 'Conquistas',
+  // ── Conquistas · conteúdo ─────────────────────────────────
+  conq_inicio_jornada_nome:  'Início da Jornada',
+  conq_inicio_jornada_desc:  'Completou o diagnóstico e gerou seu primeiro cronograma',
+  conq_primeiro_ritual_nome: 'Primeiro Ritual',
+  conq_primeiro_ritual_desc: 'Concluiu a primeira etapa do seu cronograma capilar',
+  conq_ciclo_completo_nome:  'Ciclo Completo',
+  conq_ciclo_completo_desc:  'Finalizou todas as etapas do primeiro ciclo de cuidados',
+  conq_ritmo_continuo_nome:  'Ritmo Contínuo',
+  conq_ritmo_continuo_desc:  '14 dias seguidos de registros na Jornada Lumi',
+  conq_ritual_em_dia_nome:   'Ritual em Dia',
+  conq_ritual_em_dia_desc:   'Registrou um cuidado capilar por 7 dias seguidos',
+  conq_fios_equilibrio_nome: 'Fios em Equilíbrio',
+  conq_fios_equilibrio_desc: 'Atingiu Hair Score acima de 75',
+  conq_nova_fase_nome:       'Nova Fase',
+  conq_nova_fase_desc:       'Fez um segundo diagnóstico para releitura do perfil',
+  conq_essencia_lumi_nome:   'Essência Lumi',
+  conq_essencia_lumi_desc:   'Acumulou 500 XP — você é a Lumi em sua forma mais plena',
 }
 
 export default pt

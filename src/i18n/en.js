@@ -19,6 +19,13 @@ const en = {
   nav_rotina: 'Routine',
   nav_analises: 'Analysis',
   nav_perfil: 'Profile',
+  nav_jornada: 'Journey',
+  trat_hidratacao:   'Hydration',
+  trat_nutricao:     'Nutrition',
+  trat_reconstrucao: 'Reconstruction',
+  trat_umectacao:    'Oiling',
+  trat_detox:        'Detox',
+  trat_lavagem:      'Wash',
   nav_historico: 'History',
 
   // splash
@@ -585,6 +592,10 @@ const en = {
 
   // perfil pessoal
   pp_trocar_foto: 'Change photo',
+  pp_foto_tipo:     'Invalid format. Use JPG, PNG or WEBP.',
+  pp_foto_tamanho:  'Image too large. The maximum is 5 MB.',
+  pp_foto_sucesso:  'Photo updated!',
+  pp_foto_removida: 'Photo removed.',
   pp_remover_foto: 'Remove photo',
   pp_alterar_email: 'Change email',
   pp_alterar_email_sub: 'Update the email used to access your account. We will ask for your password for security.',
@@ -605,6 +616,33 @@ const en = {
   perfil_excluir: 'Delete my account',
   perfil_excluir_desc: 'Erase your account and your data from Lumi.',
   ps_excluir_confirmar: 'Yes, delete my account',
+
+  // ── Achievements · UI ─────────────────────────────────────
+  conq_titulo: 'Achievements',
+  conq_ver_mais: 'see more',
+  conq_subtitulo: 'Your progress within the Lumi journey',
+  conq_desbloqueadas_count: '{n} of {total} unlocked',
+  conq_secao_desbloqueadas: 'Unlocked',
+  conq_secao_progresso: 'In progress',
+  conq_fechar: 'Close achievements',
+  conq_aria: 'Achievements',
+  // ── Achievements · content ────────────────────────────────
+  conq_inicio_jornada_nome:  'Journey Start',
+  conq_inicio_jornada_desc:  'Completed the assessment and generated your first schedule',
+  conq_primeiro_ritual_nome: 'First Ritual',
+  conq_primeiro_ritual_desc: 'Completed the first step of your hair schedule',
+  conq_ciclo_completo_nome:  'Full Cycle',
+  conq_ciclo_completo_desc:  'Finished all steps of the first care cycle',
+  conq_ritmo_continuo_nome:  'Steady Rhythm',
+  conq_ritmo_continuo_desc:  '14 days in a row of logs in the Lumi Journey',
+  conq_ritual_em_dia_nome:   'Ritual on Track',
+  conq_ritual_em_dia_desc:   'Logged a hair care routine for 7 days in a row',
+  conq_fios_equilibrio_nome: 'Balanced Hair',
+  conq_fios_equilibrio_desc: 'Reached a Hair Score above 75',
+  conq_nova_fase_nome:       'New Phase',
+  conq_nova_fase_desc:       'Took a second assessment to re-read your profile',
+  conq_essencia_lumi_nome:   'Lumi Essence',
+  conq_essencia_lumi_desc:   'Accumulated 500 XP — you are Lumi at its fullest',
 }
 
 export default en

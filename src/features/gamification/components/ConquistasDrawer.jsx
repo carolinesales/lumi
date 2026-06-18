@@ -1,22 +1,24 @@
 import { useEffect, useRef } from 'react'
 import { createPortal }      from 'react-dom'
 
-import { CONQUISTAS }                         from '@/lib/gamificacao'
-import { useMediaQuery }                      from '@/hooks/useMediaQuery'
-import { calcularProgressoConquistas }        from '@/features/gamification/utils/gamificationUtils'
-import { Button }                             from '@/components/ui/button'
-import { cn }                                 from '@/lib/utils'
+import { CONQUISTAS }                  from '@/lib/gamificacao'
+import { useMediaQuery }               from '@/hooks/useMediaQuery'
+import { useIdioma }                   from '@/contexts/IdiomaContext'
+import { calcularProgressoConquistas } from '@/features/gamification/utils/gamificationUtils'
+import { labelConquista }              from './ConquistasCard'
+import { Button }                      from '@/components/ui/button'
+import { cn }                          from '@/lib/utils'
 
 import medalhaConquistada  from '@/assets/medalhas/Medalha_conquistada.svg'
 import medalhaDesabilitada from '@/assets/medalhas/Medalha_desabilitada.svg'
 
-// Sub-componentes 
+// Sub-componentes
 
-function Medalha({ desbloqueada = true, size = 56 }) {
+function Medalha({ desbloqueada = true, size = 56, t }) {
   return (
     <img
       src={desbloqueada ? medalhaConquistada : medalhaDesabilitada}
-      alt={desbloqueada ? 'Conquista desbloqueada' : 'Conquista bloqueada'}
+      alt={t('conq_aria')}
       width={size}
       height={size}
       className="shrink-0 object-contain"
@@ -28,13 +30,13 @@ function ProgressBar({ atual, total }) {
   const pct = Math.min(Math.round((atual / total) * 100), 100)
   return (
     <div className="mt-2">
-      <div className="mb-1 flex justify-between font-nunito text-[10px] font-bold text-lumi-muted">
+      <div className="mb-1 flex justify-between font-nunito text-[10px] font-bold text-text-tertiary">
         <span>{atual} / {total}</span>
         <span>{pct}%</span>
       </div>
-      <div className="h-1 overflow-hidden rounded-full bg-[#E8E4E0]">
+      <div className="h-1 overflow-hidden rounded-full bg-surface-subtle">
         <div
-          className="h-full rounded-full bg-[#C8C4BC] transition-all duration-300"
+          className="h-full rounded-full bg-text-tertiary transition-all duration-300"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -42,26 +44,26 @@ function ProgressBar({ atual, total }) {
   )
 }
 
-function ConquistaRow({ conquista, desbloqueada, progresso }) {
+function ConquistaRow({ conquista, desbloqueada, progresso, t }) {
   return (
     <div className={cn(
       'flex items-start gap-4 rounded-2xl p-3',
-      desbloqueada ? 'bg-[#FAF9FC]' : 'bg-[#F5F4F4]',
+      desbloqueada ? 'bg-surface-subtle' : 'bg-surface-muted',
     )}>
-      <Medalha desbloqueada={desbloqueada} size={56} />
+      <Medalha desbloqueada={desbloqueada} size={56} t={t} />
 
       <div className="min-w-0 flex-1">
         <p className={cn(
           'mb-0.5 font-nunito text-sm font-semibold',
-          desbloqueada ? 'text-lumi-black' : 'text-lumi-muted',
+          desbloqueada ? 'text-text' : 'text-text-tertiary',
         )}>
-          {conquista.nome}
+          {labelConquista(conquista, 'nome', t)}
         </p>
         <p className={cn(
           'font-nunito text-xs leading-5',
-          desbloqueada ? 'text-lumi-secondary' : 'text-lumi-muted',
+          desbloqueada ? 'text-text-secondary' : 'text-text-tertiary',
         )}>
-          {conquista.desc}
+          {labelConquista(conquista, 'desc', t)}
         </p>
         {!desbloqueada && progresso && (
           <ProgressBar atual={progresso.atual} total={progresso.total} />
@@ -69,7 +71,7 @@ function ConquistaRow({ conquista, desbloqueada, progresso }) {
       </div>
 
       {desbloqueada && conquista.xp > 0 && (
-        <span className="shrink-0 rounded-full bg-[#EAF3DE] px-2 py-0.5 font-nunito text-[11px] font-bold text-[#3B6D11]">
+        <span className="shrink-0 rounded-full bg-state-positive-soft px-2 py-0.5 font-nunito text-[11px] font-bold text-state-positive">
           +{conquista.xp} XP
         </span>
       )}
@@ -77,7 +79,7 @@ function ConquistaRow({ conquista, desbloqueada, progresso }) {
   )
 }
 
-function ConquistasConteudo({ desbloqueadas, progressos }) {
+function ConquistasConteudo({ desbloqueadas, progressos, t }) {
   const desbloqueadasList = CONQUISTAS.filter(c =>  desbloqueadas.includes(c.id))
   const bloqueadasList    = CONQUISTAS.filter(c => !desbloqueadas.includes(c.id))
 
@@ -85,12 +87,12 @@ function ConquistasConteudo({ desbloqueadas, progressos }) {
     <>
       {desbloqueadasList.length > 0 && (
         <section className="mb-6">
-          <span className="mb-2 block font-nunito text-[11px] font-bold uppercase tracking-[.06em] text-lumi-muted">
-            Conquistadas
+          <span className="mb-2 block font-nunito text-[11px] font-bold uppercase tracking-[.06em] text-text-tertiary">
+            {t('conq_secao_desbloqueadas')}
           </span>
           <div className="flex flex-col gap-2">
             {desbloqueadasList.map(c => (
-              <ConquistaRow key={c.id} conquista={c} desbloqueada />
+              <ConquistaRow key={c.id} conquista={c} desbloqueada t={t} />
             ))}
           </div>
         </section>
@@ -98,8 +100,8 @@ function ConquistasConteudo({ desbloqueadas, progressos }) {
 
       {bloqueadasList.length > 0 && (
         <section>
-          <span className="mb-2 block font-nunito text-[11px] font-bold uppercase tracking-[.06em] text-lumi-muted">
-            Em progresso
+          <span className="mb-2 block font-nunito text-[11px] font-bold uppercase tracking-[.06em] text-text-tertiary">
+            {t('conq_secao_progresso')}
           </span>
           <div className="flex flex-col gap-2">
             {bloqueadasList.map(c => (
@@ -108,6 +110,7 @@ function ConquistasConteudo({ desbloqueadas, progressos }) {
                 conquista={c}
                 desbloqueada={false}
                 progresso={progressos?.[c.id]}
+                t={t}
               />
             ))}
           </div>
@@ -144,7 +147,7 @@ function useFocusTrap(ref, active) {
 
 // Drawer mobile
 
-function Drawer({ onClose, desbloqueadas, progressos, triggerRef }) {
+function Drawer({ onClose, desbloqueadas, progressos, triggerRef, t }) {
   const startY   = useRef(null)
   const currentY = useRef(null)
   const sheetRef = useRef(null)
@@ -176,8 +179,8 @@ function Drawer({ onClose, desbloqueadas, progressos, triggerRef }) {
         ref={sheetRef}
         role="dialog"
         aria-modal="true"
-        aria-label="Conquistas"
-        className="flex max-h-[88vh] w-full flex-col rounded-t-[24px] bg-white"
+        aria-label={t('conq_aria')}
+        className="flex max-h-[88vh] w-full flex-col rounded-t-[24px] bg-surface"
         style={{ animation: 'drawerUp .32s cubic-bezier(.32,0,.67,0) forwards' }}
       >
         <style>{`@keyframes drawerUp{from{transform:translateY(100%)}to{transform:translateY(0)}}`}</style>
@@ -190,20 +193,20 @@ function Drawer({ onClose, desbloqueadas, progressos, triggerRef }) {
           className="flex cursor-grab justify-center pb-3 pt-4"
           aria-hidden="true"
         >
-          <div className="h-1 w-9 rounded-full bg-lumi-border" />
+          <div className="h-1 w-9 rounded-full bg-paper-300" />
         </div>
 
         {/* Header */}
-        <div className="border-b border-lumi-border px-6 pb-4">
-          <h2 className="font-['Montserrat'] text-[17px] font-semibold text-lumi-black">Conquistas</h2>
-          <p className="font-nunito text-sm text-lumi-secondary">
-            {desbloqueadas.length} de {CONQUISTAS.length} desbloqueadas
+        <div className="border-b border-paper-200 px-6 pb-4">
+          <h2 className="font-['Montserrat'] text-[17px] font-semibold text-text">{t('conq_titulo')}</h2>
+          <p className="font-nunito text-sm text-text-secondary">
+            {t('conq_desbloqueadas_count').replace('{n}', desbloqueadas.length).replace('{total}', CONQUISTAS.length)}
           </p>
         </div>
 
         {/* Lista */}
         <div className="flex-1 overflow-y-auto px-6 pb-10 pt-5">
-          <ConquistasConteudo desbloqueadas={desbloqueadas} progressos={progressos} />
+          <ConquistasConteudo desbloqueadas={desbloqueadas} progressos={progressos} t={t} />
         </div>
       </div>
     </div>
@@ -212,7 +215,7 @@ function Drawer({ onClose, desbloqueadas, progressos, triggerRef }) {
 
 // Modal desktop
 
-function Modal({ onClose, desbloqueadas, progressos, triggerRef }) {
+function Modal({ onClose, desbloqueadas, progressos, triggerRef, t }) {
   const modalRef = useRef(null)
   useFocusTrap(modalRef, true)
   useEffect(() => () => { triggerRef?.current?.focus() }, [triggerRef])
@@ -227,27 +230,27 @@ function Modal({ onClose, desbloqueadas, progressos, triggerRef }) {
         ref={modalRef}
         role="dialog"
         aria-modal="true"
-        aria-label="Conquistas"
+        aria-label={t('conq_aria')}
         onClick={e => e.stopPropagation()}
-        className="flex max-h-[80vh] w-full max-w-[520px] flex-col rounded-[24px] bg-white"
+        className="flex max-h-[80vh] w-full max-w-[520px] flex-col rounded-[24px] bg-surface"
         style={{ animation: 'modalIn .25s ease forwards' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-lumi-border px-7 py-6">
+        <div className="flex items-center justify-between border-b border-paper-200 px-7 py-6">
           <div>
-            <h2 className="font-['Montserrat'] text-lg font-semibold text-lumi-black">Conquistas</h2>
-            <p className="font-nunito text-sm text-lumi-secondary">
-              {desbloqueadas.length} de {CONQUISTAS.length} desbloqueadas
+            <h2 className="font-['Montserrat'] text-lg font-semibold text-text">{t('conq_titulo')}</h2>
+            <p className="font-nunito text-sm text-text-secondary">
+              {t('conq_desbloqueadas_count').replace('{n}', desbloqueadas.length).replace('{total}', CONQUISTAS.length)}
             </p>
           </div>
-          <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Fechar conquistas">
+          <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label={t('conq_fechar')}>
             <i className="fa-solid fa-xmark text-sm" aria-hidden="true" />
           </Button>
         </div>
 
         {/* Lista */}
         <div className="flex-1 overflow-y-auto px-7 py-6">
-          <ConquistasConteudo desbloqueadas={desbloqueadas} progressos={progressos} />
+          <ConquistasConteudo desbloqueadas={desbloqueadas} progressos={progressos} t={t} />
         </div>
       </div>
     </div>
@@ -264,6 +267,7 @@ export default function ConquistasDrawer({
   triggerRef,
 }) {
   const isMobile = useMediaQuery('(max-width: 1023px)')
+  const { t } = useIdioma()
 
   const progressos = calcularProgressoConquistas({
     streak:            progressData.streak            ?? 0,
@@ -288,7 +292,7 @@ export default function ConquistasDrawer({
 
   if (!open) return null
 
-  const props = { onClose, desbloqueadas, progressos, triggerRef }
+  const props = { onClose, desbloqueadas, progressos, triggerRef, t }
 
   return createPortal(
     isMobile ? <Drawer {...props} /> : <Modal {...props} />,

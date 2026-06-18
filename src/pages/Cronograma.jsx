@@ -9,6 +9,19 @@ import { useIdioma } from '@/contexts/IdiomaContext'
 import ilustracaoVazia from '@/assets/Milestone-4_Streamline_Milano.svg'
 import RegistroModal from './RegistroModal'
 
+const _TRAT_KEY = {
+  'Hidratação': 'trat_hidratacao', 'Nutrição': 'trat_nutricao',
+  'Reconstrução': 'trat_reconstrucao', 'Umectação': 'trat_umectacao',
+  'Detox': 'trat_detox', 'Lavagem': 'trat_lavagem',
+}
+function labelTipo(tipo, t) {
+  const k = _TRAT_KEY[tipo]
+  if (!k || !t) return tipo
+  const v = t(k)
+  return (!v || v === k) ? tipo : v
+}
+
+
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const TREATMENTS = {
@@ -687,7 +700,7 @@ function TodayCard({ etapa, dateLabel, onOpen, onObservacao }) {
           <i className={`fa-solid ${t.icon} text-sm ${t.iconColor}`} />
         </div>
         <div className="flex flex-1 flex-col">
-          <span className="font-['Nunito_Sans'] text-sm font-semibold text-text">{etapa.tipoCuidado}</span>
+          <span className="font-['Nunito_Sans'] text-sm font-semibold text-text">{labelTipo(etapa.tipoCuidado, tr)}</span>
           <span className="font-['Nunito_Sans'] text-xs text-text-secondary">{etapa.concluida ? tr('cron_concluido') : tr('cron_pendente')}</span>
         </div>
         <span className={`shrink-0 rounded-[24px] px-4 py-1.5 font-['Nunito_Sans'] text-xs font-semibold text-white ${etapa.concluida ? 'bg-[#5E8C6A]' : 'bg-ink'}`}>
@@ -722,7 +735,7 @@ function UpcomingCard({ etapas, onOpen }) {
                   <i className={`fa-solid ${t.icon} text-sm ${t.iconColor}`} />
                 </div>
                 <div className="flex flex-1 flex-col">
-                  <span className="font-['Nunito_Sans'] text-sm font-semibold text-text">{etapa.tipoCuidado}</span>
+                  <span className="font-['Nunito_Sans'] text-sm font-semibold text-text">{labelTipo(etapa.tipoCuidado, tr)}</span>
                   <span className="font-['Nunito_Sans'] text-xs text-text-secondary">
                     {data?.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })}
                   </span>
@@ -767,7 +780,7 @@ function ProgressCard({ concluidas, total, etapas }) {
           return (
             <div key={tipo} className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
-                <span className="font-['Nunito_Sans'] text-sm font-semibold text-text">{tipo}</span>
+                <span className="font-['Nunito_Sans'] text-sm font-semibold text-text">{labelTipo(tipo, tr)}</span>
                 <span className="font-['Nunito_Sans'] text-xs text-text-secondary">{item.done}/{item.total}</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-surface-subtle">

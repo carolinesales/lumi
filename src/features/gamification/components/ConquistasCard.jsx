@@ -2,19 +2,26 @@
 import { useRef, useState } from 'react'
 
 import { CONQUISTAS }      from '@/lib/gamificacao'
+import { useIdioma }       from '@/contexts/IdiomaContext'
 import ConquistasDrawer    from './ConquistasDrawer'
 import { cn }              from '@/lib/utils'
 
 import medalhaConquistada  from '@/assets/medalhas/Medalha_conquistada.svg'
 import medalhaDesabilitada from '@/assets/medalhas/Medalha_desabilitada.svg'
 
-// medalhas
+// Traduz nome/desc de uma conquista (dados em PT no gamificacao.js).
+export function labelConquista(conquista, campo, t) {
+  const key = `conq_${conquista.id}_${campo}`
+  const v = t(key)
+  return (!v || v === key) ? (conquista[campo] ?? '') : v
+}
 
-function Medalha({ desbloqueada = true }) {
+// medalhas
+function Medalha({ desbloqueada = true, t }) {
   return (
     <img
       src={desbloqueada ? medalhaConquistada : medalhaDesabilitada}
-      alt={desbloqueada ? 'Conquista desbloqueada' : 'Conquista bloqueada'}
+      alt={desbloqueada ? t('conq_aria') : t('conq_aria')}
       width={48}
       height={48}
       className="object-contain"
@@ -23,27 +30,26 @@ function Medalha({ desbloqueada = true }) {
 }
 
 // conquista individual
-
-function ConquistaItem({ conquista, desbloqueada }) {
+function ConquistaItem({ conquista, desbloqueada, t }) {
   return (
     <div className={cn(
       'flex min-w-0 flex-1 flex-col items-center justify-start gap-4 rounded-2xl px-2 py-4',
       desbloqueada ? 'bg-surface-subtle' : 'bg-surface-muted',
     )}>
-      <Medalha desbloqueada={desbloqueada} />
+      <Medalha desbloqueada={desbloqueada} t={t} />
       <span className={cn(
         'w-full text-center font-nunito text-xs font-medium leading-[14px]',
-        desbloqueada ? 'text-lumi-black' : 'text-text-tertiary',
+        desbloqueada ? 'text-text' : 'text-text-tertiary',
       )}>
-        {conquista.nome}
+        {labelConquista(conquista, 'nome', t)}
       </span>
     </div>
   )
 }
 
 // card principal de conquistas
-
 export default function ConquistasCard({ desbloqueadas = [], progressData = {} }) {
+  const { t } = useIdioma()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const triggerRef = useRef(null)
 
@@ -70,34 +76,34 @@ export default function ConquistasCard({ desbloqueadas = [], progressData = {} }
         {/* Header */}
         <div className="mb-2 flex items-start gap-2">
           <span className="flex-1 font-heading text-base font-semibold leading-5 text-text">
-            Conquistas
+            {t('conq_titulo')}
           </span>
           <button
             ref={triggerRef}
             type="button"
             onClick={() => setDrawerOpen(true)}
-            className="shrink-0 bg-transparent p-0 font-nunito text-xs font-normal text-lumi-secondary transition hover:text-lumi-black"
+            className="shrink-0 bg-transparent p-0 font-nunito text-xs font-normal text-text-secondary transition hover:text-text"
           >
-            ver mais
+            {t('conq_ver_mais')}
           </button>
         </div>
 
         {/* Subtítulo */}
-        <p className="mb-[22px] font-nunito text-sm font-normal leading-5 text-lumi-secondary">
-          Sua evolução dentro da jornada Lumi
+        <p className="mb-[22px] font-nunito text-sm font-normal leading-5 text-text-secondary">
+          {t('conq_subtitulo')}
         </p>
 
         {/* Mobile */}
         <div className="flex items-start gap-3.5 xl:hidden">
           {visiveisMobile.map(c => (
-            <ConquistaItem key={c.id} conquista={c} desbloqueada={desbloqueadas.includes(c.id)} />
+            <ConquistaItem key={c.id} conquista={c} desbloqueada={desbloqueadas.includes(c.id)} t={t} />
           ))}
         </div>
 
         {/* Desktop*/}
         <div className="hidden grid-cols-3 gap-3.5 xl:grid">
           {visiveisDesktop.map(c => (
-            <ConquistaItem key={c.id} conquista={c} desbloqueada={desbloqueadas.includes(c.id)} />
+            <ConquistaItem key={c.id} conquista={c} desbloqueada={desbloqueadas.includes(c.id)} t={t} />
           ))}
         </div>
       </div>

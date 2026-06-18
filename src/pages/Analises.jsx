@@ -13,6 +13,19 @@ import { EVENTOS_CAPILARES }    from '@/lib/reavaliacaoService'
 import { cn }                   from '@/lib/utils'
 import ilustracaoDicas          from '@/assets/Financial Analyst.png'
 
+const _TRAT_KEY = {
+  'Hidratação': 'trat_hidratacao', 'Nutrição': 'trat_nutricao',
+  'Reconstrução': 'trat_reconstrucao', 'Umectação': 'trat_umectacao',
+  'Detox': 'trat_detox', 'Lavagem': 'trat_lavagem',
+}
+function labelTipo(tipo, t) {
+  const k = _TRAT_KEY[tipo]
+  if (!k || !t) return tipo
+  const v = t(k)
+  return (!v || v === k) ? tipo : v
+}
+
+
 // ─── i18n helper ──────────────────────────────────────────────────────────────
 // Usa o sistema de tradução do app; cai no fallback (PT) se a chave ainda não existe.
 function useTr() {
@@ -433,7 +446,7 @@ function SecaoAderencia({ etapas, tr }) {
           return (
             <div key={tipo} className="flex flex-col gap-2">
               <div className="flex items-start gap-4">
-                <span className="flex-1 font-['Nunito_Sans'] text-sm font-semibold text-text">{tipo}</span>
+                <span className="flex-1 font-['Nunito_Sans'] text-sm font-semibold text-text">{labelTipo(tipo, tr)}</span>
                 <span className="font-['Nunito_Sans'] text-xs text-text-secondary">{pct}%</span>
               </div>
               <div className="h-2 w-full overflow-hidden rounded bg-surface-subtle">

@@ -73,6 +73,24 @@ export function getTreatment(tipo) {
   return TREATMENTS[tipo] ?? TREATMENTS.Hidratação
 }
 
+// Traduz o nome do tipo de tratamento APENAS para exibição.
+// Os dados continuam em PT no banco; a lógica usa o valor original.
+const TIPO_KEY = {
+  'Hidratação':   'trat_hidratacao',
+  'Nutrição':     'trat_nutricao',
+  'Reconstrução': 'trat_reconstrucao',
+  'Umectação':    'trat_umectacao',
+  'Detox':        'trat_detox',
+  'Lavagem':      'trat_lavagem',
+}
+export function labelTipo(tipo, t) {
+  const k = TIPO_KEY[tipo]
+  if (!k || !t) return tipo
+  const v = t(k)
+  return (!v || v === k) ? tipo : v
+}
+
+
 export function toDate(value) {
   if (!value) return null
   if (value.toDate) return value.toDate()

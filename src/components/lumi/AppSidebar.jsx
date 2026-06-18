@@ -6,17 +6,19 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button }      from '@/components/ui/button'
+import { useIdioma }   from '@/contexts/IdiomaContext'
 import ThemeToggle     from '@/components/lumi/ThemeToggle'
 
 const NAV = [
-  { icon: 'fa-house',         label: 'Home',     href: '/app/home'      },
-  { icon: 'fa-calendar-days', label: 'Rotina',   href: '/app/cronograma'},
-  { icon: 'fa-chart-line',    label: 'Análises', href: '/app/historico' },
-  { icon: 'fa-images',        label: 'Jornada',  href: '/app/jornada'   },
+  { icon: 'fa-house',         key: 'nav_inicio',   href: '/app/home'      },
+  { icon: 'fa-calendar-days', key: 'nav_rotina',   href: '/app/cronograma'},
+  { icon: 'fa-chart-line',    key: 'nav_analises', href: '/app/historico' },
+  { icon: 'fa-images',        key: 'nav_jornada',  href: '/app/jornada'   },
 ]
 
 export default function AppSidebar({ user, onLogout }) {
   const location = useLocation()
+  const { t } = useIdioma()
   const navigate = useNavigate()
 
   const nome     = user?.displayName || 'Caroline Sales'
@@ -52,7 +54,7 @@ export default function AppSidebar({ user, onLogout }) {
               ].join(' ')}
             >
               <i className={`fa-solid ${item.icon} w-[18px] text-center text-sm`} aria-hidden="true" />
-              <span>{item.label}</span>
+              <span>{t(item.key)}</span>
             </Link>
           )
         })}
@@ -100,7 +102,7 @@ export default function AppSidebar({ user, onLogout }) {
               className="cursor-pointer rounded-xl font-semibold"
             >
               <i className="fa-regular fa-user mr-2 text-xs text-text-tertiary" aria-hidden="true" />
-              Perfil
+              {t('nav_perfil')}
             </DropdownMenuItem>
 
             <DropdownMenuItem
@@ -108,7 +110,7 @@ export default function AppSidebar({ user, onLogout }) {
               className="cursor-pointer rounded-xl font-semibold text-state-negative focus:text-state-negative"
             >
               <i className="fa-solid fa-arrow-right-from-bracket mr-2 text-xs" aria-hidden="true" />
-              Sair
+              {t('perfil_sair')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

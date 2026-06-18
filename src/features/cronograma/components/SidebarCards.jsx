@@ -1,8 +1,22 @@
 import { useMemo } from 'react'
 import { ChevronRight } from 'lucide-react'
 import { getTreatment, toDate } from '../lib/calendar'
+import { useIdioma } from '@/contexts/IdiomaContext'
 import { cn } from '@/lib/utils'
 import ilustracaoVazia from '@/assets/Milestone-4_Streamline_Milano.svg'
+
+const _TRAT_KEY = {
+  'Hidratação': 'trat_hidratacao', 'Nutrição': 'trat_nutricao',
+  'Reconstrução': 'trat_reconstrucao', 'Umectação': 'trat_umectacao',
+  'Detox': 'trat_detox', 'Lavagem': 'trat_lavagem',
+}
+function labelTipo(tipo, t) {
+  const k = _TRAT_KEY[tipo]
+  if (!k || !t) return tipo
+  const v = t(k)
+  return (!v || v === k) ? tipo : v
+}
+
 
 // Componentes de cards usados na sidebar direita do cronograma
 
@@ -39,6 +53,7 @@ function StatusBadge({ concluida }) {
 // card usado na seção "Em foco hoje" 
 
 export function TodayCard({ etapa, dateLabel, onOpen, onObservacao }) {
+  const { t } = useIdioma()
   if (!etapa) return <TodayCardEmpty dateLabel={dateLabel} onObservacao={onObservacao} />
 
   const t = getTreatment(etapa.tipoCuidado)
@@ -55,7 +70,7 @@ export function TodayCard({ etapa, dateLabel, onOpen, onObservacao }) {
           <i className={cn('fa-solid text-sm', t.icon, t.iconColor)} />
         </div>
         <div className="flex flex-1 flex-col">
-          <span className="font-nunito text-sm font-semibold text-lumi-black">{etapa.tipoCuidado}</span>
+          <span className="font-nunito text-sm font-semibold text-lumi-black">{labelTipo(etapa.tipoCuidado, t)}</span>
           <span className="font-nunito text-xs text-lumi-gray">
             {etapa.concluida ? 'Concluído' : 'Pendente'}
           </span>
@@ -144,6 +159,7 @@ export function UpcomingCard({ etapas, onOpen }) {
 // card "Progresso do ciclo"
 
 export function ProgressCard({ concluidas, total, etapas }) {
+  const { t } = useIdioma()
   const resumo = useMemo(() => {
     const map = {}
     etapas.forEach(e => {
@@ -169,7 +185,7 @@ export function ProgressCard({ concluidas, total, etapas }) {
           return (
             <div key={tipo} className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
-                <span className="font-nunito text-sm font-semibold text-lumi-black">{tipo}</span>
+                <span className="font-nunito text-sm font-semibold text-lumi-black">{labelTipo(tipo, t)}</span>
                 <span className="font-nunito text-xs text-lumi-gray">{item.done}/{item.total}</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-lumi-input">

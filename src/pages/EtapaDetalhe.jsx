@@ -11,6 +11,19 @@ import { Button } from '@/components/ui/button'
 import AppShell from '@/components/lumi/AppShell'
 import { cn } from '@/lib/utils'
 
+const _TRAT_KEY = {
+  'Hidratação': 'trat_hidratacao', 'Nutrição': 'trat_nutricao',
+  'Reconstrução': 'trat_reconstrucao', 'Umectação': 'trat_umectacao',
+  'Detox': 'trat_detox', 'Lavagem': 'trat_lavagem',
+}
+function labelTipo(tipo, t) {
+  const k = _TRAT_KEY[tipo]
+  if (!k || !t) return tipo
+  const v = t(k)
+  return (!v || v === k) ? tipo : v
+}
+
+
 // ─── Dados por tipo de cuidado ──────────────────────────────────────────────
 
 const TREATMENTS = {
@@ -395,7 +408,7 @@ export default function EtapaDetalhe() {
                     <span className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-full', theme.iconBg)}>
                       <i className={cn('fa-solid text-base', theme.icon, theme.iconColor)} aria-hidden="true" />
                     </span>
-                    <h2 className="font-['Montserrat'] text-xl font-semibold text-text">{etapa.tipoCuidado}</h2>
+                    <h2 className="font-['Montserrat'] text-xl font-semibold text-text">{labelTipo(etapa.tipoCuidado, tr)}</h2>
                   </div>
                   <div className="flex flex-col gap-2.5">
                     <p className="font-['Nunito_Sans'] text-sm leading-6 text-text-secondary">{desc.longa}</p>
@@ -799,7 +812,7 @@ function SuccessOverlay({ tr, etapa, resultado, onHome, onRoutine }) {
             <i className="fa-solid fa-check text-2xl" aria-hidden="true" />
           </div>
           <h2 className="font-['Montserrat'] text-xl font-semibold text-text">{tr('etp_concluido_titulo', 'Ritual concluído')}</h2>
-          <p className="mt-1 font-['Nunito_Sans'] text-sm text-text-secondary">{etapa.tipoCuidado}</p>
+          <p className="mt-1 font-['Nunito_Sans'] text-sm text-text-secondary">{labelTipo(etapa.tipoCuidado, tr)}</p>
         </div>
 
         {resultado && (

@@ -156,6 +156,7 @@ const pt = {
   home_ola: 'Olá',
   rot_proximo_cuidado: 'Próximo cuidado',
   rot_iniciar: 'Iniciar',
+  rot_dia: 'DIA',
   rot_pronto_titulo: 'Seu cuidado está pronto',
   rot_pronto_desc: 'O Lumi organizou um cuidado coerente para o momento atual dos seus fios.',
   rot_min: 'min',

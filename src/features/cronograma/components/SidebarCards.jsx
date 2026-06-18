@@ -56,7 +56,7 @@ export function TodayCard({ etapa, dateLabel, onOpen, onObservacao }) {
   const { t } = useIdioma()
   if (!etapa) return <TodayCardEmpty dateLabel={dateLabel} onObservacao={onObservacao} />
 
-  const t = getTreatment(etapa.tipoCuidado)
+  const treatment = getTreatment(etapa.tipoCuidado)
 
   return (
     <Card className="gap-3">

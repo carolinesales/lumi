@@ -156,6 +156,7 @@ const en = {
   home_ola: 'Hi',
   rot_proximo_cuidado: 'Next care',
   rot_iniciar: 'Start',
+  rot_dia: 'DAY',
   rot_pronto_titulo: 'Your care is ready',
   rot_pronto_desc: 'Lumi arranged a care step that fits the current state of your hair.',
   rot_min: 'min',

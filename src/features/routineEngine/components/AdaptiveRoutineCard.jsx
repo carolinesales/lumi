@@ -29,9 +29,9 @@ function normalizeActions(actions = []) {
     .slice(0, 3)
 }
 
-function todayLabel() {
+function todayLabel(t) {
   const d = new Date()
-  return `DIA ${d.getDate()}/${new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()}`
+  return `${t('rot_dia')} ${d.getDate()}/${new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()}`
 }
 
 // componenente principal
@@ -61,7 +61,7 @@ export default function AdaptiveRoutineCard({ routine, onStartAction, className 
             {t('rot_proximo_cuidado')}
           </span>
           <span className="rounded-full border border-paper-200 bg-surface-subtle px-3 py-1 font-['Montserrat'] text-[10px] font-medium capitalize tracking-[1px] text-text-secondary">
-            {todayLabel()}
+            {todayLabel(t)}
           </span>
         </div>
 

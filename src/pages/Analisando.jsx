@@ -8,7 +8,7 @@ import { db }       from '@/lib/firebase'
 import { useAuth }  from '@/contexts/AuthContext'
 import { useIdioma } from '@/contexts/IdiomaContext'
 import {
-  calcularHairScore, classificarScore,
+  calcularHairScore, calcularHairScoreDetalhado, classificarScore,
   gerarDiagnostico, gerarRecomendacoes, gerarCronograma,
 } from '@/lib/motor'
 
@@ -26,7 +26,8 @@ export default function Analisando() {
         const questionarioId = sessionStorage.getItem('lumi_questionario_id')
         const uid            = user.uid
 
-        const pontuacao      = calcularHairScore(respostas)
+        const detalhado      = calcularHairScoreDetalhado(respostas)
+        const pontuacao      = detalhado.pontuacao
         const classificacao  = classificarScore(pontuacao)
         const diagnostico    = gerarDiagnostico(respostas)
         const recomendacoes  = gerarRecomendacoes(diagnostico, respostas)

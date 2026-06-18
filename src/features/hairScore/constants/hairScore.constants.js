@@ -47,8 +47,9 @@ export const HAIR_SCORE_STATES = {
 
 export const HAIR_SCORE_THRESHOLDS = {
   radiante: 85,
-  evolucao: 60,
-  construcao: 40,
+  evolucao: 70,
+  construcao: 55,
+  cuidado: 40,
 }
 
 export const HAIR_SCORE_DELTA_LABELS = {

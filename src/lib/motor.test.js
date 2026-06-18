@@ -119,8 +119,8 @@ describe('calcularHairScore', () => {
     expect(calcularHairScore(danificado)).toBeLessThanOrEqual(55)
   })
 
-  it('descoloração aplica teto de 55 por fragilidade crítica', () => {
-    expect(calcularHairScore(descolorado)).toBeLessThanOrEqual(55)
+  it('descoloração aplica teto por fragilidade (<= 52)', () => {
+    expect(calcularHairScore(descolorado)).toBeLessThanOrEqual(52)
   })
 
   it('retorna número inteiro', () => {
@@ -188,33 +188,26 @@ describe('classificarScore', () => {
     expect(r.estado).toBe('radiante')
   })
 
-  it('score >= 70 e < 85 retorna Equilibrado', () => {
+  it('score >= 70 e < 85 retorna Em evolução', () => {
     const r = classificarScore(75)
-    expect(r.label).toBe('Equilibrado')
+    expect(r.label).toBe('Em evolução')
   })
 
-  it('score >= 55 e < 70 retorna Em evolução', () => {
-    expect(classificarScore(60).label).toBe('Em evolução')
+  it('score >= 55 e < 70 retorna Em construção', () => {
+    expect(classificarScore(60).label).toBe('Em construção')
   })
 
-  it('score >= 40 e < 55 retorna Sensível', () => {
-    expect(classificarScore(45).label).toBe('Sensível')
+  it('score >= 40 e < 55 retorna Precisa de cuidado', () => {
+    expect(classificarScore(45).label).toBe('Precisa de cuidado')
   })
 
   it('score < 40 retorna Fragilizado', () => {
     expect(classificarScore(30).label).toBe('Fragilizado')
   })
 
-  it('fragilidade crítica sobrescreve score alto', () => {
-    const r = classificarScore(90, { nivel: 'critica' })
-    expect(r.label).toBe('Fragilizado')
-    expect(r.estado).toBe('fragilidade_critica')
-  })
-
-  it('fragilidade alta sobrescreve score alto', () => {
-    const r = classificarScore(80, { nivel: 'alta' })
-    expect(r.label).toBe('Em recuperação')
-    expect(r.estado).toBe('fragilidade_alta')
+  it('label segue sempre a pontuação (fragilidade não troca label)', () => {
+    expect(classificarScore(90).label).toBe('Radiante')
+    expect(classificarScore(38).label).toBe('Fragilizado')
   })
 
   it('sem fragilidade respeita a pontuação normalmente', () => {

@@ -12,14 +12,11 @@ export function getHairScoreState(score, fragilidade = null) {
 
   if (!value) return HAIR_SCORE_STATES.neutral
 
-  if (fragilidade?.ativa || fragilidade?.nivel === 'critica' || fragilidade?.nivel === 'alta') {
-    if (value < 70) return HAIR_SCORE_STATES.fragil
-  }
-
   if (value >= HAIR_SCORE_THRESHOLDS.radiante) return HAIR_SCORE_STATES.radiante
   if (value >= HAIR_SCORE_THRESHOLDS.evolucao) return HAIR_SCORE_STATES.evolucao
   if (value >= HAIR_SCORE_THRESHOLDS.construcao) return HAIR_SCORE_STATES.construcao
-  return HAIR_SCORE_STATES.cuidado
+  if (value >= HAIR_SCORE_THRESHOLDS.cuidado) return HAIR_SCORE_STATES.cuidado
+  return HAIR_SCORE_STATES.fragil
 }
 
 export function getHairScoreDeltaMeta(delta = 0) {

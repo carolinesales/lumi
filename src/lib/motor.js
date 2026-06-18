@@ -64,9 +64,9 @@ function calcularEixoEstrutura(respostas) {
   let score = 100
   const { estado = {}, quimica = {} } = respostas
 
-  if (quimica.tipo === 'Descoloração') score -= 25
-  if (quimica.tipo === 'Progressiva') score -= 10
-  if (quimica.tipo === 'Coloração') score -= 6
+  if (quimica.tipo === 'Descoloração') score -= 38
+  if (quimica.tipo === 'Progressiva') score -= 20
+  if (quimica.tipo === 'Coloração') score -= 12
 
   if (incluiEvento(respostas, 'corte_quimico')) score -= 28
   if (incluiEvento(respostas, 'descoloracao')) score -= 18
@@ -74,11 +74,11 @@ function calcularEixoEstrutura(respostas) {
   if (incluiEvento(respostas, 'coloracao')) score -= 6
   if (incluiEvento(respostas, 'calor')) score -= 4
 
-  if (estado.elasticidade === 'Não volta') score -= 20
-  if (estado.elasticidade === 'Parcialmente') score -= 8
+  if (estado.elasticidade === 'Não volta') score -= 40
+  if (estado.elasticidade === 'Parcialmente') score -= 20
 
-  if (estado.quebra === 'Alta') score -= 22
-  if (estado.quebra === 'Moderada') score -= 10
+  if (estado.quebra === 'Alta') score -= 38
+  if (estado.quebra === 'Moderada') score -= 22
 
   return clamp(score)
 }
@@ -88,14 +88,14 @@ function calcularEixoCondicao(respostas) {
   let score = 100
   const { estado = {} } = respostas
 
-  if (estado.ressecamento === 'Alto') score -= 14
-  if (estado.ressecamento === 'Moderado') score -= 7
+  if (estado.ressecamento === 'Alto') score -= 30
+  if (estado.ressecamento === 'Moderado') score -= 16
 
-  if (estado.frizz === 'Alto') score -= 9
-  if (estado.frizz === 'Moderado') score -= 4
+  if (estado.frizz === 'Alto') score -= 20
+  if (estado.frizz === 'Moderado') score -= 10
 
-  if (estado.brilho === 'Baixo') score -= 7
-  if (estado.brilho === 'Médio') score -= 2
+  if (estado.brilho === 'Baixo') score -= 16
+  if (estado.brilho === 'Médio') score -= 8
 
   if (incluiEvento(respostas, 'piscina_mar')) score -= 3
   if (incluiEvento(respostas, 'produto_novo')) score -= 1
@@ -108,13 +108,13 @@ function calcularEixoCouro(respostas) {
   let score = 100
   const { couro = {} } = respostas
 
-  if (couro.queda === 'Alta') score -= 22
-  if (couro.queda === 'Moderada') score -= 10
+  if (couro.queda === 'Alta') score -= 38
+  if (couro.queda === 'Moderada') score -= 22
 
-  if (couro.caspa === 'Frequente') score -= 8
-  if (couro.caspa === 'Leve') score -= 3
+  if (couro.caspa === 'Frequente') score -= 18
+  if (couro.caspa === 'Leve') score -= 8
 
-  if (couro.oleosidade === 'Alta') score -= 5
+  if (couro.oleosidade === 'Alta') score -= 12
 
   if (incluiEvento(respostas, 'queda')) score -= 8
   if (incluiEvento(respostas, 'couro')) score -= 6
@@ -127,14 +127,14 @@ function calcularEixoHabitos(respostas) {
   let score = 100
   const { vida = {} } = respostas
 
-  if (vida.estresse === 'Alto') score -= 5
-  if (vida.estresse === 'Moderado') score -= 3
+  if (vida.estresse === 'Alto') score -= 16
+  if (vida.estresse === 'Moderado') score -= 8
 
-  if (vida.sono === 'Ruim') score -= 4
-  if (vida.sono === 'Média') score -= 2
+  if (vida.sono === 'Ruim') score -= 14
+  if (vida.sono === 'Média') score -= 7
 
-  if (vida.alimentacao === 'Desregulada') score -= 4
-  if (vida.alimentacao === 'Intermediária') score -= 2
+  if (vida.alimentacao === 'Desregulada') score -= 14
+  if (vida.alimentacao === 'Intermediária') score -= 7
 
   return clamp(score)
 }
@@ -156,8 +156,8 @@ export function calcularHairScoreDetalhado(respostas) {
 
   // Quando há fragilidade ativa, existe um teto temporário.
   // Isso evita "score saudável" logo após dano severo.
-  if (fragilidade.nivel === 'critica') score = Math.min(score, 55)
-  if (fragilidade.nivel === 'alta') score = Math.min(score, 68)
+  if (fragilidade.nivel === 'critica') score = Math.min(score, 38)
+  if (fragilidade.nivel === 'alta') score = Math.min(score, 52)
 
   return {
     pontuacao: clamp(score),
@@ -176,37 +176,31 @@ export function calcularHairScore(respostas) {
 }
 
 // ── CLASSIFICAÇÃO ─────────────────────────────────────────────────
-export function classificarScore(pontuacao, fragilidade = null) {
-  if (fragilidade?.nivel === 'critica') {
-    return { label: 'Fragilizado', cor: '#8C3D3D', estado: 'fragilidade_critica' }
-  }
-
-  if (fragilidade?.nivel === 'alta') {
-    return { label: 'Em recuperação', cor: '#8A6B3F', estado: 'fragilidade_alta' }
-  }
-
+export function classificarScore(pontuacao) {
   if (pontuacao >= 85) return { label: 'Radiante', cor: '#BFA878', estado: 'radiante' }
-  if (pontuacao >= 70) return { label: 'Equilibrado', cor: '#8EA37F', estado: 'equilibrado' }
-  if (pontuacao >= 55) return { label: 'Em evolução', cor: '#AFA5BF', estado: 'evolucao' }
-  if (pontuacao >= 40) return { label: 'Sensível', cor: '#A7866A', estado: 'sensivel' }
-  return { label: 'Fragilizado', cor: '#8C3D3D', estado: 'fragilizado' }
+  if (pontuacao >= 70) return { label: 'Em evolução', cor: '#8EA37F', estado: 'evolucao' }
+  if (pontuacao >= 55) return { label: 'Em construção', cor: '#AFA5BF', estado: 'construcao' }
+  if (pontuacao >= 40) return { label: 'Precisa de cuidado', cor: '#A7866A', estado: 'cuidado' }
+  return { label: 'Fragilizado', cor: '#8C3D3D', estado: 'fragil' }
 }
 
 // ── DIAGNÓSTICO ───────────────────────────────────────────────────
 export function gerarDiagnostico(respostas) {
   const { estado = {}, couro = {}, quimica = {} } = respostas
   const fragilidade = avaliarFragilidade(respostas)
+  const { pontuacao } = calcularHairScoreDetalhado(respostas)
   const partes = []
   const tratamentos = []
 
   let nivelDano = 'baixo'
-
-  if (fragilidade.nivel === 'critica') {
+  if (fragilidade.nivel === 'critica' || pontuacao < 40) {
     nivelDano = 'crítico'
-  } else if (fragilidade.nivel === 'alta') {
+  } else if (fragilidade.nivel === 'alta' || pontuacao < 55) {
     nivelDano = 'alto'
-  } else if (quimica.tipo !== 'Não' || estado.quebra === 'Moderada' || estado.elasticidade === 'Parcialmente') {
+  } else if (pontuacao < 70) {
     nivelDano = 'moderado'
+  } else if (pontuacao < 85) {
+    nivelDano = 'leve'
   }
 
   if (estado.quebra === 'Alta' || estado.elasticidade === 'Não volta' || quimica.tipo === 'Descoloração' || incluiEvento(respostas, 'corte_quimico')) {

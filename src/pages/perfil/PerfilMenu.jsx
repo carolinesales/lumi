@@ -178,7 +178,7 @@ function LegalModal({ titulo, corpo, fechar, onClose }) {
 // pagina de perfil, com seções de dados pessoais, notificações, segurança e conta, além de modais para termos e privacidade
 
 export default function PerfilMenu() {
-  const { user, logout }            = useAuth()
+  const { user, logout, refreshUser } = useAuth()
   const { t, idioma, setIdiomaApp } = useIdioma()
   const { tema, alternar }          = useTheme()
   const navigate                    = useNavigate()
@@ -199,6 +199,7 @@ export default function PerfilMenu() {
   // foto
   const [fotoURL,   setFotoURL]   = useState(null)
   const [uploading, setUploading] = useState(false)
+  const [fotoMsg,   setFotoMsg]   = useState(null)
 
   // notificações
   const [notif, setNotif]         = useState({ diaria: true, semanal: true, especialista: false })
@@ -282,6 +283,18 @@ export default function PerfilMenu() {
   async function uploadFoto(e) {
     const file = e.target.files[0]
     if (!file) return
+    setFotoMsg(null)
+    const TIPOS = ['image/jpeg', 'image/png', 'image/webp']
+    if (!TIPOS.includes(file.type)) {
+      setFotoMsg({ tipo: 'erro', txt: tr('pp_foto_tipo', 'Formato inválido. Use JPG, PNG ou WEBP.') })
+      e.target.value = ''
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setFotoMsg({ tipo: 'erro', txt: tr('pp_foto_tamanho', 'Imagem muito grande. O máximo é 5 MB.') })
+      e.target.value = ''
+      return
+    }
     setUploading(true)
     try {
       const storageRef = ref(storage, `usuarios/${user.uid}/foto`)
@@ -289,7 +302,28 @@ export default function PerfilMenu() {
       const url = await getDownloadURL(storageRef)
       await updateProfile(user, { photoURL: url })
       setFotoURL(url)
-    } finally { setUploading(false) }
+      await refreshUser()
+      setFotoMsg({ tipo: 'ok', txt: tr('pp_foto_sucesso', 'Foto atualizada!') })
+      setTimeout(() => setFotoMsg(null), 3000)
+    } catch {
+      setFotoMsg({ tipo: 'erro', txt: tr('erro_generico', 'Erro ao salvar. Tente novamente.') })
+    } finally {
+      setUploading(false)
+      e.target.value = ''
+    }
+  }
+
+  async function removerFoto() {
+    setFotoMsg(null)
+    try {
+      await updateProfile(user, { photoURL: '' })
+      setFotoURL(null)
+      await refreshUser()
+      setFotoMsg({ tipo: 'ok', txt: tr('pp_foto_removida', 'Foto removida.') })
+      setTimeout(() => setFotoMsg(null), 3000)
+    } catch {
+      setFotoMsg({ tipo: 'erro', txt: tr('erro_generico', 'Erro ao salvar. Tente novamente.') })
+    }
   }
 
   async function trocarSenha() {
@@ -368,14 +402,26 @@ export default function PerfilMenu() {
                 <Button size="sm" onClick={() => fileRef.current?.click()} disabled={uploading}>
                   {uploading ? t('salvando') : tr('pp_trocar_foto', 'Trocar foto')}
                 </Button>
-                {fotoURL && (
-                  <Button size="sm" variant="outline" onClick={() => { setFotoURL(null); updateProfile(user, { photoURL: '' }) }}>
-                    {tr('pp_remover_foto', 'Remover foto')}
-                  </Button>
-                )}
-                <input ref={fileRef} type="file" accept="image/*" onChange={uploadFoto} className="hidden" />
+                <Button size="sm" variant="outline" onClick={removerFoto} disabled={!fotoURL || uploading}>
+                  {tr('pp_remover_foto', 'Remover foto')}
+                </Button>
+                <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={uploadFoto} className="hidden" />
               </div>
             </div>
+
+            {fotoMsg && (
+              <div className={cn(
+                'flex items-center gap-2.5 rounded-xl px-4 py-3',
+                fotoMsg.tipo === 'ok' ? 'bg-state-positive-soft' : 'bg-state-negative-soft',
+              )}>
+                <i className={cn('fa-solid text-sm',
+                  fotoMsg.tipo === 'ok' ? 'fa-circle-check text-state-positive' : 'fa-circle-exclamation text-state-negative',
+                )} aria-hidden="true" />
+                <p className={cn("font-['Nunito_Sans'] text-sm font-semibold",
+                  fotoMsg.tipo === 'ok' ? 'text-state-positive' : 'text-state-negative',
+                )}>{fotoMsg.txt}</p>
+              </div>
+            )}
 
             {sucessoP && (
               <div className="flex items-center gap-2.5 rounded-xl bg-state-positive-soft px-4 py-3">

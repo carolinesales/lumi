@@ -99,7 +99,7 @@ export default function HairScoreCard({
   const theme = getTheme(score)
   const { t } = useIdioma()
   const stateLabel = getScoreMomentLabel({ state, fragilidade, trend, score }, t)
-  const stateMessage = getScoreReading({ message, fragilidade, trend, delta, score }, t)
+  const stateMessage = getScoreReading({ message, fragilidade, trend, delta, score, state }, t)
 
   return (
     <>
@@ -272,16 +272,16 @@ function getScoreMomentLabel({ state, fragilidade, trend, score }, t) {
   if (score <= 75) return t('hs_label_evolucao')
   if (trend === 'up') return t('hs_label_evolucao')
   if (trend === 'down') return t('hs_label_observacao')
-  if (state?.label && state.label !== 'Aguardando diagnóstico') return state.label
+  if (state?.id && state.id !== 'neutral') return t('hs_state_' + state.id)
   return t('hs_label_radiante')
 }
 
-function getScoreReading({ message, fragilidade, trend, delta, score }, t) {
+function getScoreReading({ message, fragilidade, trend, delta, score, state }, t) {
   if (fragilidade?.ativa) return t('hs_read_fragil')
   if (score <= 25) return t('hs_read_baixo')
   if (score <= 50) return t('hs_read_medio')
   if (score <= 75) return t('hs_read_bom')
   if (trend === 'up' || delta > 0) return t('hs_read_subindo')
   if (trend === 'down' || delta < 0) return t('hs_read_descendo')
-  return message || t('hs_read_radiante')
+  return (state?.id && state.id !== 'neutral') ? t('hs_msg_' + state.id) : (message || t('hs_read_radiante'))
 }

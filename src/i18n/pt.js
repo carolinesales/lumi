@@ -697,6 +697,16 @@ const pt = {
 
   // ── Lumi Score ────────────────────────────────────────────
   hs_atualizar: 'Atualizar diagnóstico',
+  hs_state_radiante: 'Radiante',
+  hs_state_evolucao: 'Em evolução',
+  hs_state_construcao: 'Em construção',
+  hs_state_cuidado: 'Precisa de cuidado',
+  hs_state_fragil: 'Fragilizado',
+  hs_msg_radiante: 'Seus fios estão radiantes e cheios de vida.',
+  hs_msg_evolucao: 'Sua rotina está começando a transformar seus fios.',
+  hs_msg_construcao: 'Cada ritual conta — seus fios estão respondendo.',
+  hs_msg_cuidado: 'Sua jornada de cuidado começa agora.',
+  hs_msg_fragil: 'Seus fios precisam de recuperação gradual e cuidado constante.',
   hs_label_recuperacao: 'Em recuperação',
   hs_label_fragilizado: 'Fragilizado',
   hs_label_precisa_cuidado: 'Precisa de cuidado',

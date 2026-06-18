@@ -696,6 +696,16 @@ const en = {
 
   // ── Lumi Score ────────────────────────────────────────────
   hs_atualizar: 'Update assessment',
+  hs_state_radiante: 'Radiant',
+  hs_state_evolucao: 'Improving',
+  hs_state_construcao: 'Building up',
+  hs_state_cuidado: 'Needs care',
+  hs_state_fragil: 'Fragile',
+  hs_msg_radiante: 'Your hair is radiant and full of life.',
+  hs_msg_evolucao: 'Your routine is starting to transform your hair.',
+  hs_msg_construcao: 'Every ritual counts — your hair is responding.',
+  hs_msg_cuidado: 'Your care journey starts now.',
+  hs_msg_fragil: 'Your hair needs gradual recovery and consistent care.',
   hs_label_recuperacao: 'Recovering',
   hs_label_fragilizado: 'Fragile',
   hs_label_precisa_cuidado: 'Needs care',

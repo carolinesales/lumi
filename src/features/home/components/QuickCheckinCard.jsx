@@ -1,8 +1,10 @@
 // src/features/home/components/QuickCheckinCard.jsx
 import { Button } from '@/components/ui/button'
 import ilustracaoDiario from '@/assets/Diario.png'
+import { useIdioma } from '@/contexts/IdiomaContext'
 
 export default function QuickCheckinCard({ regHoje, onOpen }) {
+  const { t } = useIdioma()
   const done = !!regHoje
 
   return (
@@ -20,12 +22,12 @@ export default function QuickCheckinCard({ regHoje, onOpen }) {
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-6">
         <div className="flex flex-col gap-2">
           <h3 className="font-['Montserrat'] text-base font-semibold leading-5 text-text">
-            Diário Lumi
+            {t('qc_titulo')}
           </h3>
           <p className="font-nunito text-sm leading-5 text-text-secondary">
             {done
-              ? 'Seu dia já foi registrado. O Lumi vai usar essas informações para acompanhar padrões e evolução dos seus fios.'
-              : 'Um resumo dos cuidados, hábitos e sensações do seu dia.'}
+              ? t('qc_desc_feito')
+              : t('qc_desc_pendente')}
           </p>
         </div>
 
@@ -33,9 +35,9 @@ export default function QuickCheckinCard({ regHoje, onOpen }) {
           onClick={onOpen}
           size="default"
           className="w-full"
-          aria-label={done ? 'Abrir registro do dia' : 'Registrar meu dia'}
+          aria-label={done ? t('qc_aria_abrir') : t('qc_aria_registrar')}
         >
-          {done ? 'Abrir registro' : 'Registrar'}
+          {done ? t('qc_btn_abrir') : t('qc_btn_registrar')}
         </Button>
       </div>
     </div>

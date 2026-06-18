@@ -50,9 +50,15 @@ export function normalizeHairScoreTimeline(scores = []) {
     })
 }
 
-export function getTimelineInsight(items = []) {
+export function getTimelineInsight(items = [], t) {
+  const tr = (k, fb) => {
+    if (!t) return fb
+    const v = t(k)
+    return (!v || v === k) ? fb : v
+  }
+
   if (!items.length) {
-    return 'Sua evolução aparecerá aqui conforme você registra cuidados e atualiza sua rotina.'
+    return tr('ti_vazio', 'Sua evolução aparecerá aqui conforme você registra cuidados e atualiza sua rotina.')
   }
 
   const first = items[0]
@@ -60,18 +66,18 @@ export function getTimelineInsight(items = []) {
   const diff = last.score - first.score
 
   if (last.fragilidade?.ativa) {
-    return 'Seus fios estão em recuperação gradual. O Lumi acompanha a evolução com cuidado, sem acelerar o processo.'
+    return tr('ti_recuperacao', 'Seus fios estão em recuperação gradual. O Lumi acompanha a evolução com cuidado, sem acelerar o processo.')
   }
 
   if (diff >= 5) {
-    return 'Seu cabelo mostra sinais consistentes de evolução nos últimos registros.'
+    return tr('ti_evolucao', 'Seu cabelo mostra sinais consistentes de evolução nos últimos registros.')
   }
 
   if (diff <= -5) {
-    return 'O Lumi percebeu uma oscilação recente. Vale observar eventos como calor, química, queda ou ressecamento.'
+    return tr('ti_oscilacao', 'O Lumi percebeu uma oscilação recente. Vale observar eventos como calor, química, queda ou ressecamento.')
   }
 
-  return 'Seu Hair Score está relativamente estável. Pequenos registros ajudam o Lumi a entender melhor sua evolução.'
+  return tr('ti_estavel', 'Seu Hair Score está relativamente estável. Pequenos registros ajudam o Lumi a entender melhor sua evolução.')
 }
 
 export function getJourneySummary(items) {

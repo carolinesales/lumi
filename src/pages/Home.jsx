@@ -212,11 +212,11 @@ export default function Home() {
   }
 
   function climaTexto() {
-    if (!clima) return 'Ative a localização para receber insights do clima.'
-    if (clima.umidade <= 45)     return `Umidade baixa em ${clima.cidade}. Capriche na hidratação hoje.`
-    if (clima.umidade >= 75)     return `Alta umidade hoje. Use um óleo ou creme mais consistente para reduzir o frizz.`
-    if (clima.temperatura >= 28) return `Calor em ${clima.cidade}. Use proteção térmica antes de sair.`
-    return `Clima equilibrado em ${clima.cidade}. Ótimo dia para manter sua rotina.`
+    if (!clima) return t('clima_sem_local')
+    if (clima.umidade <= 45)     return t('clima_seco').replace('{cidade}', clima.cidade)
+    if (clima.umidade >= 75)     return t('clima_umido')
+    if (clima.temperatura >= 28) return t('clima_calor').replace('{cidade}', clima.cidade)
+    return t('clima_equilibrado').replace('{cidade}', clima.cidade)
   }
 
   const hairScoreCard = (

@@ -8,6 +8,7 @@ import {
 import LumiCard   from '@/components/lumi/LumiCard'
 import { Button } from '@/components/ui/button'
 import { cn }     from '@/lib/utils'
+import { useIdioma } from '@/contexts/IdiomaContext'
 import {
   normalizeHairScoreTimeline,
   getTimelineInsight,
@@ -24,12 +25,6 @@ const FILTROS = [
   { label: '30d', dias: 30 },
   { label: '90d', dias: 90 },
 ]
-
-const INFO_ITEMS = Object.freeze([
-  { icon: 'fa-chart-line',  text: 'A curva mostra o movimento dos últimos registros, não uma nota isolada.' },
-  { icon: 'fa-sparkles',    text: 'A interpretação transforma pequenos registros em sinais mais fáceis de entender.' },
-  { icon: 'fa-circle-info', text: 'É uma orientação de autocuidado e não substitui avaliação profissional.' },
-])
 
 // helpers para manipulação dos dados e formatação de labels
 
@@ -53,7 +48,7 @@ function filterByDays(items, dias) {
   return items.filter(i => i._parsedDate >= cutoff)
 }
 
-function formatLabel(item) {
+function formatLabel(item, locale, t) {
   const date = item._parsedDate
   if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '—'
   const today = new Date()
@@ -61,8 +56,8 @@ function formatLabel(item) {
     date.getDate()     === today.getDate()  &&
     date.getMonth()    === today.getMonth() &&
     date.getFullYear() === today.getFullYear()
-  if (isToday) return 'Hoje'
-  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' })
+  if (isToday) return t('ht_hoje')
+  return new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'short' })
     .format(date).replace('.', '')
 }
 
@@ -123,26 +118,26 @@ function CustomTick({ x, y, payload, index, visibleTicksCount }) {
 
 // sub-componentes
 
-function EmptyState() {
+function EmptyState({ t }) {
   return (
     <div className="rounded-2xl bg-surface-subtle p-6 text-center">
-      <div className="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-full bg-[#E8F2FA] text-[#6BA8D4]">
+      <div className="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-full bg-surface-subtle text-[#6BA8D4]">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
         </svg>
       </div>
-      <strong className="block font-heading text-[13px] font-semibold text-lumi-black">
-        A leitura aparece com os registros
+      <strong className="block font-heading text-[13px] font-semibold text-text">
+        {t('ht_vazio_titulo')}
       </strong>
-      <p className="mx-auto mt-2 max-w-[280px] font-nunito text-xs leading-5 text-lumi-secondary">
-        Ao registrar cuidados, hábitos e mudanças, o Lumi começa a interpretar como seus fios respondem.
+      <p className="mx-auto mt-2 max-w-[280px] font-nunito text-xs leading-5 text-text-secondary">
+        {t('ht_vazio_desc')}
       </p>
     </div>
   )
 }
 
-function InfoModal({ onClose }) {
+function InfoModal({ onClose, t }) {
   return (
     <div
       className="fixed inset-0 z-[120] flex items-end justify-center bg-black/35 backdrop-blur-sm md:items-center md:p-6"
@@ -154,23 +149,27 @@ function InfoModal({ onClose }) {
         onClick={e => e.stopPropagation()}
         style={{ animation: 'lumi-fade-up-soft .28s cubic-bezier(.22,1,.36,1) both' }}
       >
-        <div className="mx-auto mb-4 h-1 w-9 rounded-full bg-lumi-border md:hidden" />
+        <div className="mx-auto mb-4 h-1 w-9 rounded-full bg-paper-200 md:hidden" />
         <div className="overflow-hidden rounded-[26px] bg-transparent p-5 shadow-lumi-card">
-          <h3 className="font-heading text-[22px] font-semibold leading-none tracking-tight text-lumi-black">
-            Como o Lumi lê seus fios?
+          <h3 className="font-heading text-[22px] font-semibold leading-none tracking-tight text-text">
+            {t('ht_modal_titulo')}
           </h3>
-          <p className="mt-3 font-nunito text-sm leading-relaxed text-lumi-secondary">
-            A leitura combina seus registros recentes, cuidados concluídos e variações do Hair Score para perceber como seus fios estão respondendo.
+          <p className="mt-3 font-nunito text-sm leading-relaxed text-text-secondary">
+            {t('ht_modal_desc')}
           </p>
           <div className="mt-4 flex flex-col gap-2.5">
-            {INFO_ITEMS.map(item => (
-              <div key={item.icon} className="flex items-start gap-2.5 font-nunito text-xs leading-relaxed text-lumi-secondary">
+            {[
+              { icon: 'fa-chart-line',  text: t('ht_info_1') },
+              { icon: 'fa-sparkles',    text: t('ht_info_2') },
+              { icon: 'fa-circle-info', text: t('ht_info_3') },
+            ].map(item => (
+              <div key={item.icon} className="flex items-start gap-2.5 font-nunito text-xs leading-relaxed text-text-secondary">
                 <i className={cn('fa-solid mt-0.5 shrink-0 text-[#6BA8D4]', item.icon)} aria-hidden="true" />
                 <span>{item.text}</span>
               </div>
             ))}
           </div>
-          <Button className="mt-5 w-full" onClick={onClose}>Entendi</Button>
+          <Button className="mt-5 w-full" onClick={onClose}>{t('ht_modal_entendi')}</Button>
         </div>
       </div>
     </div>
@@ -180,14 +179,16 @@ function InfoModal({ onClose }) {
 // export principal do componente de timeline do hair score
 
 export default function HairTimeline({ scores = [], className }) {
+  const { t, idioma } = useIdioma()
+  const locale = idioma === 'en' ? 'en-US' : 'pt-BR'
   const [showInfo, setShowInfo] = useState(false)
   const [filtroDias, setFiltroDias] = useState(7)
 
   const normalized = useMemo(() => normalizeHairScoreTimeline(scores), [scores])
   const allItems   = useMemo(() => deduplicateByDay(normalized), [normalized])
   const items      = useMemo(() => filterByDays(allItems, filtroDias), [allItems, filtroDias])
-  const chartData  = useMemo(() => items.map(item => ({ ...item, label: formatLabel(item) })), [items])
-  const insight    = useMemo(() => getTimelineInsight(items), [items])
+  const chartData  = useMemo(() => items.map(item => ({ ...item, label: formatLabel(item, locale, t) })), [items])
+  const insight    = useMemo(() => getTimelineInsight(items, t), [items, t])
   const domain     = useMemo(() => yDomain(items), [items])
 
   const dataLength = chartData.length
@@ -204,18 +205,18 @@ export default function HairTimeline({ scores = [], className }) {
           {/* header */}
           <header className="flex items-start justify-between gap-2">
             <div className="flex flex-col gap-2">
-              <h3 className="font-heading text-base font-semibold text-lumi-black">
-                Leitura dos fios
+              <h3 className="font-heading text-base font-semibold text-text">
+                {t('ht_titulo')}
               </h3>
-              <p className="font-nunito text-sm leading-5 text-lumi-secondary">
-                O Lumi acompanha mudanças e padrões percebidos nos seus registros.
+              <p className="font-nunito text-sm leading-5 text-text-secondary">
+                {t('ht_subtitulo')}
               </p>
             </div>
             <button
               type="button"
               onClick={() => setShowInfo(true)}
-              aria-label="Entender leitura dos fios"
-              className="shrink-0 text-text-tertiary transition-all duration-200 hover:rotate-[15deg] hover:scale-110 hover:text-lumi-black"
+              aria-label={t('ht_aria_info')}
+              className="shrink-0 text-text-tertiary transition-all duration-200 hover:rotate-[15deg] hover:scale-110 hover:text-text"
             >
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor" strokeWidth="1.8">
@@ -226,7 +227,7 @@ export default function HairTimeline({ scores = [], className }) {
           </header>
 
           {/* filtro de período */}
-          <div className="flex items-center gap-1.5" role="group" aria-label="Filtrar período">
+          <div className="flex items-center gap-1.5" role="group" aria-label={t('ht_filtro_periodo')}>
             {FILTROS.map(f => (
               <button
                 key={f.label}
@@ -236,20 +237,20 @@ export default function HairTimeline({ scores = [], className }) {
                   'rounded-full px-3 py-1 font-nunito text-xs font-semibold transition-colors',
                   filtroDias === f.dias
                     ? 'bg-ink text-white'
-                    : 'bg-lumi-input text-lumi-gray hover:bg-lumi-border',
+                    : 'bg-surface-subtle text-text-secondary hover:bg-paper-200',
                 )}
                 aria-pressed={filtroDias === f.dias}
               >
                 {f.label}
               </button>
             ))}
-            <span className="ml-auto font-nunito text-[11px] text-lumi-muted">
-              {items.length} {items.length === 1 ? 'registro' : 'registros'}
+            <span className="ml-auto font-nunito text-[11px] text-text-tertiary">
+              {items.length} {items.length === 1 ? t('ht_registro') : t('ht_registros')}
             </span>
           </div>
 
           {/* body */}
-          {items.length === 0 ? <EmptyState /> : (
+          {items.length === 0 ? <EmptyState t={t} /> : (
             <div className="flex flex-col gap-4">
 
               {/* gráfico */}
@@ -282,17 +283,17 @@ export default function HairTimeline({ scores = [], className }) {
 
               {/* Insight */}
               <div className="rounded-2xl bg-surface-subtle p-3.5">
-                <span className="mb-1.5 block font-nunito text-sm font-semibold text-lumi-black">
-                  Insights Lumi
+                <span className="mb-1.5 block font-nunito text-sm font-semibold text-text">
+                  {t('ht_insights')}
                 </span>
-                <p className="font-nunito text-sm leading-5 text-lumi-secondary">{insight}</p>
+                <p className="font-nunito text-sm leading-5 text-text-secondary">{insight}</p>
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
+      {showInfo && <InfoModal onClose={() => setShowInfo(false)} t={t} />}
     </>
   )
 }

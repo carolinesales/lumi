@@ -1,6 +1,8 @@
 // src/features/home/components/InsightCard.jsx
+import { useIdioma } from '@/contexts/IdiomaContext'
 
 export default function InsightCard({ clima, text }) {
+  const { t } = useIdioma()
   const hasWeather = !!clima
 
   return (
@@ -34,7 +36,7 @@ export default function InsightCard({ clima, text }) {
             lineHeight: '20px',
             color: 'var(--text-primary)',
           }}>
-            {hasWeather ? formatCidade(clima.cidade) : 'Insight do dia'}
+            {hasWeather ? formatCidade(clima.cidade) : t('ins_titulo')}
           </span>
 
           {hasWeather && (
@@ -93,7 +95,7 @@ export default function InsightCard({ clima, text }) {
                 color: 'var(--text-secondary)',
                 whiteSpace: 'nowrap',
               }}>
-                Sensação {clima.sensacao ?? clima.temperatura - 2}°
+                {t('ins_sensacao')} {clima.sensacao ?? clima.temperatura - 2}°
               </span>
             </div>
           </div>

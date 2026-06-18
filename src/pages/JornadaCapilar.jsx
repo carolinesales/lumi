@@ -33,8 +33,8 @@ const FILTROS = [
 function EmptyState() {
   return (
     <div className="flex flex-col items-center gap-4 py-20 text-center">
-      <div className="grid h-16 w-16 place-items-center rounded-full bg-lumi-bg">
-        <i className="fa-solid fa-camera text-2xl text-lumi-muted" aria-hidden="true" />
+      <div className="grid h-16 w-16 place-items-center rounded-full bg-surface-subtle">
+        <i className="fa-solid fa-camera text-2xl text-text-tertiary" aria-hidden="true" />
       </div>
       <div>
         <p className="font-heading text-base font-semibold text-lumi-black">
@@ -53,7 +53,7 @@ function FotoCard({ registro, onClick }) {
     <button
       type="button"
       onClick={() => onClick(registro)}
-      className="group relative aspect-square overflow-hidden rounded-2xl bg-lumi-bg"
+      className="group relative aspect-square overflow-hidden rounded-2xl bg-surface-subtle"
     >
       <img
         src={registro.fotoURL}
@@ -123,7 +123,7 @@ function Modal({ registro, onClose, onAnterior, onProximo, temAnterior, temProxi
           {registro.hairScore && (
             <div className="text-right">
               <p className="font-heading text-xl font-light text-white">{registro.hairScore}</p>
-              <p className="font-nunito text-[10px] text-white/60">Hair Score</p>
+              <p className="font-nunito text-[10px] text-white/60">Lumi Score</p>
             </div>
           )}
         </div>
@@ -205,17 +205,31 @@ export default function JornadaCapilar() {
   const temAnterior = modalIdx !== null && modalIdx > 0
   const temProximo  = modalIdx !== null && modalIdx < filtrados.length - 1
 
+  // agrupa as fotos por mês/ano preservando o índice global (pra navegação do modal)
+  const grupos = useMemo(() => {
+    const mapa = []
+    filtrados.forEach((reg, idx) => {
+      const d = new Date(reg.id + 'T12:00:00')
+      const chave = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+      let grupo = mapa.find(g => g.chave === chave)
+      if (!grupo) { grupo = { chave, itens: [] }; mapa.push(grupo) }
+      grupo.itens.push({ reg, idx })
+    })
+    return mapa
+  }, [filtrados])
+
   return (
     <AppShell>
-      <main className="mx-auto max-w-[800px] px-4 pb-28 pt-6 lg:px-8 lg:pb-12 lg:pt-10">
+      <main className="min-h-screen bg-surface-muted px-4 pb-28 pt-5 sm:px-6 lg:px-10 lg:pb-14 lg:pt-8">
+        <div className="mx-auto max-w-[1320px]">
 
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h2 className="font-heading text-xl font-semibold text-lumi-black lg:text-2xl">
-              Jornada Capilar
-            </h2>
-            <p className="mt-1 font-nunito text-sm text-lumi-gray">
+            <h1 className="font-['Montserrat'] text-xl font-semibold text-text lg:text-2xl">
+              Diário
+            </h1>
+            <p className="mt-1 font-['Nunito_Sans'] text-sm text-text-secondary">
               {registros.length} {registros.length === 1 ? 'foto registrada' : 'fotos registradas'}
             </p>
           </div>
@@ -232,8 +246,8 @@ export default function JornadaCapilar() {
               className={cn(
                 'rounded-full px-4 py-1.5 font-nunito text-sm font-semibold transition-colors',
                 filtro.label === f.label
-                  ? 'bg-lumi-black text-white'
-                  : 'bg-lumi-input text-lumi-gray hover:bg-lumi-border',
+                  ? 'bg-ink text-white'
+                  : 'bg-surface-subtle text-text-secondary hover:bg-paper-200',
               )}
             >
               {f.label}
@@ -244,21 +258,31 @@ export default function JornadaCapilar() {
         {/* Conteúdo */}
         {loading ? (
           <div className="flex justify-center py-20">
-            <i className="fa-solid fa-spinner fa-spin text-2xl text-lumi-muted" aria-hidden="true" />
+            <i className="fa-solid fa-spinner fa-spin text-2xl text-text-tertiary" aria-hidden="true" />
           </div>
         ) : filtrados.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-            {filtrados.map((reg, i) => (
-              <FotoCard
-                key={reg.id}
-                registro={reg}
-                onClick={() => setModalIdx(i)}
-              />
+          <div className="flex flex-col gap-8">
+            {grupos.map(grupo => (
+              <section key={grupo.chave}>
+                <h2 className="mb-3 font-['Montserrat'] text-sm font-semibold capitalize text-text-secondary">
+                  {grupo.chave}
+                </h2>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                  {grupo.itens.map(({ reg, idx }) => (
+                    <FotoCard
+                      key={reg.id}
+                      registro={reg}
+                      onClick={() => setModalIdx(idx)}
+                    />
+                  ))}
+                </div>
+              </section>
             ))}
           </div>
         )}
+        </div>
       </main>
 
       {/* Modal de visualização */}

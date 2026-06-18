@@ -14,7 +14,7 @@ const TOTAL = 6
 
 function AuthLayout({ photo, children }) {
   return (
-    <div className="flex h-screen overflow-hidden bg-white">
+    <div className="flex h-screen overflow-hidden bg-surface">
       <div className="hidden w-[48%] shrink-0 lg:block">
         <img
           src={photo}
@@ -184,14 +184,14 @@ export default function VerificarEmail() {
         {/* Cabeçalho */}
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-2">
-            <h2 className="font-['Montserrat'] text-2xl font-medium leading-[40px] text-lumi-black">
+            <h2 className="font-['Montserrat'] text-2xl font-medium leading-[40px] text-text">
               Confirme seu e-mail
             </h2>
-            <p className="font-nunito text-base leading-[22px] text-lumi-gray">
+            <p className="font-nunito text-base leading-[22px] text-text-secondary">
               Enviamos um código de 6 dígitos para
             </p>
           </div>
-          <p className="text-center font-nunito text-base font-semibold leading-6 text-lumi-black">
+          <p className="text-center font-nunito text-base font-semibold leading-6 text-text">
             {user?.email}
           </p>
         </div>
@@ -210,7 +210,7 @@ export default function VerificarEmail() {
               onKeyDown={e => handleKeyDown(e, i)}
               aria-label={`Dígito ${i + 1} do código`}
               className={cn(
-                'h-[72px] min-w-0 flex-1 rounded-[8px] border bg-white text-center font-["Montserrat"] text-2xl font-medium text-lumi-black outline-none transition sm:h-[80px]',
+                'h-[72px] min-w-0 flex-1 rounded-[8px] border border-paper-200 bg-surface text-center font-["Montserrat"] text-2xl font-medium text-text outline-none transition sm:h-[80px]',
                 d || erro
                   ? erro ? 'border-[#dc3232]' : 'border-black'
                   : 'border-[#E0E0E0] focus:border-black',
@@ -230,7 +230,7 @@ export default function VerificarEmail() {
             type="button"
             onClick={() => verificar()}
             disabled={loading || digitos.some(d => !d)}
-            className="flex w-full items-center justify-center rounded-[24px] bg-black px-6 py-3 font-nunito text-sm text-white transition hover:opacity-90 disabled:opacity-40"
+            className="flex w-full items-center justify-center rounded-[24px] bg-ink px-6 py-3 font-nunito text-sm text-white transition hover:opacity-90 disabled:opacity-40"
           >
             {loading
               ? <i className="fa-solid fa-spinner fa-spin text-sm" aria-hidden="true" />
@@ -238,15 +238,15 @@ export default function VerificarEmail() {
           </button>
 
           <p className="text-center font-nunito text-sm">
-            <span className="text-lumi-black">Não recebeu o código?</span>{' '}
+            <span className="text-text">Não recebeu o código?</span>{' '}
             {countdown > 0 ? (
-              <span className="font-semibold text-lumi-black">Reenviar em {countdown}s</span>
+              <span className="font-semibold text-text-secondary">Reenviar em {countdown}s</span>
             ) : (
               <button
                 type="button"
                 onClick={reenviar}
                 disabled={enviando}
-                className="font-semibold text-lumi-black underline underline-offset-2 transition hover:opacity-70 disabled:opacity-40"
+                className="font-semibold text-text underline underline-offset-2 transition hover:opacity-70 disabled:opacity-40"
               >
                 {enviando ? 'Enviando...' : 'Reenviar'}
               </button>
@@ -257,7 +257,7 @@ export default function VerificarEmail() {
             type="button"
             onClick={corrigirEmail}
             disabled={voltando}
-            className="font-nunito text-sm text-lumi-gray transition hover:text-lumi-black disabled:opacity-40"
+            className="font-nunito text-sm text-text-secondary transition hover:text-text disabled:opacity-40"
           >
             {voltando ? 'Voltando...' : 'E-mail errado? Corrigir'}
           </button>

@@ -95,11 +95,11 @@ export default function AppSidebar({ user, onLogout }) {
             align="end"
             side="right"
             sideOffset={10}
-            className="w-40 rounded-2xl border-white/80 bg-surface/95 p-1 shadow-2xl backdrop-blur-xl dark:border-white/10"
+            className="flex w-44 flex-col gap-3 rounded-md border-0 ring-1 ring-paper-200 bg-surface p-2 shadow-xl dark:ring-white/10"
           >
             <DropdownMenuItem
               onClick={() => navigate('/app/perfil')}
-              className="cursor-pointer rounded-xl font-semibold"
+              className="cursor-pointer rounded-md px-2 py-2 font-semibold outline-none transition-colors focus:bg-surface-subtle focus:text-text focus-visible:outline-none hover:bg-surface-subtle"
             >
               <i className="fa-regular fa-user mr-2 text-xs text-text-tertiary" aria-hidden="true" />
               {t('nav_perfil')}
@@ -107,7 +107,7 @@ export default function AppSidebar({ user, onLogout }) {
 
             <DropdownMenuItem
               onClick={onLogout}
-              className="cursor-pointer rounded-xl font-semibold text-state-negative focus:text-state-negative"
+              className="cursor-pointer rounded-md px-2 py-2 font-semibold text-state-negative outline-none transition-colors focus:bg-surface-subtle focus:text-state-negative focus-visible:outline-none hover:bg-surface-subtle"
             >
               <i className="fa-solid fa-arrow-right-from-bracket mr-2 text-xs" aria-hidden="true" />
               {t('perfil_sair')}

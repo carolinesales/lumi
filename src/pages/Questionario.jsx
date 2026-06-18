@@ -17,8 +17,9 @@ const STEPS = [
     subtitulo: 'Etapa 1 de 4',
     perguntas: [
       { id: 'tipoCurvatura',    label: 'Tipo de curvatura',           opcoes: ['Liso', 'Ondulado', 'Cacheado', 'Crespo'] },
-      { id: 'espessuraTextura', label: 'Espessura e textura do fio',  opcoes: ['Fino e liso', 'Fino e poroso', 'Médio', 'Grosso e liso', 'Grosso e poroso'] },
-      { id: 'densidadeCapilar', label: 'Densidade capilar',           opcoes: ['Baixa', 'Média', 'Alta'] },
+      { id: 'espessura',   label: 'Espessura do fio', descricao: 'A grossura de cada fio individual.', opcoes: ['Fino', 'Médio', 'Grosso'] },
+      { id: 'porosidade',  label: 'Porosidade', descricao: 'Quão rápido o fio absorve e perde água — fio poroso resseca com facilidade.', opcoes: ['Baixa', 'Média', 'Alta'] },
+      { id: 'densidadeCapilar', label: 'Volume do cabelo', descricao: 'A quantidade de fios na cabeça — não a grossura de cada um.', opcoes: ['Baixo', 'Médio', 'Alto'] },
       { id: 'comprimento',      label: 'Comprimento do cabelo',       opcoes: ['Curto', 'Médio', 'Longo', 'Muito longo'] },
     ],
   },
@@ -76,7 +77,8 @@ export default function Questionario() {
 
       await setDoc(doc(db, 'usuarios', uid, 'perfil_capilar', 'atual'), {
         tipoCurvatura:     respostas.tipoCurvatura,
-        espessuraFio:      respostas.espessuraTextura,
+        espessuraFio:      respostas.espessura,
+        porosidade:        respostas.porosidade,
         densidadeCapilar:  respostas.densidadeCapilar,
         comprimentoCabelo: respostas.comprimento,
         atualizadoEm:      serverTimestamp(),
@@ -110,7 +112,7 @@ export default function Questionario() {
       })
 
       sessionStorage.setItem('lumi_respostas', JSON.stringify({
-        estrutura: { tipoCurvatura: respostas.tipoCurvatura, espessuraTextura: respostas.espessuraTextura, densidadeCapilar: respostas.densidadeCapilar, comprimento: respostas.comprimento },
+        estrutura: { tipoCurvatura: respostas.tipoCurvatura, espessura: respostas.espessura, porosidade: respostas.porosidade, densidadeCapilar: respostas.densidadeCapilar, comprimento: respostas.comprimento },
         estado:    { ressecamento: respostas.ressecamento, frizz: respostas.frizz, quebra: respostas.quebra, brilho: respostas.brilho, elasticidade: respostas.elasticidade },
         couro:     { oleosidade: respostas.oleosidade, caspa: respostas.caspa, queda: respostas.queda },
         quimica:   { tipo: respostas.quimica },
@@ -131,7 +133,7 @@ export default function Questionario() {
 
       {/* Logo */}
       <div className="pb-2 pt-6 text-center">
-        <h1 className="font-serif text-[28px] italic font-normal text-lumi-black">Lumi</h1>
+        <h1 className="font-serif text-[28px] italic font-normal text-text">Lumi</h1>
       </div>
 
       <div className="flex flex-1 flex-col px-6 pb-10 pt-4">
@@ -141,21 +143,21 @@ export default function Questionario() {
           <button
             type="button"
             onClick={() => step > 0 ? setStep(s => s - 1) : navigate('/app/home')}
-            className="grid h-8 w-8 place-items-center rounded-full transition hover:bg-lumi-input"
+            className="grid h-8 w-8 place-items-center rounded-full transition hover:bg-surface-subtle"
             aria-label="Voltar"
           >
-            <i className="fa-solid fa-chevron-left text-sm text-lumi-black" aria-hidden="true" />
+            <i className="fa-solid fa-chevron-left text-sm text-text" aria-hidden="true" />
           </button>
           <div className="flex-1">
             <p className="font-nunito text-xs text-lumi-gray">{stepAtual.subtitulo}</p>
-            <h2 className="font-heading text-lg font-semibold text-lumi-black">{stepAtual.titulo}</h2>
+            <h2 className="font-heading text-lg font-semibold text-text">{stepAtual.titulo}</h2>
           </div>
         </div>
 
         {/* Barra de progresso */}
         <div className="mb-7 h-1 overflow-hidden rounded-full bg-lumi-border">
           <div
-            className="h-full rounded-full bg-lumi-black transition-all duration-400"
+            className="h-full rounded-full bg-ink transition-all duration-400"
             style={{ width: `${progresso}%` }}
           />
         </div>
@@ -164,9 +166,15 @@ export default function Questionario() {
         <div className="flex flex-col gap-6">
           {stepAtual.perguntas.map(pergunta => (
             <div key={pergunta.id}>
-              <label className="mb-2.5 block font-nunito text-sm font-semibold text-lumi-black">
+              <label className="block font-nunito text-sm font-semibold text-text">
                 {pergunta.label}
               </label>
+              {pergunta.descricao && (
+                <p className="mb-2.5 mt-0.5 font-nunito text-xs leading-4 text-text-secondary">
+                  {pergunta.descricao}
+                </p>
+              )}
+              {!pergunta.descricao && <div className="mb-2.5" />}
               <div className="flex flex-col gap-2">
                 {pergunta.opcoes.map(opcao => {
                   const sel = respostas[pergunta.id] === opcao
@@ -178,8 +186,8 @@ export default function Questionario() {
                       className={cn(
                         'flex w-full items-center justify-between rounded-xl px-4 py-3.5 text-left font-nunito text-sm transition-all',
                         sel
-                          ? 'bg-lumi-black font-semibold text-white'
-                          : 'bg-lumi-input font-normal text-lumi-black hover:bg-lumi-border',
+                          ? 'bg-ink font-semibold text-white'
+                          : 'bg-surface-subtle font-normal text-text hover:bg-paper-200',
                       )}
                     >
                       {opcao}

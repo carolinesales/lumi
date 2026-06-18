@@ -19,7 +19,7 @@ const pt = {
   nav_rotina: 'Rotina',
   nav_analises: 'Análises',
   nav_perfil: 'Perfil',
-  nav_jornada: 'Jornada',
+  nav_jornada: 'Diário',
   ti_vazio: 'Sua evolução aparecerá aqui conforme você registra cuidados e atualiza sua rotina.',
   ti_recuperacao: 'Seus fios estão em recuperação gradual. O Lumi acompanha a evolução com cuidado, sem acelerar o processo.',
   ti_evolucao: 'Seu cabelo mostra sinais consistentes de evolução nos últimos registros.',

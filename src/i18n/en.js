@@ -19,7 +19,7 @@ const en = {
   nav_rotina: 'Routine',
   nav_analises: 'Analysis',
   nav_perfil: 'Profile',
-  nav_jornada: 'Journey',
+  nav_jornada: 'Journal',
   ti_vazio: 'Your progress will show here as you log care and update your routine.',
   ti_recuperacao: 'Your hair is in gradual recovery. Lumi follows the progress carefully, without rushing it.',
   ti_evolucao: 'Your hair shows consistent signs of improvement in recent logs.',

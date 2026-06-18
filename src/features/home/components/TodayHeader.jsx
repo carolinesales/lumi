@@ -1,8 +1,9 @@
 // src/features/home/components/TodayHeader.jsx
 import { useMemo } from 'react'
+import { useIdioma } from '@/contexts/IdiomaContext'
 
-function formatHoje() {
-  return new Intl.DateTimeFormat('pt-BR', {
+function formatHoje(locale) {
+  return new Intl.DateTimeFormat(locale, {
     weekday: 'long',
     day: '2-digit',
     month: 'short',
@@ -17,6 +18,9 @@ export default function TodayHeader({
   foto,
   onProfile,
 }) {
+  const { t, idioma } = useIdioma()
+  const locale = idioma === 'en' ? 'en-US' : 'pt-BR'
+
   const primeiroNome = nome?.split(' ')?.[0] || 'Caroline'
   const iniciais = nome
     ?.split(' ')
@@ -26,19 +30,16 @@ export default function TodayHeader({
     ?.join('')
     ?.toUpperCase() || 'L'
 
-  // Recalcula a data uma vez por dia, no início do dia seguinte. Assim, se o usuário deixar a aba aberta, a data vai 
-  // atualizar automaticamente quando mudar para o próximo dia, sem precisar de um timer rodando constantemente.
-  // sem necessidade de timer
-  const dataFormatada = useMemo(() => formatHoje(), [])
+  const dataFormatada = useMemo(() => formatHoje(locale), [locale])
 
   return (
     <header className="mb-4 flex items-center justify-between gap-4 xl:mb-5">
       <div>
-        <p className="text-[12px] font-medium text-[#77736C]">
-          Olá, {primeiroNome}
+        <p className="text-[12px] font-medium text-text-secondary">
+          {t('home_ola')}, {primeiroNome}
         </p>
 
-        <h1 className="mt-1 font-['Montserrat'] text-[20px] font-medium leading-none tracking-[-0.055em] text-[#181714] xl:text-[26px]">
+        <h1 className="mt-1 font-['Montserrat'] text-[20px] font-medium leading-none tracking-[-0.055em] text-text xl:text-[26px]">
           {dataFormatada}
         </h1>
       </div>
@@ -46,8 +47,8 @@ export default function TodayHeader({
       <div className="flex items-center gap-2">
         <button
           type="button"
-          className="grid size-10 place-items-center rounded-full border border-[#EFECE6] bg-white/80 text-[#77736C] transition-all hover:-translate-y-0.5 hover:bg-white"
-          aria-label="Notificações"
+          className="grid size-10 place-items-center rounded-full border border-paper-200 bg-surface/80 text-text-secondary transition-all hover:-translate-y-0.5 hover:bg-surface"
+          aria-label={t('home_notificacoes')}
         >
           <i className="fa-regular fa-bell text-sm" />
         </button>
@@ -55,8 +56,8 @@ export default function TodayHeader({
         <button
           type="button"
           onClick={onProfile}
-          className="grid size-10 place-items-center overflow-hidden rounded-full bg-[#F0ECE5] text-[12px] font-black text-[#181714] transition-all hover:-translate-y-0.5"
-          aria-label="Abrir perfil"
+          className="grid size-10 place-items-center overflow-hidden rounded-full bg-surface-muted text-[12px] font-black text-text transition-all hover:-translate-y-0.5"
+          aria-label={t('home_abrir_perfil')}
         >
           {foto ? (
             <img

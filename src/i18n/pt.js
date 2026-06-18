@@ -528,13 +528,17 @@ const pt = {
 
   // resultado do diagnóstico
   res_titulo:             'Seu diagnóstico',
+  res_subtitulo: 'Seu Hair Score, os tratamentos prioritários e o cronograma inicial, com base nas suas respostas.',
+  res_pronto_titulo: 'Seu plano está pronto',
+  res_pronto_texto: 'A partir de agora, o Lumi acompanha a evolução dos seus fios. Registre seus cuidados na rotina e veja seu Hair Score evoluir com o tempo.',
+  res_painel: 'Ir para meu painel',
   res_de_100:             'de 100 pontos',
   res_diagnostico_titulo: 'Diagnóstico principal',
   res_necessidade:        'Necessidade de',
   res_e:                  'e',
   res_manutencao:         'Manutenção da saúde capilar',
   res_tratamentos:        'Tratamentos recomendados',
-  res_cronograma:         'Cronograma — semana 1',
+  res_cronograma:         'Cronograma · semana 1',
   res_lavagem:            'Lavagem recomendada:',
   res_cta:                'Ir para o meu painel',
 

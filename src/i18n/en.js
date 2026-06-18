@@ -528,13 +528,17 @@ const en = {
 
   // resultado
   res_titulo:             'Your diagnosis',
+  res_subtitulo: 'Your Hair Score, priority treatments and starting schedule, based on your answers.',
+  res_pronto_titulo: 'Your plan is ready',
+  res_pronto_texto: 'From now on, Lumi follows how your hair evolves. Log your care in the routine and watch your Hair Score improve over time.',
+  res_painel: 'Go to my dashboard',
   res_de_100:             'out of 100 points',
   res_diagnostico_titulo: 'Main diagnosis',
   res_necessidade:        'Need for',
   res_e:                  'and',
   res_manutencao:         'Hair health maintenance',
   res_tratamentos:        'Recommended treatments',
-  res_cronograma:         'Routine — week 1',
+  res_cronograma:         'Routine · week 1',
   res_lavagem:            'Recommended wash frequency:',
   res_cta:                'Go to my dashboard',
 
